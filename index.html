@@ -7,7 +7,8 @@
     <link rel="manifest" href="manifest.json">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
+
+        <style>
 
         /* 🎨 Variables de Tema */
       :root {
@@ -87,7 +88,8 @@
             align-items: center;
         }
 
-        header { width: 90%; max-width: 400px; display: flex; justify-content: center; align-items: center; margin-bottom: 20px; position: relative; height: 60px; }
+        /* 🛠️ AJUSTE: Ancho al 100% para alinear con el Historial en móvil */
+        header { width: 100%; max-width: 400px; display: flex; justify-content: center; align-items: center; margin-bottom: 20px; position: relative; height: 60px; }
         
         h1 { color: var(--h1-color); margin: 0; font-size: 2.5rem; text-align: center; }
         #btn-toggle-theme { cursor: pointer; user-select: none; }
@@ -115,28 +117,25 @@
         }
 
         .img-icono-perfil {
-    width: 80px !important;
-    height: 80px !important;
-    max-width: 80px !important;
-    max-height: 80px !important;
-    border-radius: 50% !important;
-    object-fit: cover !important;
-    display: block !important;
-    margin: 0 auto !important;
+            width: 80px !important;
+            height: 80px !important;
+            max-width: 80px !important;
+            max-height: 80px !important;
+            border-radius: 50% !important;
+            object-fit: cover !important;
+            display: block !important;
+            margin: 0 auto !important;
+            /* 🎨 MARCO CIRCULAR VISIBLE */
+            border: 1px solid #1976D2 !important;
+            background-color: #2A2A2E !important;
+            box-sizing: border-box !important;
+        }
 
-    /* 🎨 MARCO CIRCULAR VISIBLE */
-    border: 1px solid #1976D2 !important;
-    background-color: #2A2A2E !important;
-    box-sizing: border-box !important;
-}
-
-
-
+        /* 🛠️ AJUSTE: Ancho al 100% para alinear con el Historial en móvil */
+        .bloque-ajustado { width: 100%; max-width: 400px; box-sizing: border-box; }
         
-        .bloque-ajustado { width: 90%; max-width: 400px; box-sizing: border-box; }
-        
-        /* Simetría de respiración entre bloques inyectada */
-        .seccion-vertical { margin-bottom: 1.5rem; width: 100%; box-sizing: border-box; }
+        /* 🛠️ AJUSTE: Max-width 400px para que en iPad no se descontrole respecto a la tarjeta superior */
+        .seccion-vertical { margin-bottom: 1.5rem; width: 100%; max-width: 400px; box-sizing: border-box; }
 
         #tarjeta-glucosa, .card { background-color: var(--card-bg); padding: 1.5rem; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-align: center; margin-bottom: 1.5rem; border: 1px solid var(--border-color); }
         #valor-glucosa { font-size: 3.5rem; color: var(--accent-color); margin: 5px 0; font-weight: 700; }
@@ -182,9 +181,6 @@
         
         #contenedor-grafico { background: var(--card-bg); padding: 15px; border-radius: 20px; margin-bottom: 20px; width: 100%; height: 300px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: none; box-sizing: border-box; border: 1px solid var(--border-color); }
         #contenedor-grafico canvas { width: 100% !important; height: 100% !important; }
-
-
-
 
 /* Contenedor relativo en modo horizontal para anclar los controles flotantes */
 @media (orientation: landscape) {
@@ -445,8 +441,9 @@
 
         .grupo-reactivo { display: none; }
 
+        /* 🛠️ AJUSTE: Ancho al 100% para alinear con el Historial en móvil */
         .seccion-herramientas { 
-            width: 90%; 
+            width: 100%; 
             max-width: 400px; 
             box-sizing: border-box; 
             background-color: var(--card-bg); 
@@ -508,7 +505,7 @@
         .btn-perfil:active { transform: scale(0.95); }
         .btn-herramienta:active { background-color: var(--border-color); }
 
-                @media (max-width: 768px) {
+        @media (max-width: 768px) {
             /* Ajuste de escala para el avatar en móvil */
             .img-icono-perfil {
                 width: 68px !important;
@@ -517,17 +514,15 @@
                 max-height: 68px !important;
             }
             
-            /* ... (resto de tu código max-width: 768px) ... */
-
-    header { 
-        margin-top: 2px;     /* Separación arriba (menor) */
-        margin-bottom: 12px; /* Separación abajo (mayor) */
-        height: auto; 
-    }
-    h1 { 
-        font-size: 2.2rem; 
-        margin: 0;
-    }
+            header { 
+                margin-top: 2px;
+                margin-bottom: 12px;
+                height: auto; 
+            }
+            h1 { 
+                font-size: 2.2rem; 
+                margin: 0;
+            }
 
             .seccion-herramientas { padding: 0.6rem; margin-bottom: 1rem; }
             .btn-herramienta { padding: 0.5rem 0.2rem; }
@@ -540,11 +535,19 @@
             .contenedor-bloques-informe > div { padding: 10px !important; }
             #lista-etapas-reporte li { flex-direction: column; gap: 4px; padding: 10px 14px; margin-bottom: 10px; font-size: 0.85rem; text-align: center; }
 
-            .btn-rapido.glucosa { order: 3; flex: 0 0 100%; }
+            /* 🛠️ AJUSTE: Botones idénticos en altura (min-height) y padding estándar para Glucosa */
+            .contenedor-botones-rapidos .btn-rapido {
+                min-height: 60px !important;
+                padding: 10px !important;
+            }
+            
+            .btn-rapido.glucosa { 
+                order: 3; 
+                flex: 0 0 100% !important; 
+            }
             .btn-rapido.insulina { order: 1; }
             .btn-rapido.factor { order: 2; }
         }
-
 
         @media (orientation: landscape) and (max-device-width: 950px), (orientation: landscape) and (max-height: 550px) {
             body { padding: 0; height: 100vh; overflow: hidden; display: block; }
@@ -557,18 +560,13 @@
                 width: 100vw !important; 
                 height: 100vh !important; 
                 margin: 0 !important; 
-                
-                /* AJUSTE CLAVE: 65px de padding top para que la curva no choque con los botones flotantes */
                 padding: 65px 15px 15px 15px !important; 
-                
                 box-sizing: border-box; 
                 background: var(--bg-body); 
                 z-index: 99999; 
                 border-radius: 0; 
             }
         }
-
-
 
         @media print {
             body { background: white; color: black; padding: 0; }
@@ -776,8 +774,6 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
         }
 
-
-
         .panel-configuracion .switch input:checked + .slider { background-color: var(--accent-color); }
         .panel-configuracion .switch input:checked + .slider:before { transform: translateX(22px); }
 
@@ -801,8 +797,6 @@
             }
         }
 
-
-
 /* ==========================================================================
    📐 ALINEACIÓN EXACTA DE LA TARJETA (SIN TOCAR HTML NI JS)
    ========================================================================== */
@@ -810,7 +804,7 @@
 /* 1. Fila superior: Nivelación vertical entre el perro y los datos */
 #tarjeta-glucosa > div:first-child {
     display: flex !important;
-    align-items: center !important; /* Alinea las partes superiores en la misma horizontal */
+    align-items: center !important; 
     justify-content: space-between !important;
     margin-bottom: 15px !important;
     width: 100% !important;
@@ -818,7 +812,7 @@
 
 /* 2. Columna Izquierda (Mascota): Ancho alineado con el botón Glucosa */
 #tarjeta-glucosa > div:first-child > div:first-child {
-    flex: 0 0 30% !important; /* Mismo 30% que el botón inferior */
+    flex: 0 0 30% !important; 
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -828,10 +822,10 @@
 
 /* 3. Columna Derecha (Métricas): Centrado horizontal y vertical perfecto */
 #tarjeta-glucosa > div:first-child > div:last-child {
-    flex: 1 !important; /* Ocupa el 70% restante */
+    flex: 1 !important; 
     display: flex !important;
     flex-direction: column !important;
-    align-items: center !important;   /* Anula el 'flex-end' y CENTRA todo en el medio */
+    align-items: center !important;   
     justify-content: center !important;
     text-align: center !important;
 }
@@ -841,7 +835,7 @@
     text-align: center !important;
     margin: 0 0 5px 0 !important;
     width: 100% !important;
-    color: var(--text-secondary) !important; /* Parche de contraste inyectado */
+    color: var(--text-secondary) !important;
 }
 
 
@@ -849,7 +843,7 @@
 #tarjeta-glucosa > div:first-child > div:last-child > div {
     display: flex !important;
     align-items: center !important;
-    justify-content: center !important; /* Centra el bloque de la medición */
+    justify-content: center !important;
     gap: 8px !important;
     width: 100% !important;
 }
@@ -884,16 +878,15 @@
     }
     .contenedor-botones-rapidos .btn-rapido.insulina,
     .contenedor-botones-rapidos .btn-rapido.factor {
-        flex: 1 1 45% !important; /* Se reparten la primera línea (50/50) */
+        flex: 1 1 45% !important; 
         order: 1 !important;
     }
     .contenedor-botones-rapidos .btn-rapido.glucosa {
-        flex: 1 1 100% !important; /* Preside toda la segunda línea */
+        flex: 1 1 100% !important; 
         order: 2 !important;
-        padding: 15px 10px !important; /* Un poco más alto para facilitar el "tap" */
+        /* Padding eliminado aquí para mantener uniformidad, controlado ahora por .btn-rapido base en móvil */
     }
 }
-
 
 
 
