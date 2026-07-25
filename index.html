@@ -10,11 +10,12 @@
     <style>
 
         /* 🎨 Variables de Tema */
-        :root {
+      :root {
             --bg-body: #F0F4F0;
             --h1-color: #2D5A27;
             --card-bg: #FFFFFF;
             --text-main: #333;
+            --text-secondary: #444;
             --btn-bg: #4A7C44;
             --btn-hover: #386133;
             --accent-color: #4A7C44;
@@ -23,11 +24,13 @@
             --border-color: #E0E7E0;
         }
 
-        .theme-modern {
+         
+	    .theme-modern {
             --bg-body: #F0F5F9;
             --h1-color: #1A5F7A;
             --card-bg: #FFFFFF;
             --text-main: #333;
+            --text-secondary: #444;
             --btn-bg: #FF6F61;
             --btn-hover: #E55D50;
             --accent-color: #1A5F7A;
@@ -36,11 +39,12 @@
             --border-color: #cce5ef;
         }
 
-        .theme-dark {
+                .theme-dark {
             --bg-body: #121212;
             --h1-color: #64B5F6;
             --card-bg: #1E1E1E;
             --text-main: #E0E0E0;
+            --text-secondary: #A0A0A0;
             --btn-bg: #1976D2;
             --btn-hover: #1565C0;
             --accent-color: #64B5F6;
@@ -504,11 +508,17 @@
         .btn-perfil:active { transform: scale(0.95); }
         .btn-herramienta:active { background-color: var(--border-color); }
 
-        @media (max-width: 768px) {
-    #contenedor-fijo-superior { 
-        padding-top: 2px; 
-        padding-bottom: 0px; 
-    }
+                @media (max-width: 768px) {
+            /* Ajuste de escala para el avatar en móvil */
+            .img-icono-perfil {
+                width: 68px !important;
+                height: 68px !important;
+                max-width: 68px !important;
+                max-height: 68px !important;
+            }
+            
+            /* ... (resto de tu código max-width: 768px) ... */
+
     header { 
         margin-top: 2px;     /* Separación arriba (menor) */
         margin-bottom: 12px; /* Separación abajo (mayor) */
@@ -831,7 +841,9 @@
     text-align: center !important;
     margin: 0 0 5px 0 !important;
     width: 100% !important;
+    color: var(--text-secondary) !important; /* Parche de contraste inyectado */
 }
+
 
 /* Centrado del número "300" junto a mg/dl e insulina */
 #tarjeta-glucosa > div:first-child > div:last-child > div {
@@ -842,25 +854,46 @@
     width: 100% !important;
 }
 
-/* 4. Proporciones exactas para los Botones Rápidos */
-.contenedor-botones-rapidos {
-    display: flex !important;
-    gap: 8px !important;
-    width: 100% !important;
+/* 4. Proporciones exactas para los Botones Rápidos (Responsive Inteligente) */
+
+/* ---> EXCLUSIVO PARA IPAD Y ESCRITORIO (Mantiene la simetría con el avatar) <--- */
+@media (min-width: 769px) {
+    .contenedor-botones-rapidos {
+        display: flex !important;
+        gap: 8px !important;
+        width: 100% !important;
+    }
+    .contenedor-botones-rapidos .btn-rapido.glucosa {
+        flex: 0 0 30% !important;
+        box-sizing: border-box !important;
+    }
+    .contenedor-botones-rapidos .btn-rapido.insulina,
+    .contenedor-botones-rapidos .btn-rapido.factor {
+        flex: 1 !important;
+        box-sizing: border-box !important;
+    }
 }
 
-/* El botón Glucosa toma el 30% para enmarcarse con el perro arriba */
-.contenedor-botones-rapidos .btn-rapido.glucosa {
-    flex: 0 0 30% !important;
-    box-sizing: border-box !important;
+/* ---> EXCLUSIVO PARA MÓVIL (Estructura 2 + 1) <--- */
+@media (max-width: 768px) {
+    .contenedor-botones-rapidos {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        width: 100% !important;
+    }
+    .contenedor-botones-rapidos .btn-rapido.insulina,
+    .contenedor-botones-rapidos .btn-rapido.factor {
+        flex: 1 1 45% !important; /* Se reparten la primera línea (50/50) */
+        order: 1 !important;
+    }
+    .contenedor-botones-rapidos .btn-rapido.glucosa {
+        flex: 1 1 100% !important; /* Preside toda la segunda línea */
+        order: 2 !important;
+        padding: 15px 10px !important; /* Un poco más alto para facilitar el "tap" */
+    }
 }
 
-/* Insulina y Factores se reparten equitativamente el 70% restante */
-.contenedor-botones-rapidos .btn-rapido.insulina,
-.contenedor-botones-rapidos .btn-rapido.factor {
-    flex: 1 !important;
-    box-sizing: border-box !important;
-}
 
 
 
