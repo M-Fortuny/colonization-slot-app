@@ -505,18 +505,21 @@
         .btn-perfil:active { transform: scale(0.95); }
         .btn-herramienta:active { background-color: var(--border-color); }
 
-         /* Solo móvil: quitar el naranja y dejar el icono como en iPad */
-        @media (max-width: 767px) {
+         @media (max-width: 767px) {
+            input, select, .icono-colapso {
+                -webkit-appearance: none !important;
+                appearance: none !important;
+                accent-color: #1976D2 !important;
+            }
+
+            input:focus, select:focus {
+                box-shadow: none !important;
+                outline: none !important;
+            }
+
             .icono-colapso {
                 background-color: #1976D2 !important;
                 box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-            }
-
-            .header-colapsable,
-            .icono-colapso,
-            .sub-acordeon,
-            .acordeon-container {
-                -webkit-tap-highlight-color: transparent !important;
             }
         }
 
