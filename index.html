@@ -505,8 +505,22 @@
         .btn-perfil:active { transform: scale(0.95); }
         .btn-herramienta:active { background-color: var(--border-color); }
 
+         /* Solo móvil: quitar el naranja y dejar el icono como en iPad */
+        @media (max-width: 767px) {
+            .icono-colapso {
+                background-color: #1976D2 !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+            }
+
+            .header-colapsable,
+            .icono-colapso,
+            .sub-acordeon,
+            .acordeon-container {
+                -webkit-tap-highlight-color: transparent !important;
+            }
+        }
+
         @media (max-width: 768px) {
-            /* Ajuste de escala para el avatar en móvil */
             .img-icono-perfil {
                 width: 68px !important;
                 height: 68px !important;
@@ -515,7 +529,7 @@
             }
             
             header { 
-                margin-top: 2px;
+                margin-top: 0px;
                 margin-bottom: 12px;
                 height: auto; 
             }
@@ -523,6 +537,7 @@
                 font-size: 2.2rem; 
                 margin: 0;
             }
+        }
 
             .seccion-herramientas { padding: 0.6rem; margin-bottom: 1rem; }
             .btn-herramienta { padding: 0.5rem 0.2rem; }
@@ -1356,6 +1371,11 @@
                 <input type="number" id="p-min" placeholder="Mín" step="any" inputmode="decimal">
                 <input type="number" id="p-max" placeholder="Máx" step="any" inputmode="decimal">
             </div>
+
+
+<div id="texto-ultima-comprobacion" style="font-size: 0.8rem; color: var(--text-secondary, #888); text-align: center; margin-top: 10px; margin-bottom: 10px; opacity: 0.8;">
+    </div>
+
             
             <button type="submit" class="btn-form">Guardar Pautas</button>
             <button type="button" class="btn-form" style="background-color: #999; margin-top: 8px;" onclick="cerrarSubModal('modal-pautas')">Cancelar</button>
@@ -2266,17 +2286,44 @@ window.toggleSeccion = function(containerId, iconId) {
             actualizarInterfaz();
         };
 
-        document.getElementById('form-pautas').onsubmit = (e) => {
+
+
+                        document.getElementById('form-pautas').onsubmit = (e) => {
             e.preventDefault();
             const data = JSON.parse(localStorage.getItem(KEY_PERFIL) || '{}');
             data.insulina = document.getElementById('p-insulina').value;
             data.dosis = document.getElementById('p-dosis').value;
             data.min = document.getElementById('p-min').value;
             data.max = document.getElementById('p-max').value;
+
+            // --- ⚙️ NUEVO MOTOR HÍBRIDO: MARCA TEMPORAL ---
+            const fechaHoy = new Date();
+            const dia = String(fechaHoy.getDate()).padStart(2, '0');
+            const mes = String(fechaHoy.getMonth() + 1).padStart(2, '0');
+            const anio = fechaHoy.getFullYear();
+            
+            // 1. Formato visual amigable para el tutor (DD/MM/AAAA)
+            const fechaVisual = `${dia}/${mes}/${anio}`;
+            
+            // 2. Formato estricto para el almacenamiento interno (AAAA-MM-DD)
+            const fechaBaseDatos = `${anio}-${mes}-${dia}`;
+
+            // Actualizamos la UI (El usuario ve DD/MM/AAAA)
+            const textoComprobacion = document.getElementById('texto-ultima-comprobacion');
+            if(textoComprobacion) {
+                textoComprobacion.textContent = `Última Comprobación: ${fechaVisual}`;
+            }
+
+            // Añadimos el dato al objeto JSON principal protegiendo el motor (Guarda AAAA-MM-DD)
+            data.ultimaComprobacionPautas = fechaBaseDatos;
+            // --------------------------------------------------------
+
             localStorage.setItem(KEY_PERFIL, JSON.stringify(data));
             cerrarSubModal('modal-pautas');
             actualizarInterfaz();
         };
+
+
 
         window.guardarYcerrarSalud = function() {
             const data = JSON.parse(localStorage.getItem(KEY_PERFIL) || '{}');
@@ -2799,7 +2846,14 @@ window.toggleSeccion = function(containerId, iconId) {
 }
 
 
-        function calcularDiagnosticoIA(regs, perfil) {
+        function calcularDiagnosticoIA(regs, perfil, filtroActual = 'Todo') {
+            
+            // Traductor de filtros para los textos
+            let textoPeriodo = "histórico";
+            if (filtroActual === 'D') textoPeriodo = "diario";
+            else if (filtroActual === 'S') textoPeriodo = "semanal";
+            else if (filtroActual === 'M') textoPeriodo = "mensual";
+
             const regsGlucosa = regs.filter(r => r.valor && (!r.tipo || r.tipo === 'glucosa')).map(r => ({...r, v: parseFloat(r.valor), dt: new Date(`${r.fecha}T${r.hora}`)}));
             const regsInsulina = regs.filter(r => r.tipo === 'insulina').map(r => ({...r, dt: new Date(`${r.fecha}T${r.hora}`)}));
             const regsFactores = regs.filter(r => r.tipo === 'factor').map(r => ({...r, dt: new Date(`${r.fecha}T${r.hora}`)}));
@@ -2809,7 +2863,7 @@ window.toggleSeccion = function(containerId, iconId) {
 
             if (regsGlucosa.length > 0) {
                 let minGlucosa = Math.min(...regsGlucosa.map(r => r.v));
-                document.getElementById('diag-glucosa-nadir').innerText = `${minGlucosa} mg/dL (Mínimo histórico detectado)`;
+                                document.getElementById('diag-glucosa-nadir').innerText = `${minGlucosa} mg/dL (Mínimo ${textoPeriodo} detectado)`;
 
                 let amEnRango = 0, amTotal = 0, pmEnRango = 0, pmTotal = 0;
                 regsGlucosa.forEach(r => {
@@ -3070,9 +3124,9 @@ window.toggleSeccion = function(containerId, iconId) {
                 lista.innerHTML = '<li style="justify-content: center; color: #888; font-size: 0.9rem;">No hay registros para este filtro</li>';
             }
             
-            calcularYMostrarInformes(regsFiltrados, perfil);
-            calcularDiagnosticoIA(todosLosRegs, perfil);
-            actualizarPendientes();
+         calcularYMostrarInformes(regsFiltrados, perfil);
+         calcularDiagnosticoIA(regsFiltrados, perfil, filtroTiempoActual);
+			actualizarPendientes();
         }
 
 function renderizarGrafica(datos) {
