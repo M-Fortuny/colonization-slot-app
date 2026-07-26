@@ -465,6 +465,10 @@
         .sub-acordeon { background: var(--card-bg); transition: background-color 0.3s ease, border-color 0.3s ease; box-sizing: border-box; width: 100%; }
         .guia-tutor { font-weight: 500; line-height: 1.4; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .theme-dark .guia-tutor { background: #332b0a !important; border-left-color: #FBC02D !important; color: #ffda6a !important; }
+
+
+.info-clinica-container { font-weight: 500; line-height: 1.4; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .theme-dark .info-clinica-container { background: #332b0a !important; border-left-color: #FBC02D !important; color: #ffda6a !important; }
         
         .theme-dark .sub-acordeon {
             border-color: #444 !important;
@@ -1026,9 +1030,19 @@
                     </div>
                     <div id="acordeon-glucosa" class="acordeon-container colapsado">
                         <div class="acordeon-content" style="padding: 15px; background: var(--card-bg);">
-                            <div class="guia-tutor" style="background: #FFF9C4; border-left: 4px solid #FBC02D; padding: 10px; border-radius: 4px; font-size: 0.85rem; color: #5c5c5c; margin-bottom: 15px;">
-                                <strong>💡 Tip del Asistente:</strong> Aquí analizamos las horas donde la glucosa es más estable y calculamos el "Nadir" (punto más bajo tras la insulina) para que sepas cuándo dar un snack preventivo.
-                            </div>
+
+
+<div class="info-clinica-container" style="margin-top: 10px; margin-bottom: 15px;">
+  <details style="cursor: pointer;">
+    <summary style="color: var(--text-secondary); text-decoration: none; font-size: 0.9em; list-style: none;">
+      💡 Módulo Glucosa (Nadir y Tiempo en Rango):
+    </summary>
+    <p class="info-clinica-container" style= "background: #FFF9C4; border-left: 4px solid #FBC02D; padding: 10px; border-radius: 4px; font-size: 0.85rem; color: #5c5c5c; margin-bottom: 15px;">
+      "El Nadir es el momento exacto en el que la insulina alcanza su máxima potencia y el azúcar del perro está en su punto más bajo. Idealmente, este valor no debe caer por debajo de 80 mg/dL para evitar mareos o hipoglucemias. El Tiempo en Rango nos dice qué porcentaje del día tu perro está protegido en niveles seguros. Cuanto más alto sea este porcentaje, más sanos estarán sus órganos a largo plazo."
+    </p>
+  </details>
+</div>
+                        
                             <div class="dato-card" style="margin-bottom: 10px;">
                                 <span style="font-size: 0.8rem; color: #666;">Mejores horas (Estabilidad):</span>
                                 <div id="diag-glucosa-horas" style="font-weight: bold; color: #2e7d32;">Recopilando patrón...</div>
@@ -1048,9 +1062,21 @@
                     </div>
                     <div id="acordeon-insulina" class="acordeon-container colapsado">
                         <div class="acordeon-content" style="padding: 15px; background: var(--card-bg);">
-                            <div class="guia-tutor" style="background: #FFF9C4; border-left: 4px solid #FBC02D; padding: 10px; border-radius: 4px; font-size: 0.85rem; color: #5c5c5c; margin-bottom: 15px;">
-                                <strong>💡 Tip del Asistente:</strong> Medimos la sensibilidad de tu perro a la insulina. Compara el rendimiento de la dosis de la mañana con la de la noche.
-                            </div>
+
+
+
+                            <div class="info-clinica-container" style="margin-top: 10px; margin-bottom: 15px;">
+  <details style="cursor: pointer;">
+    <summary style="color: var(--text-secondary); text-decoration: none; font-size: 0.9em; list-style: none;">
+      💡 Módulo Insulina (Fase de Adaptación):
+    </summary>
+    <p class="info-clinica-container" style= "background: #FFF9C4; border-left: 4px solid #FBC02D; padding: 10px; border-radius: 4px; font-size: 0.85rem; color: #5c5c5c; margin-bottom: 15px;">
+      "El metabolismo de los perros es distinto al humano. Cuando cambias la dosis de insulina, su cuerpo necesita entre 7 y 14 días para asimilarla y mostrar el resultado real. Subir la dosis prematuramente porque ves un 'pico' aislado es uno de los errores más comunes y peligrosos. Ten paciencia y permite que su cuerpo se adapte antes de juzgar la nueva pauta."
+    </p>
+  </details>
+</div>
+
+
                             <div class="dato-card" style="margin-bottom: 10px;">
                                 <span style="font-size: 0.8rem; color: #666;">Sensibilidad (Caída por Unidad):</span>
                                 <div id="diag-insulina-sensibilidad" style="font-weight: bold; color: #1565c0;">Requiere más datos cruzados...</div>
@@ -1070,9 +1096,20 @@
                     </div>
                     <div id="acordeon-alimentacion" class="acordeon-container colapsado">
                         <div class="acordeon-content" style="padding: 15px; background: var(--card-bg);">
-                            <div class="guia-tutor" style="background: #FFF9C4; border-left: 4px solid #FBC02D; padding: 10px; border-radius: 4px; font-size: 0.85rem; color: #5c5c5c; margin-bottom: 15px;">
-                                <strong>💡 Tip del Asistente:</strong> Conoce qué tipo de dieta le provoca picos de glucosa más rápidos y descubre si es mejor inyectar la insulina antes o durante la comida.
-                            </div>
+
+
+                            <div class="info-clinica-container" style="margin-top: 10px; margin-bottom: 15px;">
+  <details style="cursor: pointer;">
+    <summary style="color: var(--text-secondary); text-decoration: none; font-size: 0.9em; list-style: none;">
+      💡 Módulo Alimentación (Sincronización):
+    </summary>
+    <p class="info-clinica-container" style= "background: #FFF9C4; border-left: 4px solid #FBC02D; padding: 10px; border-radius: 4px; font-size: 0.85rem; color: #5c5c5c; margin-bottom: 15px;">
+      "Para que la glucosa se mantenga estable, el proceso de digestión de la comida y la absorción de la insulina inyectada deben ocurrir al mismo tiempo. Si inyectas la insulina mucho antes o mucho después de que el perro coma, crearás un desfase. La insulina actuará cuando no hay comida (causando bajones) o la comida subirá el azúcar sin que la insulina esté lista para frenarla."
+    </p>
+  </details>
+</div>
+
+
                             <div class="dato-card" style="margin-bottom: 10px;">
                                 <span style="font-size: 0.8rem; color: #666;">Pico Postprandial:</span>
                                 <div id="diag-alimentacion-pico" style="font-weight: bold; color: #e65100;">Requiere más datos cruzados...</div>
@@ -1088,9 +1125,20 @@
                     </div>
                     <div id="acordeon-factores" class="acordeon-container colapsado">
                         <div class="acordeon-content" style="padding: 15px; background: var(--card-bg);">
-                            <div class="guia-tutor" style="background: #FFF9C4; border-left: 4px solid #FBC02D; padding: 10px; border-radius: 4px; font-size: 0.85rem; color: #5c5c5c; margin-bottom: 15px;">
-                                <strong>💡 Tip del Asistente:</strong> Observa cuánto disminuye la glucosa tras un paseo intenso vs uno normal, o cómo las siestas largas estabilizan la curva.
-                            </div>
+
+
+                            <div class="info-clinica-container" style="margin-top: 10px; margin-bottom: 15px;">
+  <details style="cursor: pointer;">
+    <summary style="color: var(--text-secondary); text-decoration: none; font-size: 0.9em; list-style: none;">
+      💡 Módulo Actividad (El Ejercicio):
+    </summary>
+    <p class="info-clinica-container" style= "background: #FFF9C4; border-left: 4px solid #FBC02D; padding: 10px; border-radius: 4px; font-size: 0.85rem; color: #5c5c5c; margin-bottom: 15px;">
+      "El ejercicio físico hace que los músculos consuman glucosa rápidamente y vuelve al cuerpo mucho más sensible a la insulina. Si le das un paseo intenso a tu perro justo en las horas donde la insulina tiene su máxima fuerza (su Nadir), el riesgo de que el azúcar caiga en picado es muy alto. Es mejor programar los paseos largos lejos de las horas pico de la medicación."
+    </p>
+  </details>
+</div>
+
+
                             <div class="dato-card" style="margin-bottom: 10px;">
                                 <span style="font-size: 0.8rem; color: #666;">Impacto del Paseo:</span>
                                 <div id="diag-factores-paseo" style="font-weight: bold; color: #e65100;">Requiere más datos cruzados...</div>
@@ -1106,9 +1154,18 @@
                     </div>
                     <div id="acordeon-medicacion" class="acordeon-container colapsado">
                         <div class="acordeon-content" style="padding: 15px; background: var(--card-bg);">
-                            <div class="guia-tutor" style="background: #FFF9C4; border-left: 4px solid #FBC02D; padding: 10px; border-radius: 4px; font-size: 0.85rem; color: #5c5c5c; margin-bottom: 15px;">
-                                <strong>💡 Tip del Asistente:</strong> Descubre si algún medicamento concurrente está aumentando la media de glucosa (impacto diabetogénico) o afectando sus deposiciones.
-                            </div>
+
+                            <div class="info-clinica-container" style="margin-top: 10px; margin-bottom: 15px;">
+  <details style="cursor: pointer;">
+    <summary style="color: var(--text-secondary); text-decoration: none; font-size: 0.9em; list-style: none;">
+      💡 Módulo Salud Concurrente (Resistencia):
+    </summary>
+    <p class="info-clinica-container" style= "background: #FFF9C4; border-left: 4px solid #FBC02D; padding: 10px; border-radius: 4px; font-size: 0.85rem; color: #5c5c5c; margin-bottom: 15px;">
+      "A veces, por mucha insulina que inyectes, la glucosa no baja. Esto se llama Resistencia a la Insulina. Suele estar provocada por infecciones (como orina o boca), inflamaciones, enfermedades hormonales comunes en perros (como el Síndrome de Cushing o Hipotiroidismo), o medicamentos como los corticoides. Si el diagnóstico detecta esto, tu veterinario debe buscar al 'enemigo silencioso' antes de seguir subiendo la dosis."
+    </p>
+  </details>
+</div>
+
                             <div class="dato-card" style="margin-bottom: 10px;">
                                 <span style="font-size: 0.8rem; color: #666;">Impacto Diabetogénico:</span>
                                 <div id="diag-medicacion-impacto" style="font-weight: bold; color: #8e24aa;">Requiere más datos cruzados...</div>
@@ -1163,7 +1220,7 @@
     </div>
     <input type="file" id="input-archivo-importar" accept=".json" class="hidden">
 
-    <footer style="text-align: center; margin-top: 20px; margin-bottom: 20px; color: var(--text-main); opacity: 0.5; font-size: 0.75rem; font-weight: 400; letter-spacing: 0.5px;">
+    <footer style="text-align: center; margin-top: 10px; margin-bottom: 10px; color: var(--text-main); opacity: 0.5; font-size: 0.75rem; font-weight: 400; letter-spacing: 0.5px;">
         Desarrollado por Manuel Fortuny Ruiz
     </footer>
 
@@ -2831,6 +2888,7 @@ window.toggleSeccion = function(containerId, iconId) {
 }
 
 
+
         function calcularDiagnosticoIA(regs, perfil, filtroActual = 'Todo') {
             
             // Traductor de filtros para los textos
@@ -2847,9 +2905,23 @@ window.toggleSeccion = function(containerId, iconId) {
             const max = parseFloat(perfil.max) || 180;
 
             if (regsGlucosa.length > 0) {
+                                // 1. Cálculo Base
                 let minGlucosa = Math.min(...regsGlucosa.map(r => r.v));
-                                document.getElementById('diag-glucosa-nadir').innerText = `${minGlucosa} mg/dL (Mínimo ${textoPeriodo} detectado)`;
+                let textoNadir = `${minGlucosa} mg/dL (Mínimo ${textoPeriodo} detectado)`;
 
+                // 💡 INYECCIÓN IA 1: Prevención y Ley del Nadir
+                if (minGlucosa < min) {
+                    textoNadir += `<br><span style="color: #FF5252 !important; font-size: 0.9em; font-weight: 600;">⚠️ Riesgo de Hipoglucemia: Nadir por debajo de ${min} mg/dL.</span>`;
+                } else if (minGlucosa <= max) {
+                    textoNadir += `<br><span style="color: #4CAF50 !important; font-size: 0.9em;">✅ Nadir en rango seguro.</span>`;
+                } else {
+                    textoNadir += `<br><span style="color: #FFA726 !important; font-size: 0.9em;">⚠️ Nadir elevado. Posible resistencia a la insulina.</span>`;
+                }
+                
+                // Usamos innerHTML para permitir los saltos de línea y el color
+                document.getElementById('diag-glucosa-nadir').innerHTML = textoNadir;
+
+                // 2. Cálculo de Ciclos
                 let amEnRango = 0, amTotal = 0, pmEnRango = 0, pmTotal = 0;
                 regsGlucosa.forEach(r => {
                     let h = r.dt.getHours();
@@ -2858,11 +2930,26 @@ window.toggleSeccion = function(containerId, iconId) {
                 });
                 let amTIR = amTotal ? (amEnRango/amTotal)*100 : 0;
                 let pmTIR = pmTotal ? (pmEnRango/pmTotal)*100 : 0;
+                
+                let totalMediciones = amTotal + pmTotal;
+                let totalEnRango = amEnRango + pmEnRango;
+                let tirGlobal = totalMediciones ? (totalEnRango / totalMediciones) * 100 : 0;
+
                 let textoHoras = "Faltan datos";
-                if (amTotal > 0 || pmTotal > 0) {
-                    textoHoras = amTIR >= pmTIR ? `Ciclo Diurno (${amTIR.toFixed(0)}% TIR)` : `Ciclo Nocturno (${pmTIR.toFixed(0)}% TIR)`;
+                if (totalMediciones > 0) {
+                    let cicloFuerte = amTIR >= pmTIR ? `Ciclo Diurno (${amTIR.toFixed(0)}% TIR)` : `Ciclo Nocturno (${pmTIR.toFixed(0)}% TIR)`;
+                    textoHoras = `Mejor control: ${cicloFuerte}`;
+
+                    // 💡 INYECCIÓN IA 2: Métrica de Éxito (TIR > 70%)
+                    if (tirGlobal >= 70) {
+                        textoHoras += `<br><span style="color: #28A745; font-size: 0.9em; font-weight: 600;">🌟 ¡Excelente! TIR global del ${tirGlobal.toFixed(0)}%. Pauta médica altamente efectiva.</span>`;
+                    } else {
+                        textoHoras += `<br><span style="color: #FF9800; font-size: 0.9em;">⚠️ TIR del ${tirGlobal.toFixed(0)}%. El perro pasa demasiado tiempo fuera de rango. Requiere revisión veterinaria.</span>`;
+                    }
                 }
-                document.getElementById('diag-glucosa-horas').innerText = textoHoras;
+                
+                document.getElementById('diag-glucosa-horas').innerHTML = textoHoras;
+
             } else {
                 document.getElementById('diag-glucosa-nadir').innerText = "Requiere más datos de glucosa...";
                 document.getElementById('diag-glucosa-horas').innerText = "Requiere más datos de glucosa...";
@@ -2881,41 +2968,139 @@ window.toggleSeccion = function(containerId, iconId) {
                     else { pmCount++; pmDosis+=parseFloat(r.dosis); }
                 });
                 
+                                // 1. Cálculo Base de Rendimiento
+                let textoRendimiento = "Falta cruce de ciclos AM/PM";
                 if(amCount > 0 && pmCount > 0) {
                     let ratioAM = amDosis/amCount; let ratioPM = pmDosis/pmCount;
-                    document.getElementById('diag-insulina-rendimiento').innerText = ratioAM > ratioPM ? "Dosis PM parece más eficiente" : (ratioPM > ratioAM ? "Dosis AM parece más eficiente" : "Rendimiento simétrico AM/PM");
-                } else {
-                    document.getElementById('diag-insulina-rendimiento').innerText = "Falta cruce de ciclos AM/PM";
+                    textoRendimiento = ratioAM > ratioPM ? "Dosis PM parece más eficiente" : (ratioPM > ratioAM ? "Dosis AM parece más eficiente" : "Rendimiento simétrico AM/PM");
                 }
+
+                // 💡 INYECCIÓN IA 3: Modo Cuarentena (Regla de los 7 Días)
+                let textoCuarentena = "";
+                let insulinaOrdenada = [...regsInsulina].sort((a, b) => b.dt - a.dt);
+                
+                if (insulinaOrdenada.length > 1) {
+                    let dosisActual = parseFloat(insulinaOrdenada[0].dosis);
+                    let fechaCambio = null;
+                    
+                    // Escanear hacia atrás buscando una dosis diferente
+                    for (let i = 1; i < insulinaOrdenada.length; i++) {
+                        if (parseFloat(insulinaOrdenada[i].dosis) !== dosisActual) {
+                            fechaCambio = insulinaOrdenada[i - 1].dt;
+                            break;
+                        }
+                    }
+                    
+                    if (fechaCambio) {
+                        let diasDesdeCambio = (new Date() - fechaCambio) / (1000 * 60 * 60 * 24);
+                        if (diasDesdeCambio <= 7) {
+                            let diasRestantes = Math.ceil(7 - diasDesdeCambio);
+                            textoCuarentena = `<br><br><span style="color: #5CA4FF !important; font-size: 0.9em; font-weight: 600;">🛡️ Fase de Adaptación (Dosis ${dosisActual}U):</span><br><span style="font-size: 0.85em;">El cuerpo se está adaptando. No modifiques la pauta médica hasta terminar este ciclo (faltan ${diasRestantes} días).</span>`;
+                        }
+                    }
+                }
+
+                // Usamos innerHTML para permitir los saltos de línea y el formato enriquecido
+                document.getElementById('diag-insulina-rendimiento').innerHTML = textoRendimiento + textoCuarentena;
+
             } else {
                 document.getElementById('diag-insulina-sensibilidad').innerText = "Requiere datos cruzados...";
                 document.getElementById('diag-insulina-rendimiento').innerText = "Requiere datos cruzados...";
             }
 
             let comidas = regsFactores.filter(f => f.factores && f.factores.includes('Comida'));
-            if(comidas.length > 0 && regsGlucosa.length > 0) {
+                        if (comidas.length > 0) {
                 let picos = [];
+                let gaps = []; // Array para almacenar las diferencias de tiempo
+
                 comidas.forEach(c => {
-                    let limite = new Date(c.dt.getTime() + 3*60*60*1000);
-                    let glucosasPost = regsGlucosa.filter(g => g.dt > c.dt && g.dt <= limite);
-                    if(glucosasPost.length > 0) picos.push(Math.max(...glucosasPost.map(g => g.v)));
+                    // 1. Lógica Original: Picos Postprandiales
+                    if (regsGlucosa.length > 0) {
+                        let limite = new Date(c.dt.getTime() + 3 * 60 * 60 * 1000);
+                        let glucosasPost = regsGlucosa.filter(g => g.dt > c.dt && g.dt <= limite);
+                        if (glucosasPost.length > 0) picos.push(Math.max(...glucosasPost.map(g => g.v)));
+                    }
+
+                    // 2. Lógica IA: Cronómetro del "Gap" (Comida vs Insulina)
+                    if (regsInsulina.length > 0) {
+                        // Buscamos insulinas inyectadas en un margen de 4h alrededor de la comida
+                        let insulinasCercanas = regsInsulina.filter(i => Math.abs(i.dt - c.dt) < 4 * 60 * 60 * 1000);
+                        if (insulinasCercanas.length > 0) {
+                            // Ordenamos para coger la más cercana a la hora de comer
+                            insulinasCercanas.sort((a, b) => Math.abs(a.dt - c.dt) - Math.abs(b.dt - c.dt));
+                            // Calculamos la diferencia en minutos exactos
+                            let gapMinutos = Math.abs(insulinasCercanas[0].dt - c.dt) / (1000 * 60);
+                            gaps.push(gapMinutos);
+                        }
+                    }
                 });
-                if(picos.length > 0) {
-                    let mediaPico = (picos.reduce((a,b)=>a+b,0) / picos.length).toFixed(0);
-                    document.getElementById('diag-alimentacion-pico').innerText = `Pico postprandial medio: ${mediaPico} mg/dL`;
+
+                let textoAlimentacion = "";
+
+                // Render de Picos
+                if (picos.length > 0) {
+                    let mediaPico = (picos.reduce((a, b) => a + b, 0) / picos.length).toFixed(0);
+                    textoAlimentacion = `Pico postprandial medio: ${mediaPico} mg/dL`;
                 } else {
-                    document.getElementById('diag-alimentacion-pico').innerText = "Faltan mediciones tras las comidas";
+                    textoAlimentacion = "Faltan mediciones de glucosa tras las comidas.";
                 }
+
+                // Render Diagnóstico IA: Alerta de Gap
+                if (gaps.length > 0) {
+                    let mediaGap = gaps.reduce((a, b) => a + b, 0) / gaps.length;
+                    
+                    if (mediaGap >= 45) {
+                        textoAlimentacion += `<br><br><span style="color: #FFA726 !important; font-size: 0.9em; font-weight: 600;">⚠️ Desfase Horario Crítico (${mediaGap.toFixed(0)} min media):</span><br><span style="font-size: 0.85em;">Los picos de glucosa observados se deben a este desfase. Sincroniza la comida y el pinchazo en un margen de 15 minutos para que la insulina frene los carbohidratos a tiempo.</span>`;
+                    } else if (mediaGap <= 15) {
+                        textoAlimentacion += `<br><br><span style="color: #4CAF50 !important; font-size: 0.9em; font-weight: 600;">✅ Sincronización perfecta:</span><br><span style="font-size: 0.85em;">El desfase medio es de solo ${mediaGap.toFixed(0)} minutos. ¡Gran trabajo!</span>`;
+                    } else {
+                        textoAlimentacion += `<br><br><span style="color: #5CA4FF !important; font-size: 0.9em; font-weight: 600;">ℹ️ Desfase moderado:</span><br><span style="font-size: 0.85em;">Diferencia media de ${mediaGap.toFixed(0)} minutos entre toma y pinchazo.</span>`;
+                    }
+                }
+
+                document.getElementById('diag-alimentacion-pico').innerHTML = textoAlimentacion;
+
             } else {
-                document.getElementById('diag-alimentacion-pico').innerText = "Requiere registros de comida cruzados...";
+                document.getElementById('diag-alimentacion-pico').innerText = "Requiere registrar eventos de Comida y cruzarlos con Insulina...";
             }
 
+
             let paseos = regsFactores.filter(f => f.factores && f.factores.includes('Paseo'));
-            if (paseos.length > 0 && regsGlucosa.length > 0) {
-                document.getElementById('diag-factores-paseo').innerText = `Se estabiliza mejor tras ${paseos.length} paseos registrados`;
+                        if (paseos.length > 0) {
+                let textoPaseo = `Evaluando ${paseos.length} paseos registrados en este periodo...`;
+                let alertaColapso = false;
+
+                // Cruzamos las horas de los paseos con las insulinas inyectadas
+                if (regsInsulina.length > 0) {
+                    for (let paseo of paseos) {
+                        // Buscar la insulina inmediatamente anterior al paseo
+                        let insulinasPrevias = regsInsulina.filter(i => i.dt < paseo.dt).sort((a, b) => b.dt - a.dt);
+                        
+                        if (insulinasPrevias.length > 0) {
+                            // Calcular desfase en horas
+                            let horasDesfase = (paseo.dt - insulinasPrevias[0].dt) / (1000 * 60 * 60);
+                            
+                            // Ventana Crítica del Nadir: Entre 4 y 6 horas tras el pinchazo
+                            if (horasDesfase >= 4 && horasDesfase <= 6) {
+                                alertaColapso = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (alertaColapso) {
+                    textoPaseo = `<span style="color: #FF5252 !important; font-size: 0.9em; font-weight: 600;">⚠️ Riesgo de Colapso por Horas:</span><br><span style="font-size: 0.85em;">Has registrado actividad intensa cerca de la hora de máxima acción de la insulina (4-6h tras el pinchazo). Considera dar un pequeño snack seguro antes de salir para prevenir una bajada brusca de azúcar.</span>`;
+                } else if (regsInsulina.length > 0) {
+                    textoPaseo = `<span style="color: #4CAF50 !important; font-size: 0.9em; font-weight: 600;">✅ Rutina Segura:</span><br><span style="font-size: 0.85em;">Los paseos registrados no coinciden con el pico de máxima acción de la insulina. ¡Excelente sincronización!</span>`;
+                }
+
+                document.getElementById('diag-factores-paseo').innerHTML = textoPaseo;
+
             } else {
-                document.getElementById('diag-factores-paseo').innerText = "Requiere medir glucosa tras paseos...";
+                document.getElementById('diag-factores-paseo').innerText = "Requiere registrar eventos de Paseo para cruzar horarios...";
             }
+
 
             let meds = regsFactores.filter(f => f.factores && f.factores.includes('Medicación'));
             if (meds.length > 0) {
@@ -2967,6 +3152,8 @@ window.toggleSeccion = function(containerId, iconId) {
                 listaEtapas.appendChild(li);
             }
         }
+
+
         
         function generarHtmlTags(factores, detalles, isFactorPrincipal) {
             if (!factores) return '';
