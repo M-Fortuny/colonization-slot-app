@@ -505,25 +505,8 @@
         .btn-perfil:active { transform: scale(0.95); }
         .btn-herramienta:active { background-color: var(--border-color); }
 
-         @media (max-width: 767px) {
-            input, select, .icono-colapso {
-                -webkit-appearance: none !important;
-                appearance: none !important;
-                accent-color: #1976D2 !important;
-            }
-
-            input:focus, select:focus {
-                box-shadow: none !important;
-                outline: none !important;
-            }
-
-            .icono-colapso {
-                background-color: #1976D2 !important;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-            }
-        }
-
         @media (max-width: 768px) {
+            /* Ajuste de escala para el avatar en móvil */
             .img-icono-perfil {
                 width: 68px !important;
                 height: 68px !important;
@@ -540,7 +523,6 @@
                 font-size: 2.2rem; 
                 margin: 0;
             }
-        }
 
             .seccion-herramientas { padding: 0.6rem; margin-bottom: 1rem; }
             .btn-herramienta { padding: 0.5rem 0.2rem; }
