@@ -37,6 +37,7 @@ self.addEventListener('fetch', (event) => {
 /* ==========================================================================
    MÓDULO DE NOTIFICACIONES EXTERNAS (UNIVERSAL ANDROID/iOS)
    ========================================================================== */
+// Variable de respaldo solo para navegadores antiguos
 const alarmasActivas = {};
 
 self.addEventListener('message', (event) => {
@@ -47,33 +48,53 @@ self.addEventListener('message', (event) => {
   if (datos && datos.accion === 'programarAlarmaInsulina') {
     const tiempoEspera = datos.tiempo - Date.now();
 
+    // Limpiamos cualquier fallback previo por seguridad
     if (alarmasActivas[idAlarma]) clearTimeout(alarmasActivas[idAlarma]);
     
     if (tiempoEspera > 0) {
-      alarmasActivas[idAlarma] = setTimeout(() => {
-        const opciones = {
-          body: datos.texto,
-          icon: '/icono-app.png', 
-          badge: '/icono-app.png',
-          vibrate: [200, 100, 200], // Patrón corregido
-          tag: idAlarma,
-          renotify: true,
-          data: { url: '/' }
-        };
+      const opciones = {
+        body: datos.texto,
+        icon: '/icono-app.png', 
+        badge: '/icono-app.png',
+        vibrate: [200, 100, 200],
+        tag: idAlarma,
+        renotify: true,
+        data: { url: '/' }
+      };
+
+      // INTENTO A: API Nativa de Notificaciones Programadas (Blindaje para móviles)
+      if ('showTrigger' in Notification.prototype) {
+        opciones.showTrigger = new TimestampTrigger(datos.tiempo);
         self.registration.showNotification(datos.titulo, opciones);
-        delete alarmasActivas[idAlarma];
-      }, tiempoEspera);
+        console.log('SW: Alarma delegada al reloj del sistema operativo.');
+      } 
+      // INTENTO B: Fallback tradicional para sistemas no compatibles
+      else {
+        console.warn('SW: TimestampTrigger no soportado, usando setTimeout.');
+        alarmasActivas[idAlarma] = setTimeout(() => {
+          self.registration.showNotification(datos.titulo, opciones);
+          delete alarmasActivas[idAlarma];
+        }, tiempoEspera);
+      }
     }
   }
 
   // 2. Cancelar alarma si el usuario desactiva el control
   if (datos && datos.accion === 'cancelarAlarmaInsulina') {
+    // Limpiamos el fallback si existe
     if (alarmasActivas[idAlarma]) {
       clearTimeout(alarmasActivas[idAlarma]);
       delete alarmasActivas[idAlarma];
     }
+    
+    // Y limpiamos las notificaciones programadas en el reloj del sistema
+    self.registration.getNotifications({ tag: idAlarma }).then(notifications => {
+      notifications.forEach(notification => notification.close());
+      console.log('SW: Alarma nativa cancelada con éxito.');
+    });
   }
 });
+
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
