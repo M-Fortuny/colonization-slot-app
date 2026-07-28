@@ -1287,19 +1287,27 @@
             </div>
 
             <div id="bloque-factor" class="grupo-reactivo">
-                <label style="margin-top: 15px; display: block;">Factor influyente</label>
-                <div class="checkbox-grupo" id="input-factores">
-                    <label class="chip"><input type="checkbox" name="factor" value="Comida"> 🍚 Comida</label>
-                    <label class="chip"><input type="checkbox" name="factor" value="Golosina"> 🍬 Golosina</label>
-                    <label class="chip"><input type="checkbox" name="factor" value="Ejercicio"> 🏃 Ejercicio</label>
-                    <label class="chip"><input type="checkbox" name="factor" value="Paseo"> 🐕 Paseo</label>
-                    <label class="chip"><input type="checkbox" name="factor" value="Siesta"> 💤 Siesta</label>
-                    <label class="chip"><input type="checkbox" name="factor" value="Malestar"> 🤒 Malestar</label>
-                    <label class="chip"><input type="checkbox" name="factor" value="Medicación"> 💊 Medicación</label>
-                </div>
-                
-                <div id="modificadores-dinamicos" style="margin-top: 15px;"></div>
-            </div>
+    <label style="margin-top: 15px; display: block;">Factor influyente</label>
+    <div class="checkbox-grupo" id="input-factores">
+        <label class="chip"><input type="checkbox" name="factor" value="Comida" id="chk-comida"> 🍚 Comida</label>
+        <label class="chip"><input type="checkbox" name="factor" value="Golosina"> 🍬 Golosina</label>
+        <label class="chip"><input type="checkbox" name="factor" value="Ejercicio"> 🏃 Ejercicio</label>
+        <label class="chip"><input type="checkbox" name="factor" value="Paseo"> 🐕 Paseo</label>
+        <label class="chip"><input type="checkbox" name="factor" value="Siesta"> 💤 Siesta</label>
+        <label class="chip"><input type="checkbox" name="factor" value="Malestar"> 🤒 Malestar</label>
+        <label class="chip"><input type="checkbox" name="factor" value="Medicación"> 💊 Medicación</label>
+    </div>
+    
+    <div id="contenedor-comida-avanzada" style="display: none; margin-top: 15px; padding: 12px; border: 2px solid #FF9800; border-radius: 8px; background-color: rgba(255, 152, 0, 0.05);">
+        <label style="display: block; margin-bottom: 5px; color: #FF9800; font-weight: bold;">Dieta Exacta</label>
+        <select id="select-comida-exacta" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 16px;">
+            <option value="">-- Selecciona la comida --</option>
+            </select>
+    </div>
+
+    <div id="modificadores-dinamicos" style="margin-top: 15px;"></div>
+</div>
+
 
             <div style="margin-top: 20px;">
                 <button type="submit" class="btn-form">Guardar Registro</button>
@@ -1668,14 +1676,7 @@
             return [...dbFarmacosDefault, ...custom];
         }
 
-        function obtenerTodasLasComidas() {
-            const perfil = JSON.parse(localStorage.getItem(KEY_PERFIL) || '{}');
-            const custom = (perfil.alimentacion && perfil.alimentacion.comidasCustom) ? perfil.alimentacion.comidasCustom : [];
-            return [...dbComidasDefault, ...custom];
-        }                    
-
-
-
+        
 
 function actualizarDatosCabecera() {
         const regs = JSON.parse(localStorage.getItem(KEY_GLUCOSA) || '[]');
@@ -4049,6 +4050,84 @@ async function sincronizarAlarmaInsulinaAutomatica() {
         }
     }
 }
+
+
+
+
+
+
+
+// --- MÓDULO DE NUTRICIÓN: EXTRACCIÓN E INYECCIÓN BLINDADA ---
+
+function poblarSelectorComidaFactor() {
+    // Buscamos el ID exacto. Usamos un fallback por si en tu HTML se llama de otra forma.
+    const selectComida = document.getElementById('select-comida-exacta') || document.getElementById('select-comida-factor');
+    if (!selectComida) return;
+
+    let dietas = [];
+
+    // 1. Extracción Segura de la Base de Datos (JSON Serializado)
+    try {
+        const perfil = JSON.parse(localStorage.getItem('misDatos_perfil') || '{}');
+        if (perfil.alimentacion && Array.isArray(perfil.alimentacion.comidasCustom)) {
+            dietas = perfil.alimentacion.comidasCustom;
+        }
+        // Si dbComidasDefault existe en otra parte de tu código, lo sumamos con cuidado
+        if (typeof dbComidasDefault !== 'undefined' && Array.isArray(dbComidasDefault)) {
+            dietas = [...dbComidasDefault, ...dietas];
+        }
+    } catch (error) {
+        console.error("Error del Búnker: Fallo al extraer datos clínicos", error);
+    }
+
+    // 2. SISTEMA DE RESCATE: Si tu iPad aún no tiene dietas guardadas, inyectamos estas para probar visualmente
+    if (dietas.length === 0) {
+        dietas = ["Pienso Renal (Rescate)", "Dieta BARF (Rescate)", "Comida Húmeda (Rescate)"];
+    }
+
+    // 3. Limpieza e Inyección en el HTML
+    selectComida.innerHTML = '<option value="">-- Selecciona la comida --</option>';
+
+    dietas.forEach(dieta => {
+        const option = document.createElement('option');
+        // Extraemos el nombre si es un objeto estructurado, o usamos el texto directo
+        const nombreDieta = dieta.nombre ? dieta.nombre : dieta;
+        option.value = nombreDieta;
+        option.textContent = nombreDieta;
+        selectComida.appendChild(option);
+    });
+}
+
+// Escucha global inquebrantable vía 'click' para activar la reactividad (Bypass iOS)
+document.addEventListener('click', function(event) {
+    if (event.target && event.target.type === 'checkbox') {
+        // Búsqueda táctica de la pastilla naranja
+        const esComida = event.target.value === 'Comida' || 
+                         (event.target.id && event.target.id.toLowerCase().includes('comida')) || 
+                         (event.target.name && event.target.name.toLowerCase().includes('comida'));
+        
+        if (esComida) {
+            const contenedorAvanzado = document.getElementById('contenedor-comida-avanzada');
+            
+            if (event.target.checked) {
+                // Desplegamos el contenedor naranja y disparamos la inyección
+                if (contenedorAvanzado) {
+                    contenedorAvanzado.style.display = 'block';
+                    poblarSelectorComidaFactor();
+                }
+            } else {
+                // Plegamos y reseteamos el valor para mantener la Sencillez Poderosa
+                if (contenedorAvanzado) {
+                    contenedorAvanzado.style.display = 'none';
+                    const selectComida = document.getElementById('select-comida-exacta') || document.getElementById('select-comida-factor');
+                    if (selectComida) selectComida.value = '';
+                }
+            }
+        }
+    }
+});
+
+
 
 /* ==========================================================================
    3. ACTIVADORES DE LOS BOTONES DE CONFIGURACIÓN
