@@ -2349,14 +2349,25 @@ function renderizarModalFavoritos() {
 }
 
 async function definirFavoritoFijo(tipo) {
-  const coords = document.getElementById('origen-ruta').value || document.getElementById('destino-ruta').value;
-  const dir = prompt(`Introduce la dirección o coordenadas para ${tipo.toUpperCase()}:`, coords || "");
+  // Verificamos si hay coordenadas GPS activas primero
+  let coordsPorDefecto = "";
+  if (typeof userCoordinates !== 'undefined' && userCoordinates && userCoordinates.lat) {
+    coordsPorDefecto = `${userCoordinates.lat}, ${userCoordinates.lng}`;
+  } else {
+    // Si no hay GPS, intentamos coger lo que haya en los inputs de ruta
+    coordsPorDefecto = document.getElementById('origen-ruta').value || document.getElementById('destino-ruta').value || "";
+  }
+  
+  const dir = prompt(`Introduce la dirección o coordenadas para ${tipo.toUpperCase()}:`, coordsPorDefecto);
   if (!dir) return;
+  
   appFavoritos[tipo] = { nombre: dir, coords: dir };
   localStorage.setItem('app_favoritos_gps', JSON.stringify(appFavoritos));
+  
   renderizarModalFavoritos();
   mostrarNotificacion(`Guardado como ${tipo.toUpperCase()}`);
 }
+
 
 function cargarFavoritoEn(tipo, campo) {
   const fav = appFavoritos[tipo];
@@ -2372,13 +2383,26 @@ function cargarFavoritoEn(tipo, campo) {
 async function añadirNuevoFavoritoManual() {
   const nombre = prompt("Nombre del nuevo favorito:", "");
   if (!nombre) return;
-  const ubicacion = document.getElementById('origen-ruta').value || prompt("Dirección o coordenadas:", "");
+  
+  // Verificamos si hay coordenadas GPS activas
+  let coordsPorDefecto = "";
+  if (typeof userCoordinates !== 'undefined' && userCoordinates && userCoordinates.lat) {
+    coordsPorDefecto = `${userCoordinates.lat}, ${userCoordinates.lng}`;
+  } else {
+    coordsPorDefecto = document.getElementById('origen-ruta').value || "";
+  }
+
+  const ubicacion = prompt("Dirección o coordenadas:", coordsPorDefecto);
   if (!ubicacion) return;
+  
   appFavoritos.custom.push({ nombre, coords: ubicacion });
   localStorage.setItem('app_favoritos_gps', JSON.stringify(appFavoritos));
+  
   renderizarModalFavoritos();
   mostrarNotificacion("Favorito añadido correctamente");
 }
+
+
 
 function cargarFavoritoCustom(index, campo) {
   const fav = appFavoritos.custom[index];
@@ -2539,18 +2563,38 @@ function ubicarMiPosicionActual() {
 }
 
 function abrirMapaLibre() {
-  // Usamos tu función original para cerrar la ventana
+  // Cerramos la ventana de la estrella
   if (typeof cerrarModalFavoritos === 'function') {
     cerrarModalFavoritos();
   }
   
-  // Refrescamos el mapa por si estaba oculto o a medias
+  // Forzamos la apertura del contenedor del mapa a pantalla completa
+  const contenedorMapa = document.getElementById('miMapa');
+  if (contenedorMapa) {
+    contenedorMapa.style.display = 'block';
+    contenedorMapa.classList.add('modo-pantalla-completa');
+  }
+
+  // Ocultamos el cuadro de resultados si estuviera abierto
+  const resultadoRuta = document.getElementById('resultado-ruta');
+  if (resultadoRuta) {
+    resultadoRuta.style.display = 'none';
+  }
+  
+  // Mostramos el botón de cerrar navegador que usas en pantalla completa
+  const btnCerrarNavegador = document.getElementById('btn-cerrar-navegador');
+  if (btnCerrarNavegador) {
+    btnCerrarNavegador.style.display = 'block';
+  }
+  
+  // Refrescamos Leaflet para que los tiles se carguen bien en el nuevo tamaño
   if (mapa) {
     setTimeout(() => {
       mapa.invalidateSize();
     }, 300);
   }
 }
+
 
 
 
