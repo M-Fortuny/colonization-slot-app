@@ -2463,7 +2463,6 @@ async function togglePOIsEnMapa() {
 
   if (!checkGas && !checkRest && !checkMon) return;
 
-  // Asegurarnos de tener un punto de origen (userCoordinates o el centro del mapa)
   let lat, lng;
   if (userCoordinates && userCoordinates.lat) {
     lat = parseFloat(userCoordinates.lat);
@@ -2474,10 +2473,9 @@ async function togglePOIsEnMapa() {
     lng = centro.lng;
   }
 
-  // Función interna para buscar 1 solo punto real y calcular distancia
-  const buscarYMarcarUnPOI = async (tipo, queryOsm, emoji) => {
-    // Buscamos 1 solo resultado en un radio de 5km
-    const query = `[out:json];node${queryOsm}(around:5000,${lat},${lng});out 1;`;
+  const buscarYMarcarMultiplesPOIs = async (tipo, queryOsm, emoji) => {
+    // Radio de 25km (25000 metros) y límite de 15 resultados para no saturar
+    const query = `[out:json];node${queryOsm}(around:25000,${lat},${lng});out 15;`;
     const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
     
     try {
@@ -2485,27 +2483,30 @@ async function togglePOIsEnMapa() {
       const datos = await respuesta.json();
       
       if (datos.elements && datos.elements.length > 0) {
-        const poi = datos.elements[0];
-        
-        // Calcular la distancia real en base a las coordenadas del mapa
-        const distanciaMetros = mapa.distance([lat, lng], [poi.lat, poi.lon]);
-        const distanciaKm = (distanciaMetros / 1000).toFixed(2);
-        const nombrePoi = (poi.tags && poi.tags.name) ? poi.tags.name : `${tipo} sin nombre`;
-        
-        L.marker([poi.lat, poi.lon])
-          .bindPopup(`<b>${emoji} ${nombrePoi}</b><br>📍 Distancia: ${distanciaKm} km`)
-          .addTo(poiMarkersGroup);
+        // Iteramos sobre todos los resultados encontrados
+        datos.elements.forEach(poi => {
+          const distanciaMetros = mapa.distance([lat, lng], [poi.lat, poi.lon]);
+          const distanciaKm = (distanciaMetros / 1000).toFixed(2);
+          const nombrePoi = (poi.tags && poi.tags.name) ? poi.tags.name : `${tipo} sin nombre`;
+          
+          L.marker([poi.lat, poi.lon])
+            .bindPopup(`<b>${emoji} ${nombrePoi}</b><br>📍 Distancia: ${distanciaKm} km`)
+            .addTo(poiMarkersGroup);
+        });
+      } else {
+        console.log(`No se encontraron ${tipo}s en 25km.`);
       }
     } catch (error) {
       console.error(`Error buscando ${tipo}:`, error);
     }
   };
 
-  // Si están marcados, ejecutamos la búsqueda real
-  if (checkGas) await buscarYMarcarUnPOI('Gasolinera', '["amenity"="fuel"]', '⛽');
-  if (checkRest) await buscarYMarcarUnPOI('Restaurante', '["amenity"="restaurant"]', '🍽️');
-  if (checkMon) await buscarYMarcarUnPOI('Monumento', '["tourism"~"viewpoint|museum|artwork"]', '🏛️');
+  // Consultas optimizadas para asegurar que traiga resultados
+  if (checkGas) await buscarYMarcarMultiplesPOIs('Gasolinera', '["amenity"="fuel"]', '⛽');
+  if (checkRest) await buscarYMarcarMultiplesPOIs('Restaurante', '["amenity"="restaurant"]', '🍽️');
+  if (checkMon) await buscarYMarcarMultiplesPOIs('Monumento', '["tourism"~"viewpoint|museum|artwork|attraction"]', '🏛️');
 }
+
 
 
 function ubicarMiPosicionActual() {
