@@ -743,7 +743,6 @@ input[type="date"] {
     <button class="btn-custom" onclick="toggleDarkMode()">🌓 Modo Visual</button>
     <button class="btn-custom" onclick="toggleAyuda()">❓ Ayuda</button>
     <button class="btn-custom" onclick="toggleInfo()">ℹ️ Info Pro</button>
-    <button class="btn-custom" onclick="abrirModalFavoritos()">⭐ Favoritos</button>
     <div id="fechaHora"></div>
 </div>
 
@@ -2498,8 +2497,8 @@ async function togglePOIsEnMapa() {
   }
 
   const buscarYMarcarMultiplesPOIs = async (tipo, queryOsm, emoji) => {
-    // Radio de 25km (25000 metros) y límite de 15 resultados para no saturar
-    const query = `[out:json];node${queryOsm}(around:25000,${lat},${lng});out 15;`;
+    // Pedimos hasta 50 resultados en un radio de 15km para asegurarnos de no perder los cercanos
+    const query = `[out:json];node${queryOsm}(around:15000,${lat},${lng});out 50;`;
     const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
     
     try {
@@ -2507,29 +2506,43 @@ async function togglePOIsEnMapa() {
       const datos = await respuesta.json();
       
       if (datos.elements && datos.elements.length > 0) {
-        // Iteramos sobre todos los resultados encontrados
-        datos.elements.forEach(poi => {
+        
+        // 1. Calculamos la distancia de todos los resultados encontrados
+        let poisConDistancia = datos.elements.map(poi => {
           const distanciaMetros = mapa.distance([lat, lng], [poi.lat, poi.lon]);
-          const distanciaKm = (distanciaMetros / 1000).toFixed(2);
+          return {
+            ...poi,
+            distanciaMetros: distanciaMetros,
+            distanciaKm: (distanciaMetros / 1000).toFixed(2)
+          };
+        });
+
+        // 2. Ordenamos el array de menor a mayor distancia (¡Clave para que salgan los cercanos!)
+        poisConDistancia.sort((a, b) => a.distanciaMetros - b.distanciaMetros);
+
+        // 3. Nos quedamos solo con los 15 más cercanos reales
+        const poisMasCercanos = poisConDistancia.slice(0, 15);
+
+        // 4. Los pintamos en el mapa
+        poisMasCercanos.forEach(poi => {
           const nombrePoi = (poi.tags && poi.tags.name) ? poi.tags.name : `${tipo} sin nombre`;
-          
           L.marker([poi.lat, poi.lon])
-            .bindPopup(`<b>${emoji} ${nombrePoi}</b><br>📍 Distancia: ${distanciaKm} km`)
+            .bindPopup(`<b>${emoji} ${nombrePoi}</b><br>📍 Distancia: ${poi.distanciaKm} km`)
             .addTo(poiMarkersGroup);
         });
       } else {
-        console.log(`No se encontraron ${tipo}s en 25km.`);
+        console.log(`No se encontraron ${tipo}s cercanos.`);
       }
     } catch (error) {
       console.error(`Error buscando ${tipo}:`, error);
     }
   };
 
-  // Consultas optimizadas para asegurar que traiga resultados
   if (checkGas) await buscarYMarcarMultiplesPOIs('Gasolinera', '["amenity"="fuel"]', '⛽');
   if (checkRest) await buscarYMarcarMultiplesPOIs('Restaurante', '["amenity"="restaurant"]', '🍽️');
   if (checkMon) await buscarYMarcarMultiplesPOIs('Monumento', '["tourism"~"viewpoint|museum|artwork|attraction"]', '🏛️');
 }
+
 
 
 
@@ -2563,37 +2576,39 @@ function ubicarMiPosicionActual() {
 }
 
 function abrirMapaLibre() {
-  // Cerramos la ventana de la estrella
+  // 1. Cerramos la ventana de la estrella
   if (typeof cerrarModalFavoritos === 'function') {
     cerrarModalFavoritos();
   }
   
-  // Forzamos la apertura del contenedor del mapa a pantalla completa
-  const contenedorMapa = document.getElementById('miMapa');
-  if (contenedorMapa) {
-    contenedorMapa.style.display = 'block';
-    contenedorMapa.classList.add('modo-pantalla-completa');
-  }
-
-  // Ocultamos el cuadro de resultados si estuviera abierto
+  // 2. Ocultamos el cuadro de texto de los resultados de ruta (si estuviera abierto)
   const resultadoRuta = document.getElementById('resultado-ruta');
   if (resultadoRuta) {
     resultadoRuta.style.display = 'none';
   }
   
-  // Mostramos el botón de cerrar navegador que usas en pantalla completa
-  const btnCerrarNavegador = document.getElementById('btn-cerrar-navegador');
-  if (btnCerrarNavegador) {
-    btnCerrarNavegador.style.display = 'block';
+  // 3. ¡LA MAGIA! Llamamos a tu propia función original que ya lo hace todo perfecto
+  if (typeof abrirNavegador === 'function') {
+    abrirNavegador();
+  } else {
+    // Respaldo manual por si la función abrirNavegador tuviera otro nombre
+    const contenedorMapa = document.getElementById('miMapa');
+    if (contenedorMapa) {
+      contenedorMapa.style.display = 'block';
+      contenedorMapa.classList.add('modo-pantalla-completa');
+    }
+    const overlay = document.getElementById('map-overlay-controls');
+    if (overlay) overlay.style.display = 'flex'; // o 'block' según tu CSS
   }
   
-  // Refrescamos Leaflet para que los tiles se carguen bien en el nuevo tamaño
-  if (mapa) {
+  // 4. Refrescamos el lienzo de Leaflet para que los mapas carguen al tamaño completo
+  if (typeof mapa !== 'undefined' && mapa !== null) {
     setTimeout(() => {
       mapa.invalidateSize();
     }, 300);
   }
 }
+
 
 
 
