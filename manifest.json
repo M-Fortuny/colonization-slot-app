@@ -1,19 +1,14 @@
 {
-  "name": "Pawsitive Diabetes Control",
-  "short_name": "Pawsitive",
-  "start_url": "./index.html",
+  "name": "AutoControl IA Pro",
+  "short_name": "AutoControl",
+  "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#4A90E2",
+  "background_color": "#0f172a",
+  "theme_color": "#2563eb",
   "icons": [
     {
       "src": "icono-app.png",
       "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icono-app.png",
-      "sizes": "512x512",
       "type": "image/png"
     }
   ]
