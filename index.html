@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Slot Machine PWA</title>
 
+  <!-- Vinculación del archivo Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Configuración de color de barra de estado en móviles -->
+  <meta name="theme-color" content="#000000">
+
+  <!-- Soporte optimizado para iOS (Safari) -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
   <style>
     * {
       box-sizing: border-box;
@@ -162,13 +173,8 @@
     }
 
     @keyframes pulseWinText {
-      from {
-        transform: scale(.98);
-      }
-
-      to {
-        transform: scale(1.06);
-      }
+      from { transform: scale(.98); }
+      to { transform: scale(1.06); }
     }
 
     .lockers-container {
@@ -281,17 +287,8 @@
     }
 
     @keyframes pulsePayline {
-      from {
-        stroke-width: 5px;
-        opacity: .85;
-        filter: drop-shadow(0 0 4px currentColor);
-      }
-
-      to {
-        stroke-width: 8px;
-        opacity: 1;
-        filter: drop-shadow(0 0 12px currentColor);
-      }
+      from { stroke-width: 5px; opacity: .85; filter: drop-shadow(0 0 4px currentColor); }
+      to { stroke-width: 8px; opacity: 1; filter: drop-shadow(0 0 12px currentColor); }
     }
 
     .reel-column {
@@ -325,27 +322,14 @@
     }
 
     @keyframes reelScroll {
-      from {
-        transform: translateY(0);
-      }
-
-      to {
-        transform: translateY(-20%);
-      }
+      from { transform: translateY(0); }
+      to { transform: translateY(-20%); }
     }
 
     @keyframes reelBounceStop {
-      0% {
-        transform: translateY(-15px);
-      }
-
-      70% {
-        transform: translateY(8px);
-      }
-
-      100% {
-        transform: translateY(0);
-      }
+      0% { transform: translateY(-15px); }
+      70% { transform: translateY(8px); }
+      100% { transform: translateY(0); }
     }
 
     .symbol-cell {
@@ -367,9 +351,7 @@
       transition: transform .2s ease;
     }
 
-    .symbol-cell.dimmed {
-      opacity: .2;
-    }
+    .symbol-cell.dimmed { opacity: .2; }
 
     .symbol-cell.winning {
       opacity: 1;
@@ -384,13 +366,8 @@
     }
 
     @keyframes pulseEmoji {
-      from {
-        transform: scale(1);
-      }
-
-      to {
-        transform: scale(1.25);
-      }
+      from { transform: scale(1); }
+      to { transform: scale(1.25); }
     }
 
     .control-panel {
@@ -441,9 +418,7 @@
       box-shadow: 0 5px 0 #b23c00;
     }
 
-    .btn-spin:active {
-      box-shadow: 0 2px 0 #b23c00;
-    }
+    .btn-spin:active { box-shadow: 0 2px 0 #b23c00; }
 
     .btn-gamble {
       background: linear-gradient(180deg, #e91e63 0%, #880e4f 100%);
@@ -513,7 +488,15 @@
       margin-top: 20px;
     }
 
+            /* --- ESTILOS PANEL DESARROLLADOR --- */
     .fullscreen-dev-panel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 100%; /* 💡 Cambiado de 100vh a 100% para evitar fallos de viewport en iOS */
+      
       display: flex;
       flex-direction: column;
       color: #fff;
@@ -534,51 +517,116 @@
       padding: 20px;
       text-align: center;
       background: #1a0933;
+      flex-shrink: 0; /* 💡 Obligatorio para que iOS no intente colapsar estas zonas */
     }
 
-    .dev-header {
-      border-bottom: 3px solid var(--purple);
-    }
-
-    .dev-header h2 {
+    .dev-header { border-bottom: 3px solid var(--purple); }
+    
+    .dev-header h2, .dev-header h1 { /* 💡 Asegura ambos tags de título */
       color: var(--gold);
       font-size: 24px;
       letter-spacing: 2px;
+      margin: 0;
     }
 
     .dev-content {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 30px;
-      overflow-y: auto;
+      flex: 1 1 auto; /* 💡 Fuerza a crecer y decrecer de forma flexible */
+      min-height: 0;   /* 💡 Truco CSS crítico: rompe la restricción de altura implícita en flexbox */
+      display: block;  /* 💡 Cambiado de 'flex' a 'block' para que los elementos fluyan hacia abajo naturalmente */
+      padding: 20px;
+      overflow-y: scroll; /* 💡 Fuerza la presencia del contenedor de scroll */
+      -webkit-overflow-scrolling: touch; /* Scroll nativo inercial para tu iPad */
     }
 
-    .dev-footer {
+    /* 💡 Añade este contenedor para centrar los elementos sin romper el comportamiento de bloque */
+    .dev-content > * {
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+
+
+    .dev-section-title {
+      width: 100%;
+      max-width: 700px;
+      margin: 20px 0 10px;
+      padding-bottom: 8px;
+      color: var(--green);
+      font-size: 18px;
+      font-weight: bold;
+      text-align: left;
+      border-bottom: 2px solid rgba(0, 230, 118, 0.4);
+    }
+    
+    .dev-table { width: 100%; max-width: 700px; border-collapse: collapse; margin-bottom: 20px; }
+    .dev-table th { color: var(--light-purple); padding: 8px; font-size: 13px; border-bottom: 1px solid var(--purple); }
+    .dev-table td { padding: 6px; text-align: center; border-bottom: 1px solid rgba(123, 44, 191, 0.2); }
+    
+    .dev-input { 
+      width: 100%; max-width: 65px; background: #000; color: #fff; 
+      border: 1px solid var(--purple); border-radius: 6px; padding: 6px; 
+      text-align: center; font-weight: bold; font-family: inherit;
+    }
+    .dev-input:focus { border-color: var(--gold); outline: none; background: #1a0933; }
+    .dev-emoji-input { font-size: 18px; max-width: 80px; }
+
+    .dev-economy-grid {
+      width: 100%;
+      max-width: 700px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .dev-economy-box {
+      background: rgba(20, 10, 35, 0.8);
+      padding: 12px;
+      border: 1px solid var(--purple);
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .dev-economy-box label {
+      display: block;
+      font-size: 11px;
+      color: #aaa;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .dev-economy-box input {
+      width: 100%;
+      max-width: 120px;
+      background: #000;
+      color: var(--gold);
+      border: 1px dashed var(--light-purple);
+      border-radius: 6px;
+      padding: 8px;
+      text-align: center;
+      font-weight: bold;
+      font-family: inherit;
+      font-size: 14px;
+    }
+
+        .dev-footer {
       display: flex;
+      flex-direction: row; /* 💡 CORREGIDO: Pone los botones uno al lado del otro */
+      flex-wrap: wrap;     /* 💡 CORREGIDO: Si la pantalla es muy estrecha, bajan limpiamente */
       justify-content: center;
+      align-items: center;
+      gap: 15px;
+      padding: 20px;
+      background: #1a0933;
       border-top: 3px solid var(--purple);
     }
 
+
+
     @keyframes badgePulse {
-      0% {
-        transform: scale(1);
-        filter: brightness(1);
-        box-shadow: 0 0 5px orange;
-      }
-
-      50% {
-        transform: scale(1.15);
-        filter: brightness(1.4);
-        box-shadow: 0 0 15px yellow;
-      }
-
-      100% {
-        transform: scale(1);
-        filter: brightness(1);
-        box-shadow: 0 0 5px orange;
-      }
+      0% { transform: scale(1); filter: brightness(1); box-shadow: 0 0 5px orange; }
+      50% { transform: scale(1.15); filter: brightness(1.4); box-shadow: 0 0 15px yellow; }
+      100% { transform: scale(1); filter: brightness(1); box-shadow: 0 0 5px orange; }
     }
 
     .badge-line.badge-winning-pulse {
@@ -588,34 +636,14 @@
     }
 
     @media (orientation: landscape) and (min-width: 601px) {
-      body {
-        gap: 8px;
-        padding: 10px 24px;
-      }
-
-      .symbol-cell {
-        font-size: 60px;
-      }
-
-      .top-bar {
-        min-height: 65px;
-        padding: 6px 15px;
-      }
-
-      .control-panel {
-        padding: 8px 12px;
-      }
-
-      .btn-action {
-        height: 48px;
-      }
-
-      .btn-spin {
-        height: 54px;
-      }
+      body { gap: 8px; padding: 10px 24px; }
+      .symbol-cell { font-size: 60px; }
+      .top-bar { min-height: 65px; padding: 6px 15px; }
+      .control-panel { padding: 8px 12px; }
+      .btn-action { height: 48px; }
+      .btn-spin { height: 54px; }
     }
 
-    /* Ajustes exclusivos para móviles en orientación vertical */
     @media screen and (max-width: 600px) and (orientation: portrait) {
       body {
         gap: 6px;
@@ -624,399 +652,40 @@
                  max(6px, env(safe-area-inset-bottom))
                  max(6px, env(safe-area-inset-left));
       }
-
-      .top-bar {
-        min-height: 58px;
-        gap: 5px;
-        padding: 5px;
-        border-width: 1px;
-        border-radius: 9px;
-      }
-
-      .total-bet-box,
-      .balance-box {
-        width: 25%;
-        min-width: 0;
-        padding: 4px 5px;
-        border-radius: 6px;
-      }
-
-      .dynamic-center-area {
-        width: 50%;
-        min-width: 0;
-      }
-
-      .total-bet-label,
-      .balance-label {
-        overflow: hidden;
-        font-size: 8px;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      .total-bet-value,
-      .balance-value {
-        overflow: hidden;
-        font-size: clamp(12px, 4vw, 18px);
-        text-overflow: ellipsis;
-      }
-
-      .dynamic-text-display {
-        overflow: hidden;
-        font-size: clamp(11px, 3.8vw, 17px);
-        text-overflow: ellipsis;
-      }
-
-      .dynamic-text-display.jackpot-text {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 1px;
-        width: 100%;
-        max-width: 100%;
-        min-width: 0;
-        padding-inline: 2px;
-        line-height: 1.05;
-        white-space: normal;
-        text-align: center;
-      }
-
-      .dynamic-text-display.jackpot-text .jackpot-name,
-      .dynamic-text-display.jackpot-text .jackpot-value {
-        display: block;
-        width: 100%;
-        max-width: 100%;
-        overflow: visible;
-        text-align: center;
-        text-overflow: clip;
-      }
-
-      .dynamic-text-display.jackpot-text .jackpot-name {
-        font-size: clamp(9px, 3vw, 15px);
-        line-height: 1.1;
-        white-space: normal;
-        overflow-wrap: anywhere;
-      }
-
-      .dynamic-text-display.jackpot-text .jackpot-value {
-        font-size: clamp(10px, 3.2vw, 17px);
-        line-height: 1.1;
-        white-space: nowrap;
-      }
-
-      .dynamic-text-display.win-text {
-        font-size: clamp(12px, 4vw, 18px);
-      }
-
-      .lockers-container {
-        gap: 3px;
-        padding: 4px;
-        border-width: 1px;
-        border-radius: 9px;
-      }
-
-      .locker-box {
-        height: 27px;
-        overflow: hidden;
-        font-size: 7px;
-        letter-spacing: 0;
-        white-space: nowrap;
-      }
-
-      .locker-icon {
-        margin-right: 2px;
-        font-size: 10px;
-      }
-
-      .slot-stage {
-        gap: 3px;
-      }
-
-      .badges-column {
-        width: 22px;
-        gap: 5px;
-        padding: 5px 0;
-      }
-
-      .badge-line {
-        width: 21px;
-        height: 21px;
-        font-size: 10px;
-        border-width: 1px;
-      }
-
-      .slot-grid-container {
-        gap: 3px;
-        padding: 4px;
-        border-width: 2px;
-        border-radius: 11px;
-      }
-
-      .reel-column {
-        padding: 2px;
-        border-radius: 6px;
-      }
-
-      .reel-strip {
-        gap: 3px;
-      }
-
-      .symbol-cell {
-        font-size: clamp(24px, 9vw, 42px);
-        border-radius: 5px;
-      }
-
-      .symbol-cell.winning {
-        border-width: 2px;
-      }
-
-      .control-panel {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 5px;
-        padding: 5px;
-        border-width: 1px;
-        border-radius: 10px;
-      }
-
-      .btn-action,
-      .btn-spin {
-        height: 42px;
-        border-radius: 7px;
-        font-size: 12px;
-        box-shadow: 0 2px 0 #1a0033;
-      }
-
-      .btn-spin {
-        font-size: 16px;
-      }
-
-      .control-label {
-        font-size: 8px;
-      }
-
-      #btn-spin {
-        order: -1;
-      }
-
-      .modal-card {
-        width: 100%;
-        padding: 18px 12px;
-      }
-
-      .modal-title {
-        font-size: 18px;
-      }
-
-      .gamble-card-display {
-        height: 80px;
-        margin: 12px 0;
-        font-size: 50px;
-      }
-
-      .modal-actions {
-        gap: 7px;
-      }
-
-      .modal-actions .btn-action {
-        height: 45px !important;
-        font-size: 11px;
-      }
-    }
-
-    /* Ajustes exclusivos para móviles en orientación horizontal */
-    @media screen and (max-width: 600px) and (orientation: landscape) {
-      body {
-        gap: 4px;
-        padding: max(4px, env(safe-area-inset-top))
-                 max(6px, env(safe-area-inset-right))
-                 max(4px, env(safe-area-inset-bottom))
-                 max(6px, env(safe-area-inset-left));
-      }
-
-      .top-bar {
-        min-height: 43px;
-        gap: 8px;
-        padding: 3px 6px;
-        border-width: 1px;
-        border-radius: 8px;
-      }
-
-      .total-bet-box,
-      .balance-box {
-        min-width: 105px;
-        padding: 3px 6px;
-        border-radius: 5px;
-      }
-
-      .total-bet-label,
-      .balance-label {
-        font-size: 7px;
-      }
-
-      .total-bet-value,
-      .balance-value {
-        font-size: 15px;
-      }
-
-      .dynamic-center-area {
-        min-width: 0;
-      }
-
-      .dynamic-text-display {
-        font-size: 15px;
-      }
-
-      .dynamic-text-display.jackpot-text {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        max-width: 100%;
-        min-width: 0;
-        gap: 1px;
-        line-height: 1.05;
-        white-space: normal;
-        text-align: center;
-      }
-
-      .dynamic-text-display.jackpot-text .jackpot-name,
-      .dynamic-text-display.jackpot-text .jackpot-value {
-        display: block;
-        width: 100%;
-        max-width: 100%;
-        overflow: visible;
-        text-align: center;
-        text-overflow: clip;
-      }
-
-      .dynamic-text-display.jackpot-text .jackpot-name {
-        font-size: clamp(9px, 2.8vw, 15px);
-        line-height: 1.1;
-        white-space: normal;
-        overflow-wrap: anywhere;
-      }
-
-      .dynamic-text-display.jackpot-text .jackpot-value {
-        font-size: clamp(10px, 2.8vw, 17px);
-        line-height: 1.1;
-        white-space: nowrap;
-      }
-
-      .dynamic-text-display.win-text {
-        font-size: 17px;
-      }
-
-      .lockers-container {
-        gap: 4px;
-        padding: 3px 5px;
-        border-width: 1px;
-        border-radius: 8px;
-      }
-
-      .locker-box {
-        height: 22px;
-        font-size: 7px;
-        letter-spacing: 0;
-      }
-
-      .locker-icon {
-        font-size: 9px;
-      }
-
-      .slot-stage {
-        gap: 4px;
-      }
-
-      .badges-column {
-        width: 24px;
-        gap: 3px;
-        padding: 3px 0;
-      }
-
-      .badge-line {
-        width: 21px;
-        height: 21px;
-        font-size: 9px;
-        border-width: 1px;
-      }
-
-      .slot-grid-container {
-        gap: 4px;
-        padding: 4px;
-        border-width: 2px;
-        border-radius: 10px;
-      }
-
-      .reel-column {
-        padding: 2px;
-        border-radius: 6px;
-      }
-
-      .reel-strip {
-        gap: 3px;
-      }
-
-      .symbol-cell {
-        font-size: clamp(24px, 8vh, 48px);
-        border-radius: 5px;
-      }
-
-      .symbol-cell.winning {
-        border-width: 2px;
-      }
-
-      .control-panel {
-        grid-template-columns: 1fr 1fr 1.2fr 1.5fr 1fr;
-        gap: 5px;
-        padding: 4px 5px;
-        border-width: 1px;
-        border-radius: 9px;
-      }
-
-      .btn-action,
-      .btn-spin {
-        height: 36px;
-        border-radius: 6px;
-        font-size: 10px;
-        box-shadow: 0 2px 0 #1a0033;
-      }
-
-      .btn-spin {
-        height: 40px;
-        font-size: 15px;
-      }
-
-      .control-label {
-        font-size: 7px;
-      }
-
-      .modal-card {
-        max-height: 96vh;
-        padding: 12px;
-      }
-
-      .modal-title {
-        margin-bottom: 7px;
-        font-size: 17px;
-      }
-
-      .gamble-card-display {
-        height: 60px;
-        margin: 8px 0;
-        font-size: 42px;
-      }
-
-      .modal-actions {
-        gap: 7px;
-        margin-top: 8px;
-      }
-
-      .modal-actions .btn-action {
-        height: 38px !important;
-        font-size: 10px;
-      }
+      .top-bar { min-height: 58px; gap: 5px; padding: 5px; border-width: 1px; border-radius: 9px; }
+      .total-bet-box, .balance-box { width: 25%; min-width: 0; padding: 4px 5px; border-radius: 6px; }
+      .dynamic-center-area { width: 50%; min-width: 0; }
+      .total-bet-label, .balance-label { overflow: hidden; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
+      .total-bet-value, .balance-value { overflow: hidden; font-size: clamp(12px, 4vw, 18px); text-overflow: ellipsis; }
+      .dynamic-text-display { overflow: hidden; font-size: clamp(11px, 3.8vw, 17px); text-overflow: ellipsis; }
+      
+      .dynamic-text-display.jackpot-text { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: 100%; max-width: 100%; min-width: 0; padding-inline: 2px; line-height: 1.05; white-space: normal; text-align: center; }
+      .dynamic-text-display.jackpot-text .jackpot-name, .dynamic-text-display.jackpot-text .jackpot-value { display: block; width: 100%; max-width: 100%; overflow: visible; text-align: center; text-overflow: clip; }
+      .dynamic-text-display.jackpot-text .jackpot-name { font-size: clamp(9px, 3vw, 15px); line-height: 1.1; white-space: normal; overflow-wrap: anywhere; }
+      .dynamic-text-display.jackpot-text .jackpot-value { font-size: clamp(10px, 3.2vw, 17px); line-height: 1.1; white-space: nowrap; }
+      
+      .dynamic-text-display.win-text { font-size: clamp(12px, 4vw, 18px); }
+      .lockers-container { gap: 3px; padding: 4px; border-width: 1px; border-radius: 9px; }
+      .locker-box { height: 27px; overflow: hidden; font-size: 7px; letter-spacing: 0; white-space: nowrap; }
+      .locker-icon { margin-right: 2px; font-size: 10px; }
+      .slot-stage { gap: 3px; }
+      .badges-column { width: 22px; gap: 5px; padding: 5px 0; }
+      .badge-line { width: 21px; height: 21px; font-size: 10px; border-width: 1px; }
+      .slot-grid-container { gap: 3px; padding: 4px; border-width: 2px; border-radius: 11px; }
+      .reel-column { padding: 2px; border-radius: 6px; }
+      .reel-strip { gap: 3px; }
+      .symbol-cell { font-size: clamp(24px, 9vw, 42px); border-radius: 5px; }
+      .symbol-cell.winning { border-width: 2px; }
+      .control-panel { grid-template-columns: repeat(2, 1fr); gap: 5px; padding: 5px; border-width: 1px; border-radius: 10px; }
+      .btn-action, .btn-spin { height: 42px; border-radius: 7px; font-size: 12px; box-shadow: 0 2px 0 #1a0033; }
+      .btn-spin { font-size: 16px; }
+      .control-label { font-size: 8px; }
+      #btn-spin { order: -1; }
+      .modal-card { width: 100%; padding: 18px 12px; }
+      .modal-title { font-size: 18px; }
+      .gamble-card-display { height: 80px; margin: 12px 0; font-size: 50px; }
+      .modal-actions { gap: 7px; }
+      .modal-actions .btn-action { height: 45px !important; font-size: 11px; }
     }
   </style>
 </head>
@@ -1104,63 +773,246 @@
     </div>
   </div>
 
+
   <div class="fullscreen-dev-panel" id="fullscreen-dev">
     <div class="dev-header">
-      <h2>⚙️ MODO DESARROLLADOR ⚙️</h2>
+      <h1>🎰 Slot Machine PWA</h1>
     </div>
 
     <div class="dev-content">
-      <p style="color:#7b2cbf;font-size:24px;font-weight:bold;text-align:center;">
-        [ÁREA DE CONFIGURACIÓN]<br><br>
-        <span style="font-size:16px;color:#aaa;">
-          Aquí integraremos todos los controles para modificar RTP, pesos de emojis, líneas y economía.
-        </span>
+		  
+      <!-- SECCIÓN 3: ESTADÍSTICAS DEL MOTOR -->
+      <div class="dev-section-title">📊 ESTADÍSTICAS DEL MOTOR</div>
+      <p style="margin-bottom: 10px; font-size: 13px; color: #aaa; text-align: left; width: 100%; max-width: 700px;">
+        Métricas de rendimiento en tiempo real basadas en las jugadas realizadas durante la sesión actual.
       </p>
+      
+      <div class="dev-economy-grid" style="margin-bottom: 30px;">
+        <div class="dev-economy-box" style="background: rgba(255,255,255,0.03);">
+          <label>Total Jugadas</label>
+          <span id="stat-plays" style="font-weight: bold; font-size: 16px; color: #fff; margin-top: 5px; display: block;">0</span>
+        </div>
+        <div class="dev-economy-box" style="background: rgba(255,255,255,0.03);">
+          <label>Total Apostado</label>
+          <span id="stat-bet" style="font-weight: bold; font-size: 16px; color: #fff; margin-top: 5px; display: block;">0</span>
+        </div>
+        <div class="dev-economy-box" style="background: rgba(255,255,255,0.03);">
+          <label>Premios Entregados</label>
+          <span id="stat-won" style="font-weight: bold; font-size: 16px; color: #fff; margin-top: 5px; display: block;">0</span>
+        </div>
+        <div class="dev-economy-box" style="background: rgba(255,255,255,0.03);">
+          <label>Perdido Arriesgando</label>
+          <span id="stat-lost-risk" style="font-weight: bold; font-size: 16px; color: #fff; margin-top: 5px; display: block;">0</span>
+        </div>
+        <div class="dev-economy-box" style="background: rgba(255,255,255,0.03);">
+          <label>RTP Real (%)</label>
+          <span id="stat-rtp" style="font-weight: bold; font-size: 16px; color: #4caf50; margin-top: 5px; display: block;">0%</span>
+        </div>
+        <div class="dev-economy-box" style="background: rgba(255,255,255,0.03);">
+          <label>Media Jugadas / Premio</label>
+          <span id="stat-avg-win" style="font-weight: bold; font-size: 16px; color: #fff; margin-top: 5px; display: block;">0</span>
+        </div>
+        <div class="dev-economy-box" style="background: rgba(255,255,255,0.03);">
+          <label>Racha Actual sin Premio</label>
+          <span id="stat-current-streak" style="font-weight: bold; font-size: 16px; color: #fff; margin-top: 5px; display: block;">0</span>
+        </div>
+        <div class="dev-economy-box" style="background: rgba(255,255,255,0.03);">
+          <label>Veces que ha Doblado</label>
+          <span id="stat-double-attempts" style="font-weight: bold; font-size: 16px; color: #fff; margin-top: 5px; display: block;">0</span>
+        </div>
+        <div class="dev-economy-box" style="background: rgba(255,255,255,0.03);">
+          <label>Racha Máx. Doblando</label>
+          <span id="stat-max-double" style="font-weight: bold; font-size: 16px; color: #fff; margin-top: 5px; display: block;">0</span>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 1: ECONOMÍA Y BANCA -->
+      <div class="dev-section-title">🏦 ECONOMÍA Y BANCA</div>
+      <p style="margin-bottom: 10px; font-size: 13px; color: #aaa; text-align: left; width: 100%; max-width: 700px;">
+        Parte de las pérdidas del "Doble o Nada" nutren los Jackpots. El resto son beneficios para la Banca.
+      </p>
+      
+      <div class="dev-economy-grid">
+        <div class="dev-economy-box">
+          <label title="Beneficios acumulados por la banca">Beneficio Banca</label>
+          <input type="number" id="dev-bank-profit" value="0">
+        </div>
+        <div class="dev-economy-box">
+          <label title="Porcentaje de la pérdida que va al bote">% al Jackpot</label>
+          <input type="number" id="dev-jp-percent" value="20" min="0" max="100">
+        </div>
+        <div class="dev-economy-box">
+          <label>Mini Jackpot (3+)</label>
+          <input type="number" id="dev-jp-3" value="1500000">
+        </div>
+        <div class="dev-economy-box">
+          <label>Grand Jackpot (4+)</label>
+          <input type="number" id="dev-jp-4" value="5000000">
+        </div>
+        <div class="dev-economy-box">
+          <label>Super Jackpot (5+)</label>
+          <input type="number" id="dev-jp-5" value="25000000">
+			</div>
+		
+			
+			<div class="dev-economy-box">
+  			<label>Créditos Iniciales (al resetear):</label>
+  <input type="number" id="dev-starting-credits" class="dev-input">
+
+        </div>
+      </div>
+
+
+
+      <!-- SECCIÓN 2: EMOJIS Y PROBABILIDADES -->
+      <div class="dev-section-title">🎰 SÍMBOLOS Y PREMIOS</div>
+      <p style="margin-bottom: 15px; font-size: 13px; color: #aaa; text-align: left; width: 100%; max-width: 700px;">
+        A mayor <strong>Peso</strong>, más frecuencia de aparición (menor volatilidad). Edita el Emoji directamente para cambiarlo.
+      </p>
+      
+      <div style="overflow-x: auto; width: 100%; display: flex; justify-content: center;">
+        <table class="dev-table">
+          <thead>
+            <tr>
+              <th>Emoji</th>
+              <th>Peso (Freq)</th>
+              <th>Pago x3</th>
+              <th>Pago x4</th>
+              <th>Pago x5</th>
+            </tr>
+          </thead>
+          <tbody id="dev-emoji-tbody">
+            <!-- Rellenado vía JS -->
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <div class="dev-footer">
-      <button class="btn-action" id="btn-dev-close" style="background:#c62828;width:250px;">
-        CERRAR PANEL
+        <!-- 💡 FOOTER CON BOTONES MÁS PEQUEÑOS -->
+    <div class="dev-footer" style="padding: 15px 20px;">
+      <button class="btn-action" onclick="resetStats()" style="background:#0288d1; width: min(100%, 200px); font-size: 13px; height: 38px;">
+        📊 RESET ESTADÍSTICAS
+      </button>
+      <button class="btn-action" id="btn-dev-reset" style="background:#f57c00; width: min(100%, 200px); font-size: 13px; height: 38px;">
+        🔄 POR DEFECTO
+      </button>
+      <button class="btn-action" id="btn-dev-close" style="background:#c62828; width: min(100%, 200px); font-size: 13px; height: 38px;">
+        ❌ CERRAR PANEL
       </button>
     </div>
-  </div>
 
-  <script>
-    const SYMBOLS = ['⚡', '🧠', '🔮', '💎', '👑', '🌀', '🎰', '🍒'];
+
+
+    <script>
+    // --- 1. CONFIGURACIÓN DE EMOJIS ---
+    const DEFAULT_CONFIG = [
+      { symbol: '🍒', weight: 45, pay3: 5,   pay4: 15,  pay5: 30 },
+      { symbol: '⚡', weight: 35, pay3: 10,  pay4: 20,  pay5: 40 },
+      { symbol: '🧠', weight: 25, pay3: 15,  pay4: 30,  pay5: 60 },
+      { symbol: '🔮', weight: 20, pay3: 20,  pay4: 40,  pay5: 80 },
+      { symbol: '🌀', weight: 15, pay3: 30,  pay4: 60,  pay5: 120 },
+      { symbol: '👑', weight: 10, pay3: 50,  pay4: 100, pay5: 250 },
+      { symbol: '💎', weight: 5,  pay3: 100, pay4: 250, pay5: 500 },
+      { symbol: '🎰', weight: 2,  pay3: 250, pay4: 500, pay5: 1500 }
+    ];
+
+    let EMOJI_CONFIG = JSON.parse(localStorage.getItem('slot_config')) || JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+
+    // --- 2. CONFIGURACIÓN DE LA ECONOMÍA Y JUGADOR ---
+    const DEFAULT_ECONOMY = {
+      startingCredits: 100000, 
+      bankProfit: 0,
+      jackpotPercent: 20,
+      jackpots: { 3: 1500000, 4: 5000000, 5: 25000000 }
+    };
+    
+    const savedEconomy = JSON.parse(localStorage.getItem('slot_economy')) || {};
+    let ECONOMY = { ...DEFAULT_ECONOMY, ...savedEconomy };
+
+    const savedPlayer = JSON.parse(localStorage.getItem('slot_player')) || {};
+
+    // --- 3. ESTADÍSTICAS DEL MOTOR ---
+    const defaultStats = {
+      totalPlays: 0,
+      totalBet: 0,
+      totalWon: 0,
+      totalLostRisking: 0,
+      doubleAttempts: 0,
+      maxDoubleStreak: 0,
+      currentDoubleStreak: 0,
+      currentNoPrizeStreak: 0,
+      prizesGiven: 0
+    };
+
+    const savedStats = JSON.parse(localStorage.getItem('machine_stats')) || {};
+    let gameStats = { ...defaultStats, ...savedStats };
+
+    // --- HELPERS Y GUARDADO ---
+    const $ = id => document.getElementById(id);
+
+    function saveConfig() { localStorage.setItem('slot_config', JSON.stringify(EMOJI_CONFIG)); }
+    function saveEconomy() { localStorage.setItem('slot_economy', JSON.stringify(ECONOMY)); }
+    function savePlayer() { localStorage.setItem('slot_player', JSON.stringify({ credits: state.credits })); }
+    
+    function saveAndUpdateStats() {
+      localStorage.setItem('machine_stats', JSON.stringify(gameStats));
+      renderStats();
+    }
+
+    function renderStats() {
+      if (!$('stat-plays')) return;
+      
+      $('stat-plays').innerText = gameStats.totalPlays;
+      $('stat-bet').innerText = gameStats.totalBet.toFixed(2);
+      $('stat-won').innerText = gameStats.totalWon.toFixed(2);
+      $('stat-lost-risk').innerText = gameStats.totalLostRisking.toFixed(2);
+      
+      let rtp = gameStats.totalBet > 0 ? (gameStats.totalWon / gameStats.totalBet) * 100 : 0;
+      $('stat-rtp').innerText = rtp.toFixed(2) + '%';
+      
+      let avgPlaysPerWin = gameStats.prizesGiven > 0 ? (gameStats.totalPlays / gameStats.prizesGiven) : 0;
+      $('stat-avg-win').innerText = avgPlaysPerWin.toFixed(1);
+      
+      $('stat-current-streak').innerText = gameStats.currentNoPrizeStreak;
+      $('stat-double-attempts').innerText = gameStats.doubleAttempts;
+      $('stat-max-double').innerText = gameStats.maxDoubleStreak;
+    }
+
+    function resetStats() {
+      if(confirm('¿Estás seguro de que quieres borrar todas las estadísticas?')) {
+        gameStats = { ...defaultStats };
+        saveAndUpdateStats();
+      }
+    }
+
+    function getJackpotsDisplay() {
+      return [
+        { name: 'MINI JACKPOTS', credits: ECONOMY.jackpots[3] },
+        { name: 'GRAND JACKPOTS', credits: ECONOMY.jackpots[4] },
+        { name: 'SÚPER JACKPOTS', credits: ECONOMY.jackpots[5] }
+      ];
+    }
 
     const PAYLINES = [
-      [2, 2, 2, 2, 2],
-      [1, 1, 1, 1, 1],
-      [3, 3, 3, 3, 3],
-      [0, 0, 0, 0, 0],
-      [4, 4, 4, 4, 4],
-      [4, 3, 2, 1, 0],
-      [0, 1, 2, 3, 4],
-      [0, 2, 4, 2, 0],
-      [4, 2, 0, 2, 4]
+      [2, 2, 2, 2, 2], [1, 1, 1, 1, 1], [3, 3, 3, 3, 3],
+      [0, 0, 0, 0, 0], [4, 4, 4, 4, 4], [4, 3, 2, 1, 0],
+      [0, 1, 2, 3, 4], [0, 2, 4, 2, 0], [4, 2, 0, 2, 4]
     ];
 
     const LINE_OPTIONS = [1, 3, 5, 7, 9];
     const BET_OPTIONS = [1, 2, 3, 5, 10];
-    const CREDIT_VALUE_EUR = 0.00001;
-
-    const JACKPOTS = [
-      { name: 'MINI JACKPOTS', credits: 1500000 },
-      { name: 'GRAND JACKPOTS', credits: 5000000 },
-      { name: 'SÚPER JACKPOTS', credits: 25000000 }
-    ];
-
+    
     const state = {
-      credits: 100000,
+      credits: savedPlayer.credits !== undefined ? savedPlayer.credits : ECONOMY.startingCredits,
       selectedLinesIdx: 4,
       selectedBetIdx: 0,
       isSpinning: false,
       autoSpin: false,
       lastWinCredits: 0,
+      lastWinMatchCount: 3, 
       hasActiveWin: false,
       gambleFailCount: 0,
-      displayMode: 'eur',
-      grid: Array.from({ length: 5 }, () => Array(5).fill('⚡')),
+      grid: Array.from({ length: 5 }, () => Array(5).fill('')),
       totalSpins: 0,
       totalPayout: 0,
       currentWinningLines: []
@@ -1169,8 +1021,6 @@
     let jackpotIndex = 0;
     let secretBuffer = '';
     let secretTimeout = null;
-
-    const $ = id => document.getElementById(id);
 
     const gridContainer = $('slot-grid');
     const paylineSvg = $('payline-svg');
@@ -1193,10 +1043,11 @@
     document.addEventListener('DOMContentLoaded', () => {
       initBadges();
       initGridUI();
-      setupBalanceToggle();
       registerEvents();
       updateUI();
       startJackpotRotation();
+      renderDevPanel();
+      renderStats();
 
       window.addEventListener('resize', () => {
         if (state.currentWinningLines.length) {
@@ -1205,62 +1056,82 @@
       });
     });
 
-    function formatEur(value) {
-      if (value === 0) return '0.00';
-      if (value < 0.01) return value.toFixed(5);
-      return value.toFixed(2);
-    }
-
     function formatValue(credits) {
-      if (state.displayMode === 'eur') {
-        return `${formatEur(credits * CREDIT_VALUE_EUR)} €`;
-      }
-
-      return `${credits.toLocaleString('es-ES')} C`;
-    }
-
-    function setupBalanceToggle() {
-      balanceBox.style.cursor = 'pointer';
-      balanceBox.title = 'Cambiar entre euros y créditos';
-
-      balanceBox.addEventListener('click', () => {
-        state.displayMode = state.displayMode === 'eur' ? 'cr' : 'eur';
-        updateUI();
-
-        if (!state.isSpinning && !state.hasActiveWin) {
-          showJackpotText(jackpotIndex);
-        }
-      });
+      return `${Math.floor(credits).toLocaleString('es-ES')} C`;
     }
 
     function checkSecretCode(value) {
       secretBuffer += value;
-
-      if (secretBuffer.length > 4) {
-        secretBuffer = secretBuffer.slice(-4);
-      }
-
+      if (secretBuffer.length > 4) secretBuffer = secretBuffer.slice(-4);
       if (secretBuffer === '1974') {
+        renderDevPanel();
         $('fullscreen-dev').classList.add('active');
         secretBuffer = '';
       }
-
       clearTimeout(secretTimeout);
-      secretTimeout = setTimeout(() => {
-        secretBuffer = '';
-      }, 3000);
+      secretTimeout = setTimeout(() => { secretBuffer = ''; }, 3000);
+    }
+    
+    function renderDevPanel() {
+      const tbody = $('dev-emoji-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      
+      EMOJI_CONFIG.forEach((config, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><input type="text" class="dev-input dev-emoji-input" data-idx="${idx}" data-key="symbol" value="${config.symbol}"></td>
+          <td><input type="number" class="dev-input" data-idx="${idx}" data-key="weight" value="${config.weight}"></td>
+          <td><input type="number" class="dev-input" data-idx="${idx}" data-key="pay3" value="${config.pay3}"></td>
+          <td><input type="number" class="dev-input" data-idx="${idx}" data-key="pay4" value="${config.pay4}"></td>
+          <td><input type="number" class="dev-input" data-idx="${idx}" data-key="pay5" value="${config.pay5}"></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      tbody.querySelectorAll('.dev-input').forEach(input => {
+        input.addEventListener('change', (e) => {
+          const idx = e.target.dataset.idx;
+          const key = e.target.dataset.key;
+          if (key === 'symbol') {
+            EMOJI_CONFIG[idx][key] = e.target.value || '❓';
+          } else {
+            EMOJI_CONFIG[idx][key] = parseInt(e.target.value) || 0;
+          }
+          saveConfig();
+        });
+      });
+
+      if ($('dev-starting-credits')) $('dev-starting-credits').value = ECONOMY.startingCredits;
+      if ($('dev-bank-profit')) $('dev-bank-profit').value = Math.floor(ECONOMY.bankProfit);
+      if ($('dev-jp-percent')) $('dev-jp-percent').value = ECONOMY.jackpotPercent;
+      if ($('dev-jp-3')) $('dev-jp-3').value = Math.floor(ECONOMY.jackpots[3]);
+      if ($('dev-jp-4')) $('dev-jp-4').value = Math.floor(ECONOMY.jackpots[4]);
+      if ($('dev-jp-5')) $('dev-jp-5').value = Math.floor(ECONOMY.jackpots[5]);
+
+      const saveEcoFields = () => {
+        ECONOMY.startingCredits = parseFloat($('dev-starting-credits')?.value) || 100000;
+        ECONOMY.bankProfit = parseFloat($('dev-bank-profit')?.value) || 0;
+        ECONOMY.jackpotPercent = parseFloat($('dev-jp-percent')?.value) || 0;
+        ECONOMY.jackpots[3] = parseFloat($('dev-jp-3')?.value) || 0;
+        ECONOMY.jackpots[4] = parseFloat($('dev-jp-4')?.value) || 0;
+        ECONOMY.jackpots[5] = parseFloat($('dev-jp-5')?.value) || 0;
+        saveEconomy();
+      };
+
+      ['dev-starting-credits', 'dev-bank-profit', 'dev-jp-percent', 'dev-jp-3', 'dev-jp-4', 'dev-jp-5'].forEach(id => {
+        if ($(id)) $(id).addEventListener('change', saveEcoFields);
+      });
     }
 
     function initBadges() {
       badgesLeft.innerHTML = '';
       badgesRight.innerHTML = '';
-
       const leftMapping = [4, 2, 1, 3, 5];
       const rightMapping = [6, 8, null, 9, 7];
 
       [...leftMapping, ...rightMapping].forEach((line, index) => {
         const badge = document.createElement('div');
-
         if (line) {
           badge.className = 'badge-line';
           badge.dataset.line = line;
@@ -1270,32 +1141,38 @@
           badge.style.width = '21px';
           badge.style.height = '21px';
         }
-
         (index < 5 ? badgesLeft : badgesRight).appendChild(badge);
       });
     }
 
+    function getRandomSymbol() {
+      const totalWeight = EMOJI_CONFIG.reduce((sum, config) => sum + config.weight, 0);
+      let random = Math.random() * totalWeight;
+      for (const config of EMOJI_CONFIG) {
+        if (random < config.weight) return config.symbol;
+        random -= config.weight;
+      }
+      return EMOJI_CONFIG[0].symbol; 
+    }
+
     function initGridUI() {
+      clearPaylinesSVG();
       gridContainer.querySelectorAll('.reel-column').forEach((reel, reelIndex) => {
         reel.innerHTML = '';
-
         const strip = document.createElement('div');
         strip.className = 'reel-strip';
         strip.id = `strip-${reelIndex}`;
 
         for (let row = 0; row < 5; row++) {
           const cell = document.createElement('div');
-          const symbol = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-
+          const symbol = getRandomSymbol();
           cell.className = 'symbol-cell';
           cell.dataset.reel = reelIndex;
           cell.dataset.row = row;
           cell.innerHTML = `<span class="emoji-wrapper">${symbol}</span>`;
-
           state.grid[reelIndex][row] = symbol;
           strip.appendChild(cell);
         }
-
         reel.appendChild(strip);
       });
     }
@@ -1303,26 +1180,24 @@
     function startJackpotRotation() {
       setInterval(() => {
         if (!state.isSpinning && !state.hasActiveWin) {
-          jackpotIndex = (jackpotIndex + 1) % JACKPOTS.length;
+          const currentJackpots = getJackpotsDisplay();
+          jackpotIndex = (jackpotIndex + 1) % currentJackpots.length;
           showJackpotText(jackpotIndex);
         }
       }, 3500);
     }
 
     function showJackpotText(index) {
-      const jackpot = JACKPOTS[index];
-
+      const currentJackpots = getJackpotsDisplay();
+      const jackpot = currentJackpots[index];
       dynamicDisplay.style.opacity = '0';
       dynamicDisplay.style.transform = 'scale(.9)';
-
       setTimeout(() => {
         dynamicDisplay.className = 'dynamic-text-display jackpot-text';
-
         dynamicDisplay.innerHTML = `
           <span class="jackpot-name">🏆 ${jackpot.name}</span>
           <span class="jackpot-value">${formatValue(jackpot.credits)}</span>
         `;
-
         dynamicDisplay.style.opacity = '1';
         dynamicDisplay.style.transform = 'scale(1)';
       }, 350);
@@ -1335,7 +1210,6 @@
       } else {
         dynamicDisplay.className = 'dynamic-text-display';
       }
-
       dynamicDisplay.innerHTML = message;
       dynamicDisplay.style.opacity = '1';
       dynamicDisplay.style.transform = 'scale(1)';
@@ -1346,18 +1220,9 @@
       const bet = BET_OPTIONS[state.selectedBetIdx];
       const totalBet = lines * bet;
 
-      balanceLabel.textContent =
-        state.displayMode === 'eur' ? 'SALDO TOTAL' : 'CRÉDITOS TOTALES';
-
-      balanceVal.textContent =
-        state.displayMode === 'eur'
-          ? `${formatEur(state.credits * CREDIT_VALUE_EUR)} €`
-          : `${state.credits.toLocaleString('es-ES')} C`;
-
-      valTotalBet.textContent =
-        state.displayMode === 'eur'
-          ? `${formatEur(totalBet * CREDIT_VALUE_EUR)} €`
-          : `${totalBet} Créditos`;
+      balanceLabel.textContent = 'CRÉDITOS TOTALES';
+      balanceVal.textContent = `${Math.floor(state.credits).toLocaleString('es-ES')} C`;
+      valTotalBet.textContent = `${totalBet} Créditos`;
 
       valLines.textContent = lines;
       valBet.textContent = `x${bet}`;
@@ -1366,14 +1231,8 @@
         badge.classList.toggle('active', Number(badge.dataset.line) <= lines);
       });
 
-      btnGamble.classList.toggle(
-        'disabled',
-        state.lastWinCredits <= 0 || state.isSpinning
-      );
-
-      [btnSpin, btnLines, btnBet].forEach(button => {
-        button.classList.toggle('disabled', state.isSpinning);
-      });
+      btnGamble.classList.toggle('disabled', state.lastWinCredits <= 0 || state.isSpinning);
+      [btnSpin, btnLines, btnBet].forEach(button => button.classList.toggle('disabled', state.isSpinning));
     }
 
     function clearPaylinesSVG() {
@@ -1383,41 +1242,25 @@
 
     function drawPaylinesSVG(winningLines) {
       paylineSvg.innerHTML = '';
-
       const gridRect = gridContainer.getBoundingClientRect();
       paylineSvg.setAttribute('width', gridRect.width);
       paylineSvg.setAttribute('height', gridRect.height);
 
-      const colors = [
-        '#ffd700', '#00ff88', '#ff0055', '#00e5ff',
-        '#ff9900', '#e040fb', '#76ff03', '#1de9b6', '#ff3d00'
-      ];
+      const colors = ['#ffd700', '#00ff88', '#ff0055', '#00e5ff', '#ff9900', '#e040fb', '#76ff03', '#1de9b6', '#ff3d00'];
 
       winningLines.forEach(win => {
         const points = [];
-
         for (let reel = 0; reel < win.matchCount; reel++) {
           const row = PAYLINES[win.lineIdx][reel];
-          const cell = gridContainer.querySelector(
-            `.symbol-cell[data-reel="${reel}"][data-row="${row}"]`
-          );
-
+          const cell = gridContainer.querySelector(`.symbol-cell[data-reel="${reel}"][data-row="${row}"]`);
           if (!cell) continue;
-
           const rect = cell.getBoundingClientRect();
-          points.push(
-            `${rect.left + rect.width / 2 - gridRect.left},` +
-            `${rect.top + rect.height / 2 - gridRect.top}`
-          );
+          points.push(`${rect.left + rect.width / 2 - gridRect.left},${rect.top + rect.height / 2 - gridRect.top}`);
         }
 
         if (points.length < 2) return;
 
-        const polyline = document.createElementNS(
-          'http://www.w3.org/2000/svg',
-          'polyline'
-        );
-
+        const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
         polyline.setAttribute('points', points.join(' '));
         polyline.setAttribute('stroke', colors[win.lineIdx % colors.length]);
         polyline.setAttribute('stroke-width', '6');
@@ -1433,19 +1276,13 @@
     function registerEvents() {
       btnLines.addEventListener('click', () => {
         if (state.isSpinning) return;
-
-        state.selectedLinesIdx =
-          (state.selectedLinesIdx + 1) % LINE_OPTIONS.length;
-
+        state.selectedLinesIdx = (state.selectedLinesIdx + 1) % LINE_OPTIONS.length;
         updateUI();
       });
 
       btnBet.addEventListener('click', () => {
         if (state.isSpinning) return;
-
-        state.selectedBetIdx =
-          (state.selectedBetIdx + 1) % BET_OPTIONS.length;
-
+        state.selectedBetIdx = (state.selectedBetIdx + 1) % BET_OPTIONS.length;
         updateUI();
       });
 
@@ -1454,19 +1291,12 @@
       btnAuto.addEventListener('click', () => {
         state.autoSpin = !state.autoSpin;
         valAuto.textContent = state.autoSpin ? 'AUTO: ON' : 'AUTO: OFF';
-
-        btnAuto.style.background = state.autoSpin
-          ? 'linear-gradient(180deg,#2e7d32 0%,#1b5e20 100%)'
-          : '';
-
-        if (state.autoSpin && !state.isSpinning) {
-          triggerSpin();
-        }
+        btnAuto.style.background = state.autoSpin ? 'linear-gradient(180deg,#2e7d32 0%,#1b5e20 100%)' : '';
+        if (state.autoSpin && !state.isSpinning) triggerSpin();
       });
 
       btnGamble.addEventListener('click', () => {
         if (state.lastWinCredits <= 0) return;
-
         state.gambleFailCount = 0;
         $('gamble-win-val').textContent = formatValue(state.lastWinCredits);
         $('gamble-card').textContent = '❓';
@@ -1484,38 +1314,91 @@
 
       $('btn-dev-close').addEventListener('click', () => {
         $('fullscreen-dev').classList.remove('active');
+        initGridUI();
       });
+
+      $('btn-dev-reset').addEventListener('click', () => {
+        if(confirm('¿Seguro que quieres borrar todos tus cambios y restaurar la economía y emojis por defecto?')) {
+          EMOJI_CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+          ECONOMY = JSON.parse(JSON.stringify(DEFAULT_ECONOMY));
+          localStorage.removeItem('slot_player');
+          state.credits = ECONOMY.startingCredits;
+          saveConfig();
+          saveEconomy();
+          savePlayer();
+          renderDevPanel();
+          updateUI();
+        }
+      });
+    }
+
+    function processGambleLoss(lostAmount) {
+      const jpPercentage = ECONOMY.jackpotPercent / 100;
+      const jackpotCut = lostAmount * jpPercentage;
+      const bankCut = lostAmount - jackpotCut;
+
+      ECONOMY.bankProfit += bankCut;
+      
+      let match = state.lastWinMatchCount;
+      if (match < 3) match = 3; 
+      if (match > 5) match = 5; 
+      
+      ECONOMY.jackpots[match] += jackpotCut;
+      saveEconomy();
     }
 
     function playGamble() {
       if (state.lastWinCredits <= 0) return;
 
+      gameStats.doubleAttempts++;
+
       if (Math.random() >= .5) {
         state.credits += state.lastWinCredits;
-        state.lastWinCredits *= 2;
+        savePlayer();
+        
+        gameStats.currentDoubleStreak++;
+        if (gameStats.currentDoubleStreak > gameStats.maxDoubleStreak) {
+          gameStats.maxDoubleStreak = gameStats.currentDoubleStreak;
+        }
+        gameStats.totalWon += state.lastWinCredits; 
+        saveAndUpdateStats();
 
+        state.lastWinCredits *= 2;
         $('gamble-card').textContent = '✨ 2X ✨';
         $('gamble-win-val').textContent = formatValue(state.lastWinCredits);
-
-        setStatusText(
-          `🎉 ¡PREMIO DUPLICADO! +${formatValue(state.lastWinCredits)}`,
-          true
-        );
+        setStatusText(`🎉 ¡PREMIO DUPLICADO! +${formatValue(state.lastWinCredits)}`, true);
       } else {
         state.gambleFailCount++;
 
         if (state.gambleFailCount === 1) {
           const half = Math.floor(state.lastWinCredits / 2);
+          const lostAmount = state.lastWinCredits - half; 
+          
+          processGambleLoss(lostAmount);
 
-          state.credits -= state.lastWinCredits - half;
+          gameStats.currentDoubleStreak = 0;
+          gameStats.totalLostRisking += lostAmount;
+          gameStats.totalWon -= lostAmount; 
+          saveAndUpdateStats();
+
+          state.credits -= lostAmount;
+          savePlayer();
           state.lastWinCredits = half;
-
           $('gamble-card').textContent = '💔 1/2';
           $('gamble-win-val').textContent = formatValue(half);
           setStatusText(`⚠️ Te quedan: ${formatValue(half)}`);
         } else {
-          state.credits -= state.lastWinCredits;
+          const lostAmount = state.lastWinCredits;
+          processGambleLoss(lostAmount);
+
+          gameStats.currentDoubleStreak = 0;
+          gameStats.totalLostRisking += lostAmount;
+          gameStats.totalWon -= lostAmount; 
+          saveAndUpdateStats();
+
+          state.credits -= lostAmount;
           state.credits = Math.max(0, state.credits);
+          savePlayer();
           state.lastWinCredits = 0;
           state.hasActiveWin = false;
 
@@ -1529,7 +1412,6 @@
           }, 1200);
         }
       }
-
       updateUI();
     }
 
@@ -1547,6 +1429,15 @@
       }
 
       state.credits -= totalBet;
+      savePlayer();
+      ECONOMY.bankProfit += totalBet; 
+      saveEconomy();
+
+      gameStats.totalPlays++;
+      gameStats.totalBet += totalBet;
+      gameStats.currentNoPrizeStreak++; 
+      saveAndUpdateStats();
+
       state.isSpinning = true;
       state.lastWinCredits = 0;
       state.hasActiveWin = false;
@@ -1558,7 +1449,6 @@
       document.querySelectorAll('.symbol-cell').forEach(cell => {
         cell.classList.remove('winning', 'dimmed');
       });
-
       document.querySelectorAll('.badge-line').forEach(badge => {
         badge.classList.remove('badge-winning-pulse');
       });
@@ -1579,12 +1469,11 @@
 
     function stopReel(col) {
       const strip = $(`strip-${col}`);
-
       strip.classList.remove('spinning');
       strip.classList.add('bounce');
 
       for (let row = 0; row < 5; row++) {
-        const symbol = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+        const symbol = getRandomSymbol();
         state.grid[col][row] = symbol;
 
         const cell = strip.querySelector(`[data-row="${row}"]`);
@@ -1600,6 +1489,7 @@
       const activeLines = LINE_OPTIONS[state.selectedLinesIdx];
       const bet = BET_OPTIONS[state.selectedBetIdx];
       let totalWin = 0;
+      let maxWinMatchCount = 0; 
       const winningCells = new Set();
       const winningLines = [];
 
@@ -1609,29 +1499,31 @@
         let matchCount = 1;
 
         for (let reel = 1; reel < 5; reel++) {
-          if (state.grid[reel][path[reel]] === firstSymbol) {
-            matchCount++;
-          } else {
-            break;
-          }
+          if (state.grid[reel][path[reel]] === firstSymbol) matchCount++;
+          else break;
         }
 
         if (matchCount < 3) continue;
 
-        totalWin += matchCount * 10 * bet;
+        if (matchCount > maxWinMatchCount) {
+          maxWinMatchCount = matchCount;
+        }
+
+        const configItem = EMOJI_CONFIG.find(c => c.symbol === firstSymbol);
+        if (!configItem) continue;
+        
+        const multiplier = configItem[`pay${matchCount}`];
+        const winAmount = multiplier * bet;
+        
+        totalWin += winAmount;
         winningLines.push({ lineIdx: lineIndex, matchCount });
 
         for (let reel = 0; reel < matchCount; reel++) {
           winningCells.add(`${reel}-${path[reel]}`);
         }
 
-        const badge = document.querySelector(
-          `.badge-line[data-line="${lineIndex + 1}"]`
-        );
-
-        if (badge) {
-          badge.classList.add('badge-winning-pulse');
-        }
+        const badge = document.querySelector(`.badge-line[data-line="${lineIndex + 1}"]`);
+        if (badge) badge.classList.add('badge-winning-pulse');
       }
 
       if (!totalWin) {
@@ -1640,16 +1532,25 @@
         return;
       }
 
+      ECONOMY.bankProfit -= totalWin;
+      saveEconomy();
+
       state.credits += totalWin;
+      savePlayer();
       state.lastWinCredits = totalWin;
-      state.totalPayout += totalWin * CREDIT_VALUE_EUR;
+      state.lastWinMatchCount = maxWinMatchCount; 
+      state.totalPayout += totalWin;
       state.currentWinningLines = winningLines;
+
+      gameStats.prizesGiven++;
+      gameStats.currentNoPrizeStreak = 0; 
+      gameStats.totalWon += totalWin;
+      saveAndUpdateStats();
 
       setStatusText(`🎉 ¡PREMIO! +${formatValue(totalWin)} 🎉`, true);
 
       document.querySelectorAll('.symbol-cell').forEach(cell => {
         const key = `${cell.dataset.reel}-${cell.dataset.row}`;
-
         cell.classList.toggle('winning', winningCells.has(key));
         cell.classList.toggle('dimmed', !winningCells.has(key));
       });
@@ -1668,6 +1569,15 @@
         }, 1500);
       }
     }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('Service Worker registrado', reg))
+          .catch(err => console.log('Error al registrar Service Worker', err));
+      });
+    }
   </script>
+
 </body>
 </html>

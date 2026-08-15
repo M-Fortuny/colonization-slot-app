@@ -1,0 +1,22 @@
+{
+  "name": "Slot Machine PWA",
+  "short_name": "SlotMachine",
+  "description": "Un divertido juego de tragamonedas responsivo e instalable.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#000000",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icono-app.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icono-app.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
