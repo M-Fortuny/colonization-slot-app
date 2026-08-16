@@ -670,125 +670,81 @@ body {
 
 
 
-        @media screen and (max-width: 768px) and (orientation: portrait) {
-      body {
-        gap: 6px;
-        padding: max(8px, env(safe-area-inset-top))
-                 max(8px, env(safe-area-inset-right))
-                 max(8px, env(safe-area-inset-bottom))
-                 max(8px, env(safe-area-inset-left));
-      }
-      
-      .top-bar { min-height: 58px; gap: 5px; padding: 5px; border-width: 1px; border-radius: 9px; }
-      .total-bet-box, .balance-box { width: 25%; min-width: 0; padding: 4px 5px; border-radius: 6px; }
-      .dynamic-center-area { width: 50%; min-width: 0; }
-      .total-bet-label, .balance-label { overflow: hidden; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
-      .total-bet-value, .balance-value { overflow: hidden; font-size: clamp(12px, 4vw, 18px); text-overflow: ellipsis; }
-      .dynamic-text-display { overflow: hidden; font-size: clamp(11px, 3.8vw, 17px); text-overflow: ellipsis; }
-      
-      /* Mantenemos el apilamiento vertical para textos dinámicos largos */
-      .dynamic-text-display.jackpot-text { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: 100%; max-width: 100%; min-width: 0; padding-inline: 2px; line-height: 1.05; white-space: normal; text-align: center; }
-      .dynamic-text-display.jackpot-text .jackpot-name, .dynamic-text-display.jackpot-text .jackpot-value { display: block; width: 100%; max-width: 100%; overflow: visible; text-align: center; text-overflow: clip; }
-      .dynamic-text-display.jackpot-text .jackpot-name { font-size: clamp(9px, 3vw, 15px); line-height: 1.1; white-space: normal; overflow-wrap: anywhere; }
-      .dynamic-text-display.jackpot-text .jackpot-value { font-size: clamp(10px, 3.2vw, 17px); line-height: 1.1; white-space: nowrap; }
-      
-      .dynamic-text-display.win-text { font-size: clamp(12px, 4vw, 18px); }
+        /* ========================================================
+   MODO MÓVIL (VERTICAL) - COLOCAR AL FINAL DEL CSS
+   ======================================================== */
+@media screen and (max-width: 768px) and (orientation: portrait) {
+  
+  /* 1. LOCKERS: Estilo Carta Vertical (Doble de altos) */
+  .lockers-container {
+    gap: 6px !important;
+    padding: 6px !important;
+  }
+  .locker-box {
+    flex-direction: column !important; /* Apila candado y texto */
+    height: 70px !important; /* Mucho más altos */
+    font-size: 11px !important;
+    justify-content: center !important;
+  }
+  .locker-icon {
+    font-size: 22px !important;
+    margin-right: 0 !important;
+    margin-bottom: 4px !important;
+  }
 
-      /* --- 1. DESBLOQUEABLES: DOBLE DE ALTOS (ESTILO CARTA) --- */
-      .lockers-container { gap: 4px; padding: 5px; border-width: 1px; border-radius: 9px; }
-      .locker-box { 
-        height: 55px; /* Altura duplicada para mejor visibilidad */
-        flex-direction: column; /* Apila icono sobre el texto verticalmente */
-        justify-content: center;
-        gap: 3px;
-        overflow: hidden; 
-        font-size: 8px; /* Texto ligeramente mayor */
-        letter-spacing: 0; 
-        white-space: normal;
-        line-height: 1;
-      }
-      .locker-icon { margin-right: 0; font-size: 14px; } /* Icono grande y centrado */
+  /* 2. RODILLOS: Reducción de altura para ganar espacio (Proporción 4:3) */
+  .slot-grid-container {
+    gap: 4px !important;
+    padding: 6px !important;
+  }
+  .symbol-cell {
+    font-size: 38px !important; /* Emojis un poco más ajustados */
+    height: 50px !important;    /* Reducimos la altura del rectángulo */
+  }
+  .badge-line {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 11px !important;
+  }
 
-      /* --- 2. MATRIZ Y RODILLOS: PROPORCIÓN 4:3 VERTICAL Y MÁS ESTRECHOS --- */
-      .slot-stage { gap: 3px; width: 92%; } /* Un pelín más estrecho */
-      
-      /* Indicadores de línea más compactos */
-      .badges-column { width: 18px; gap: 5px; padding: 5px 0; }
-      .badge-line { width: 18px; height: 18px; font-size: 9px; border-width: 1px; }
-      
-      .slot-grid-container { 
-        gap: 3px; 
-        padding: 4px; 
-        border-width: 2px; 
-        border-radius: 11px;
-        aspect-ratio: 3 / 4; /* Fuerza visualmente el formato vertical de los rodillos */
-      }
-      .reel-column { padding: 2px; border-radius: 6px; }
-      .reel-strip { gap: 3px; }
-      .symbol-cell { font-size: clamp(20px, 8vw, 38px); border-radius: 5px; }
-      .symbol-cell.winning { border-width: 2px; }
+  /* 3. PANEL DE CONTROL: Redistribución Ergonómica Total */
+  .control-panel {
+    display: grid !important;
+    /* Creamos una cuadrícula invisible de 4 columnas y 2 filas */
+    grid-template-columns: 1fr 1fr 1fr 1fr !important;
+    grid-template-areas: 
+      "auto auto spin spin"
+      "lines bet gamble gamble" !important;
+    gap: 8px !important;
+    padding: 10px !important;
+  }
 
-      /* --- 3. PANEL DE CONTROL ASIMÉTRICO (ZONA DEL PULGAR) --- */
-      .control-panel { 
-        display: grid;
-        /* Estructura del grid: 4 columnas, 2 filas */
-        grid-template-areas: 
-          "auto auto spin spin"
-          "lines bet gamble gamble";
-        grid-template-columns: 1fr 1fr 1.3fr 1.3fr; /* Zona derecha un poco más ancha para pulgar */
-        grid-template-rows: 1fr 1fr;
-        gap: 5px; 
-        padding: 6px; 
-        border-width: 1px; 
-        border-radius: 10px; 
-      }
+  /* Asignamos cada botón a su zona en el mapa (Magia pura) */
+  #btn-auto   { grid-area: auto !important; height: 50px !important; }
+  #btn-lines  { grid-area: lines !important; height: 50px !important; }
+  #btn-bet    { grid-area: bet !important; height: 50px !important; }
+  
+  #btn-spin   { 
+    grid-area: spin !important; 
+    height: 60px !important; /* Destacado y más alto */
+    font-size: 20px !important; 
+  }
+  
+  #btn-gamble { 
+    grid-area: gamble !important; 
+    height: 40px !important; /* Compacto debajo de girar */
+  }
+  
+  /* Ajustes de textos interiores de los botones para que no se desborden */
+  .control-label {
+    font-size: 9px !important;
+    margin-bottom: 0 !important;
+  }
+  #val-lines, #val-bet, #val-auto {
+    font-size: 13px !important;
+  }
+}
 
-      .btn-action, .btn-spin { 
-        height: 100%; min-height: 44px; /* Ocupan todo el alto de su celda (2 filas) */
-        border-radius: 7px; 
-        font-size: 11px; 
-        box-shadow: 0 3px 0 #1a0033; 
-        padding: 4px; 
-      }
-      .btn-spin { font-size: 16px; box-shadow: 0 3px 0 #b23c00; }
-      .control-label { font-size: 8px; margin-bottom: 0; }
-      
-      /* Asignamos los botones específicos a su área del Grid */
-      .btn-spin { grid-area: spin; }
-      .btn-gamble { grid-area: gamble; }
-      
-      /* Basado en el orden HTML de izquierda a derecha: 1º Líneas, 2º Apuesta, 3º Auto */
-      /* Si en tu HTML el orden de los 3 primeros botones es distinto, dímelo y ajustamos los números */
-      .control-panel > *:nth-child(1) { grid-area: lines; }  
-      .control-panel > *:nth-child(2) { grid-area: bet; }    
-      .control-panel > *:nth-child(3) { grid-area: auto; }
-      
-      /* Ajuste de texto para botones más pequeños de la izquierda */
-      .control-panel > *:nth-child(1) .control-label,
-      .control-panel > *:nth-child(2) .control-label { font-size: 7px; }
-
-      /* --- 4. EFECTO PARPADEO / RESPIRACIÓN BOTÓN GIRAR (Solo móvil) --- */
-      @keyframes pulseGlowBtnMobile {
-        0% { box-shadow: 0 0 5px rgba(255, 152, 0, 0.3), 0 3px 0 #b23c00; }
-        50% { box-shadow: 0 0 15px rgba(255, 152, 0, 0.9), 0 3px 0 #b23c00; }
-        100% { box-shadow: 0 0 5px rgba(255, 152, 0, 0.3), 0 3px 0 #b23c00; }
-      }
-      
-      .btn-spin:not(.disabled) {
-        animation: pulseGlowBtnMobile 1.5s infinite alternate ease-in-out;
-      }
-      .btn-spin.disabled { 
-        animation: none; /* Se apaga automáticamente al presionar / girar */
-        box-shadow: 0 3px 0 #b23c00; 
-      }
-
-      /* MODALES Y EXTRAS */
-      .modal-card { width: 100%; padding: 18px 12px; }
-      .modal-title { font-size: 18px; }
-      .gamble-card-display { height: 80px; margin: 12px 0; font-size: 50px; }
-      .modal-actions { gap: 7px; }
-      .modal-actions .btn-action { height: 45px !important; font-size: 11px; }
-    }
 
   </style>
 </head>
