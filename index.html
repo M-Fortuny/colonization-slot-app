@@ -36,34 +36,46 @@
       --green: #00e676;
     }
 
-    html,
-    body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
+    html {
+  width: 100%;
+  height: 100%;
+  /* 💡 NUEVO: Obliga a Safari a usar el alto real disponible, ignorando sus barras invisibles */
+  height: -webkit-fill-available; 
+  /* 💡 NUEVO: Si iOS falla un milisegundo al rotar, el fondo será negro, no blanco */
+  background-color: #08020f; 
+  overflow: hidden;
+}
 
-    body {
-  min-height: 100dvh;
+body {
+  /* 💡 NUEVO: Anclaje absoluto. Clava la app a las 4 esquinas de la pantalla para evitar saltos */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  min-height: -webkit-fill-available; /* Hack para Safari */
+  
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center; /* 💡 Obliga a centrar en pantallas grandes/iPad */
+  align-items: center;
   gap: 16px;
   
-  /* 💡 Márgenes seguros aplicados a nivel GLOBAL para todos los dispositivos IOS */
+  /* Márgenes seguros globales */
   padding: max(20px, env(safe-area-inset-top))
            max(20px, env(safe-area-inset-right))
            max(20px, env(safe-area-inset-bottom))
            max(20px, env(safe-area-inset-left));
            
-  position: relative;
   color: #fff;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background: radial-gradient(circle at center, #1b092b 0%, #08020f 100%);
-  width: 100%;
+  overflow: hidden;
 }
-
 
 
     button {
@@ -75,6 +87,7 @@
       max-width: 980px;
       margin-inline: auto;
     }
+
 
     .top-bar {
       min-height: 80px;
