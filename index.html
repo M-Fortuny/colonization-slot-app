@@ -670,80 +670,15 @@ body {
 
 
 
-        /* ========================================================
-   MODO MÓVIL (VERTICAL) - COLOCAR AL FINAL DEL CSS
-   ======================================================== */
-@media screen and (max-width: 768px) and (orientation: portrait) {
-  
-  /* 1. LOCKERS: Estilo Carta Vertical (Doble de altos) */
-  .lockers-container {
-    gap: 5px !important;
-    padding: 5px !important;
-  }
-  .locker-box {
-    flex-direction: column !important; /* Apila candado y texto */
-    height: 70px !important; /* Mucho más altos */
-    font-size: 11px !important;
-    justify-content: center !important;
-  }
-  .locker-icon {
-    font-size: 22px !important;
-    margin-right: 0 !important;
-    margin-bottom: 4px !important;
-  }
-
-  /* 2. RODILLOS: Reducción de altura para ganar espacio (Proporción 4:3) */
-  .slot-grid-container {
-    gap: 4px !important;
-    padding: 6px !important;
-  }
-  .symbol-cell {
-    font-size: 5px !important; /* Emojis un poco más ajustados */
-    height: 45px !important;    /* Reducimos la altura del rectángulo */
-  }
-  .badge-line {
-    width: 20px !important;
-    height: 20px !important;
-    font-size: 11px !important;
-  }
-
-  /* 3. PANEL DE CONTROL: Redistribución Ergonómica Total */
-  .control-panel {
-    display: grid !important;
-    /* Creamos una cuadrícula invisible de 4 columnas y 2 filas */
-    grid-template-columns: 1fr 1fr 1fr 1fr !important;
-    grid-template-areas: 
-      "auto auto spin spin"
-      "lines bet gamble gamble" !important;
-    gap: 8px !important;
-    padding: 10px !important;
-  }
-
-  /* Asignamos cada botón a su zona en el mapa (Magia pura) */
-  #btn-auto   { grid-area: auto !important; height: 50px !important; }
-  #btn-lines  { grid-area: lines !important; height: 25px !important; }
-  #btn-bet    { grid-area: bet !important; height: 25px !important; }
-  
-  #btn-spin   { 
-    grid-area: spin !important; 
-    height: 50px !important; /* Destacado y más alto */
-    font-size: 20px !important; 
-  }
-  
-  #btn-gamble { 
-    grid-area: gamble !important; 
-    height: 50px !important; /* Compacto debajo de girar */
-  }
-  
-  /* Ajustes de textos interiores de los botones para que no se desborden */
-  .control-label {
-    font-size: 9px !important;
-    margin-bottom: 0 !important;
-  }
-  #val-lines, #val-bet, #val-auto {
-    font-size: 13px !important;
-
-.top-bar { min-height: 58px; gap: 5px; padding: 5px; border-width: 1px; border-radius: 9px; }
+    @media screen and (max-width: 600px) and (orientation: portrait) {
+      body {
+        gap: 6px;
+        padding: max(6px, env(safe-area-inset-top))
+                 max(6px, env(safe-area-inset-right))
+                 max(6px, env(safe-area-inset-bottom))
+                 max(6px, env(safe-area-inset-left));
+      }
+      .top-bar { min-height: 58px; gap: 5px; padding: 5px; border-width: 1px; border-radius: 9px; }
       .total-bet-box, .balance-box { width: 25%; min-width: 0; padding: 4px 5px; border-radius: 6px; }
       .dynamic-center-area { width: 50%; min-width: 0; }
       .total-bet-label, .balance-label { overflow: hidden; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
@@ -762,12 +697,22 @@ body {
       .slot-stage { gap: 3px; }
       .badges-column { width: 22px; gap: 5px; padding: 5px 0; }
       .badge-line { width: 21px; height: 21px; font-size: 10px; border-width: 1px; }
-
-
-  }
-}
-
-
+      .slot-grid-container { gap: 3px; padding: 4px; border-width: 2px; border-radius: 11px; }
+      .reel-column { padding: 2px; border-radius: 6px; }
+      .reel-strip { gap: 3px; }
+      .symbol-cell { font-size: clamp(24px, 9vw, 42px); border-radius: 5px; }
+      .symbol-cell.winning { border-width: 2px; }
+      .control-panel { grid-template-columns: repeat(2, 1fr); gap: 5px; padding: 5px; border-width: 1px; border-radius: 10px; }
+      .btn-action, .btn-spin { height: 42px; border-radius: 7px; font-size: 12px; box-shadow: 0 2px 0 #1a0033; }
+      .btn-spin { font-size: 16px; }
+      .control-label { font-size: 8px; }
+      #btn-spin { order: -1; }
+      .modal-card { width: 100%; padding: 18px 12px; }
+      .modal-title { font-size: 18px; }
+      .gamble-card-display { height: 80px; margin: 12px 0; font-size: 50px; }
+      .modal-actions { gap: 7px; }
+      .modal-actions .btn-action { height: 45px !important; font-size: 11px; }
+    }
   </style>
 </head>
 
