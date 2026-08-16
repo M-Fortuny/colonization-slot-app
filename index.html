@@ -945,17 +945,71 @@ body {
     let EMOJI_CONFIG = JSON.parse(localStorage.getItem('slot_config')) || JSON.parse(JSON.stringify(DEFAULT_CONFIG));
 
     // --- 2. CONFIGURACIÓN DE LA ECONOMÍA Y JUGADOR ---
-    const DEFAULT_ECONOMY = {
-      startingCredits: 100000, 
+  const DEFAULT_ECONOMY = {
+      startingCredits: 5000,
       bankProfit: 0,
-      jackpotPercent: 20,
-      jackpots: { 3: 0, 4: 0, 5: 0 }
+      jackpotPercent: 80,
+      jackpots: {
+        3: 0,
+        4: 0,
+        5: 0
+      }
     };
-    
-    const savedEconomy = JSON.parse(localStorage.getItem('slot_economy')) || {};
-    let ECONOMY = { ...DEFAULT_ECONOMY, ...savedEconomy };
 
-    const savedPlayer = JSON.parse(localStorage.getItem('slot_player')) || {};
+    const DEFAULT_PLAYER = {
+      credits: DEFAULT_ECONOMY.startingCredits
+    };
+
+    function loadLocalStorage(key, defaultValue = {}) {
+      try {
+        const value = localStorage.getItem(key);
+        return value ? JSON.parse(value) : defaultValue;
+      } catch (error) {
+        console.warn(`No se pudieron cargar los datos de ${key}.`, error);
+        return defaultValue;
+      }
+    }
+
+    const savedEconomy = loadLocalStorage('slot_economy');
+    const savedPlayer = loadLocalStorage('slot_player');
+
+    let ECONOMY = {
+      ...DEFAULT_ECONOMY,
+      ...savedEconomy,
+      jackpots: {
+        ...DEFAULT_ECONOMY.jackpots,
+        ...(savedEconomy.jackpots || {})
+      }
+    };
+
+    let PLAYER = {
+      ...DEFAULT_PLAYER,
+      ...savedPlayer
+    };
+
+    function saveEconomy() {
+      localStorage.setItem('slot_economy', JSON.stringify(ECONOMY));
+    }
+
+    function savePlayer() {
+      localStorage.setItem('slot_player', JSON.stringify(PLAYER));
+    }
+
+    // En una instalación nueva se guardan inmediatamente los valores iniciales.
+    if (!localStorage.getItem('slot_economy')) {
+      saveEconomy();
+    }
+
+    if (!localStorage.getItem('slot_player')) {
+      savePlayer();
+    }
+
+    console.log('Economía cargada:', ECONOMY);
+    console.log('Jugador cargado:', PLAYER);
+
+
+
+
 
     // --- 3. ESTADÍSTICAS DEL MOTOR ---
     const defaultStats = {
@@ -1136,7 +1190,7 @@ body {
       if ($('dev-jp-5')) $('dev-jp-5').value = Math.floor(ECONOMY.jackpots[5]);
 
       const saveEcoFields = () => {
-        ECONOMY.startingCredits = parseFloat($('dev-starting-credits')?.value) || 5000;
+        ECONOMY.startingCredits = parseFloat($('dev-starting-credits')?.value) || DEFAULT_ECONOMY.startingCredits;
         ECONOMY.bankProfit = parseFloat($('dev-bank-profit')?.value) || 0;
         ECONOMY.jackpotPercent = parseFloat($('dev-jp-percent')?.value) || 0;
         ECONOMY.jackpots[3] = parseFloat($('dev-jp-3')?.value) || 0;
