@@ -713,6 +713,56 @@ body {
       .modal-actions { gap: 7px; }
       .modal-actions .btn-action { height: 45px !important; font-size: 11px; }
     }
+
+/* ========================================================
+   MODO MÓVIL (VERTICAL) - COLOCAR AL FINAL DEL TODO
+   ======================================================== */
+@media screen and (max-width: 768px) and (orientation: portrait) {
+  
+  /* 1. Reducir altura de los rodillos */
+  .symbol-cell {
+    height: 48px !important; 
+    font-size: 32px !important; /* Emojis un poco más pequeños */
+  }
+
+  /* 2. Desbloqueables más altos (Efecto Carta Vertical) */
+  .unlockables-container {
+    min-height: 85px !important;
+  }
+  .unlockable-item {
+    flex-direction: column !important;
+    justify-content: center !important;
+    font-size: 12px !important;
+  }
+  .unlockable-item span.icon {
+    font-size: 28px !important; /* Icono grande arriba */
+    margin-bottom: 4px !important;
+  }
+
+  /* 3. Reestructuración de la botonera inferior */
+  /* Forzamos que el panel de control use una rejilla de 2 columnas */
+  .control-panel {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important; /* Mitad izquierda, mitad derecha */
+    gap: 12px !important;
+    padding: 10px !important;
+  }
+
+  /* Si tienes los botones sueltos, esto ajustará sus tamaños para encajar.
+     Hacemos que el botón GIRAR ocupe mucho espacio a la derecha */
+  .btn-spin {
+    height: 70px !important;
+    font-size: 20px !important;
+  }
+  
+  /* Botones pequeños a la izquierda (Líneas y Apuesta) */
+  .btn-lines, .btn-bet {
+    height: 40px !important;
+    font-size: 14px !important;
+  }
+}
+
+	  
   </style>
 </head>
 
