@@ -718,22 +718,21 @@ body {
    MODO MÓVIL (VERTICAL) - COLOCAR AL FINAL DEL CSS
    ======================================================== */
 @media screen and (max-width: 768px) and (orientation: portrait) {
-
- /* 5. MARCO SUPERIOR: Ganamos altura aprovechando el espacio */
+  
+  /* 3. MARCO SUPERIOR: Ganamos altura aprovechando el espacio */
   .top-bar {
     min-height: 75px !important; /* Más alto para que respire */
     padding: 8px !important;
   }
 
-	
-  /* 1. LOCKERS: Estilo Carta Vertical (Doble de altos) */
+  /* LOCKERS: Estilo Carta Vertical */
   .lockers-container {
     gap: 6px !important;
     padding: 6px !important;
   }
   .locker-box {
     flex-direction: column !important; /* Apila candado y texto */
-    height: 60px !important; /* Mucho más altos */
+    height: 60px !important;
     font-size: 11px !important;
     justify-content: center !important;
   }
@@ -743,16 +742,16 @@ body {
     margin-bottom: 4px !important;
   }
 
-  /* 2. RODILLOS: Reducción de altura para ganar espacio (Proporción 4:3) */
+  /* 1. RODILLOS: Ajuste de marco, huecos internos y márgenes exteriores */
   .slot-grid-container {
-    
-	padding: 10px !important; /* Reducimos el marco principal */
-    margin-top: 10px !important; /* Separación con el bloque superior */
-    margin-bottom: 10px !important; /* Separación con la botonera */
+    gap: 2px !important; /* Juntamos los marcos de los emojis */
+    padding: 8px !important; /* Reducimos el marco principal */
+    margin-top: 12px !important; /* Separación con el bloque superior */
+    margin-bottom: 12px !important; /* Separación con la botonera */
   }
   .symbol-cell {
     font-size: 38px !important; /* Emojis un poco más ajustados */
-	/* height: 50px !important;   /*  Reducimos la altura del rectángulo */
+    height: 65px !important; /* Ajuste para proporción 4:3 */
   }
   .badge-line {
     width: 24px !important;
@@ -799,6 +798,7 @@ body {
     font-size: 13px !important;
   }
 }
+
 	  
   </style>
 </head>
