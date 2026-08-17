@@ -718,7 +718,14 @@ body {
    MODO MÓVIL (VERTICAL) - COLOCAR AL FINAL DEL CSS
    ======================================================== */
 @media screen and (max-width: 768px) and (orientation: portrait) {
-  
+
+ /* 5. MARCO SUPERIOR: Ganamos altura aprovechando el espacio */
+  .top-bar {
+    min-height: 75px !important; /* Más alto para que respire */
+    padding: 8px !important;
+  }
+
+	
   /* 1. LOCKERS: Estilo Carta Vertical (Doble de altos) */
   .lockers-container {
     gap: 6px !important;
