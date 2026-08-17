@@ -760,32 +760,34 @@ body {
     font-size: 11px !important;
   }
 
-  /* 3. PANEL DE CONTROL: Redistribución Ergonómica Total */
+  /* 2. PANEL DE CONTROL: Nuevo botón de Compras y reordenación */
   .control-panel {
     display: grid !important;
-    /* Creamos una cuadrícula invisible de 4 columnas y 2 filas */
+    /* Cuadrícula de 4 columnas iguales */
     grid-template-columns: 1fr 1fr 1fr 1fr !important;
+    /* Mapa visual de los botones */
     grid-template-areas: 
-      "auto auto spin spin"
-      "lines bet gamble gamble" !important;
+      "shop auto spin spin"    /* Fila 1: Compras | Auto | Girar (Doble ancho) */
+      "lines bet gamble gamble" !important; /* Fila 2: Líneas | Apuesta | Riesgo (Doble ancho) */
     gap: 8px !important;
     padding: 10px !important;
   }
 
-  /* Asignamos cada botón a su zona en el mapa (Magia pura) */
+  /* Asignamos cada botón a su zona en el mapa */
+  #btn-shop   { grid-area: shop !important; height: 50px !important; } /* NUEVO BOTÓN */
   #btn-auto   { grid-area: auto !important; height: 50px !important; }
   #btn-lines  { grid-area: lines !important; height: 50px !important; }
   #btn-bet    { grid-area: bet !important; height: 50px !important; }
   
   #btn-spin   { 
     grid-area: spin !important; 
-    height: 50px !important; /* Destacado y más alto */
+    height: 50px !important;
     font-size: 20px !important; 
   }
   
   #btn-gamble { 
     grid-area: gamble !important; 
-    height: 50px !important; /* Compacto debajo de girar */
+    height: 50px !important; 
   }
   
   /* Ajustes de textos interiores de los botones para que no se desborden */
