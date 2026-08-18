@@ -37,46 +37,41 @@
     }
 
     html {
-  width: 100%;
-  height: 100%;
-  /* 💡 NUEVO: Obliga a Safari a usar el alto real disponible, ignorando sus barras invisibles */
-  height: -webkit-fill-available; 
-  /* 💡 NUEVO: Si iOS falla un milisegundo al rotar, el fondo será negro, no blanco */
-  background-color: #08020f; 
-  overflow: hidden;
-}
+      width: 100%;
+      height: 100%;
+      height: -webkit-fill-available; 
+      background-color: #08020f; 
+      overflow: hidden;
+    }
 
-body {
-  /* 💡 NUEVO: Anclaje absoluto. Clava la app a las 4 esquinas de la pantalla para evitar saltos */
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  
-  width: 100%;
-  height: 100%;
-  min-height: 100vh;
-  min-height: -webkit-fill-available; /* Hack para Safari */
-  
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
-  
-  /* Márgenes seguros globales */
-  padding: max(20px, env(safe-area-inset-top))
-           max(20px, env(safe-area-inset-right))
-           max(20px, env(safe-area-inset-bottom))
-           max(20px, env(safe-area-inset-left));
-           
-  color: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background: radial-gradient(circle at center, #1b092b 0%, #08020f 100%);
-  overflow: hidden;
-}
-
+    body {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      
+      padding: max(20px, env(safe-area-inset-top))
+               max(20px, env(safe-area-inset-right))
+               max(20px, env(safe-area-inset-bottom))
+               max(20px, env(safe-area-inset-left));
+               
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(circle at center, #1b092b 0%, #08020f 100%);
+      overflow: hidden;
+    }
 
     button {
       font-family: inherit;
@@ -88,9 +83,8 @@ body {
       margin-inline: auto;
     }
 
-
     .top-bar {
-      min-height: 80px;
+      min-height: 85px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -104,24 +98,19 @@ body {
 
     .total-bet-box,
     .balance-box {
-      min-width: 150px;
+      min-width: 160px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 8px 14px;
+      align-items: center;
+      text-align: center;
+      padding: 6px 14px;
       background: rgba(0, 0, 0, .55);
       border-radius: 10px;
     }
 
-    .total-bet-box {
-      text-align: left;
-      border: 1px solid var(--light-purple);
-    }
-
-    .balance-box {
-      text-align: right;
-      border: 1px solid var(--green);
-    }
+    .total-bet-box { border: 1px solid var(--light-purple); }
+    .balance-box { border: 1px solid var(--green); }
 
     .total-bet-label,
     .balance-label,
@@ -129,30 +118,40 @@ body {
       font-size: 11px;
       font-weight: bold;
       text-transform: uppercase;
+      text-align: center;
     }
 
-    .total-bet-label {
-      color: #e0b0ff;
-    }
-
-    .balance-label {
-      color: #b9f6ca;
-    }
+    .total-bet-label { color: #e0b0ff; }
+    .balance-label { color: #b9f6ca; }
 
     .total-bet-value,
     .balance-value {
       margin-top: 2px;
-      font-size: 25px;
+      font-size: 22px;
       font-weight: 900;
       white-space: nowrap;
+      text-align: center;
     }
 
-    .total-bet-value {
+    .total-bet-value { color: var(--gold); }
+    .balance-value { color: var(--green); }
+
+    .player-name-display {
+      font-size: 18px;
+      font-weight: 900;
       color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      line-height: 1.1;
+      text-align: center;
     }
 
-    .balance-value {
-      color: var(--green);
+    .player-level-display {
+      font-size: 13px;
+      font-weight: bold;
+      color: var(--light-purple);
+      margin-bottom: 2px;
+      text-align: center;
     }
 
     .dynamic-center-area {
@@ -187,14 +186,8 @@ body {
       text-shadow: 0 0 12px #ff9800, 0 0 22px var(--gold);
     }
 
-    .jackpot-name,
-    .jackpot-value {
-      display: block;
-    }
-
-    .jackpot-value {
-      color: #fff;
-    }
+    .jackpot-name, .jackpot-value { display: block; }
+    .jackpot-value { color: #fff; }
 
     @keyframes pulseWinText {
       from { transform: scale(.98); }
@@ -512,14 +505,75 @@ body {
       margin-top: 20px;
     }
 
-            /* --- ESTILOS PANEL DESARROLLADOR --- */
+    /* --- VENTANA EMERGENTE DE LEVEL UP Y PREMIOS ANIMADA --- */
+    .level-up-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.85);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .level-up-modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .level-up-card {
+      background: linear-gradient(135deg, #2a085c 0%, #0d001a 100%);
+      border: 4px solid var(--gold);
+      border-radius: 20px;
+      padding: 35px 25px;
+      text-align: center;
+      box-shadow: 0 0 50px rgba(255, 215, 0, 0.6);
+      transform: scale(0.5);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      max-width: 90%;
+      width: 400px;
+    }
+
+    .level-up-modal.active .level-up-card {
+      transform: scale(1);
+    }
+
+    .level-up-title {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--gold);
+      letter-spacing: 2px;
+      margin-bottom: 15px;
+      text-shadow: 0 0 15px var(--gold);
+      text-align: center;
+    }
+
+    .level-up-sub {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .level-up-sub span {
+      color: var(--green);
+      display: block;
+      font-size: 28px;
+      margin-top: 5px;
+    }
+
+    /* --- ESTILOS PANEL DESARROLLADOR --- */
     .fullscreen-dev-panel {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      height: 100%; /* 💡 Cambiado de 100vh a 100% para evitar fallos de viewport en iOS */
+      height: 100%;
       
       display: flex;
       flex-direction: column;
@@ -541,12 +595,12 @@ body {
       padding: 20px;
       text-align: center;
       background: #1a0933;
-      flex-shrink: 0; /* 💡 Obligatorio para que iOS no intente colapsar estas zonas */
+      flex-shrink: 0;
     }
 
     .dev-header { border-bottom: 3px solid var(--purple); }
     
-    .dev-header h2, .dev-header h1 { /* 💡 Asegura ambos tags de título */
+    .dev-header h2, .dev-header h1 {
       color: var(--gold);
       font-size: 24px;
       letter-spacing: 2px;
@@ -554,20 +608,18 @@ body {
     }
 
     .dev-content {
-      flex: 1 1 auto; /* 💡 Fuerza a crecer y decrecer de forma flexible */
-      min-height: 0;   /* 💡 Truco CSS crítico: rompe la restricción de altura implícita en flexbox */
-      display: block;  /* 💡 Cambiado de 'flex' a 'block' para que los elementos fluyan hacia abajo naturalmente */
+      flex: 1 1 auto;
+      min-height: 0;
+      display: block;
       padding: 20px;
-      overflow-y: scroll; /* 💡 Fuerza la presencia del contenedor de scroll */
-      -webkit-overflow-scrolling: touch; /* Scroll nativo inercial para tu iPad */
+      overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
     }
 
-    /* 💡 Añade este contenedor para centrar los elementos sin romper el comportamiento de bloque */
     .dev-content > * {
       margin-left: auto !important;
       margin-right: auto !important;
     }
-
 
     .dev-section-title {
       width: 100%;
@@ -633,10 +685,10 @@ body {
       font-size: 14px;
     }
 
-        .dev-footer {
+    .dev-footer {
       display: flex;
-      flex-direction: row; /* 💡 CORREGIDO: Pone los botones uno al lado del otro */
-      flex-wrap: wrap;     /* 💡 CORREGIDO: Si la pantalla es muy estrecha, bajan limpiamente */
+      flex-direction: row;
+      flex-wrap: wrap;
       justify-content: center;
       align-items: center;
       gap: 15px;
@@ -644,8 +696,6 @@ body {
       background: #1a0933;
       border-top: 3px solid var(--purple);
     }
-
-
 
     @keyframes badgePulse {
       0% { transform: scale(1); filter: brightness(1); box-shadow: 0 0 5px orange; }
@@ -668,8 +718,6 @@ body {
       .btn-spin { height: 54px; }
     }
 
-
-
     @media screen and (max-width: 600px) and (orientation: portrait) {
       body {
         gap: 6px;
@@ -679,10 +727,12 @@ body {
                  max(6px, env(safe-area-inset-left));
       }
       .top-bar { min-height: 58px; gap: 5px; padding: 5px; border-width: 1px; border-radius: 9px; }
-      .total-bet-box, .balance-box { width: 25%; min-width: 0; padding: 4px 5px; border-radius: 6px; }
-      .dynamic-center-area { width: 50%; min-width: 0; }
+      .total-bet-box, .balance-box { width: 28%; min-width: 0; padding: 4px 5px; border-radius: 6px; }
+      .dynamic-center-area { width: 44%; min-width: 0; }
       .total-bet-label, .balance-label { overflow: hidden; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
-      .total-bet-value, .balance-value { overflow: hidden; font-size: clamp(12px, 4vw, 18px); text-overflow: ellipsis; }
+      .total-bet-value, .balance-value { overflow: hidden; font-size: clamp(12px, 3.5vw, 16px); text-overflow: ellipsis; }
+      .player-name-display { font-size: clamp(11px, 3.2vw, 14px); }
+      .player-level-display { font-size: clamp(9px, 2.8vw, 11px); }
       .dynamic-text-display { overflow: hidden; font-size: clamp(11px, 3.8vw, 17px); text-overflow: ellipsis; }
       
       .dynamic-text-display.jackpot-text { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: 100%; max-width: 100%; min-width: 0; padding-inline: 2px; line-height: 1.05; white-space: normal; text-align: center; }
@@ -714,90 +764,75 @@ body {
       .modal-actions .btn-action { height: 45px !important; font-size: 11px; }
     }
 
-/* ========================================================
-   MODO MÓVIL (VERTICAL) - COLOCAR AL FINAL DEL CSS
-   ======================================================== */
-@media screen and (max-width: 768px) and (orientation: portrait) {
+    @media screen and (max-width: 768px) and (orientation: portrait) {
+      .top-bar {
+        min-height: 75px !important;
+        padding: 8px !important;
+      }
 
- /* 5. MARCO SUPERIOR: Ganamos altura aprovechando el espacio */
-  .top-bar {
-    min-height: 75px !important; /* Más alto para que respire */
-    padding: 8px !important;
-  }
+      .lockers-container {
+        gap: 6px !important;
+        padding: 6px !important;
+      }
+      .locker-box {
+        flex-direction: column !important;
+        height: 60px !important;
+        font-size: 11px !important;
+        justify-content: center !important;
+      }
+      .locker-icon {
+        font-size: 22px !important;
+        margin-right: 0 !important;
+        margin-bottom: 4px !important;
+      }
 
-	
-  /* 1. LOCKERS: Estilo Carta Vertical (Doble de altos) */
-  .lockers-container {
-    gap: 6px !important;
-    padding: 6px !important;
-  }
-  .locker-box {
-    flex-direction: column !important; /* Apila candado y texto */
-    height: 60px !important; /* Mucho más altos */
-    font-size: 11px !important;
-    justify-content: center !important;
-  }
-  .locker-icon {
-    font-size: 22px !important;
-    margin-right: 0 !important;
-    margin-bottom: 4px !important;
-  }
+      .slot-grid-container {
+        padding: 10px !important;
+        margin-top: 10px !important;
+        margin-bottom: 10px !important;
+      }
+      .symbol-cell {
+        font-size: 38px !important;
+      }
+      .badge-line {
+        width: 24px !important;
+        height: 24px !important;
+        font-size: 11px !important;
+      }
 
-  /* 2. RODILLOS: Reducción de altura para ganar espacio (Proporción 4:3) */
-  .slot-grid-container {
-    
-	padding: 10px !important; /* Reducimos el marco principal */
-    margin-top: 10px !important; /* Separación con el bloque superior */
-    margin-bottom: 10px !important; /* Separación con la botonera */
-  }
-  .symbol-cell {
-    font-size: 38px !important; /* Emojis un poco más ajustados */
-	/* height: 50px !important;   /*  Reducimos la altura del rectángulo */
-  }
-  .badge-line {
-    width: 24px !important;
-    height: 24px !important;
-    font-size: 11px !important;
-  }
+      .control-panel {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr 1fr 1fr !important;
+        grid-template-areas: 
+          "auto auto spin spin"
+          "lines bet gamble gamble" !important;
+        gap: 8px !important;
+        padding: 10px !important;
+      }
 
-  /* 3. PANEL DE CONTROL: Redistribución Ergonómica Total */
-  .control-panel {
-    display: grid !important;
-    /* Creamos una cuadrícula invisible de 4 columnas y 2 filas */
-    grid-template-columns: 1fr 1fr 1fr 1fr !important;
-    grid-template-areas: 
-      "auto auto spin spin"
-      "lines bet gamble gamble" !important;
-    gap: 8px !important;
-    padding: 10px !important;
-  }
-
-  /* Asignamos cada botón a su zona en el mapa (Magia pura) */
-  #btn-auto   { grid-area: auto !important; height: 50px !important; }
-  #btn-lines  { grid-area: lines !important; height: 50px !important; }
-  #btn-bet    { grid-area: bet !important; height: 50px !important; }
-  
-  #btn-spin   { 
-    grid-area: spin !important; 
-    height: 50px !important; /* Destacado y más alto */
-    font-size: 20px !important; 
-  }
-  
-  #btn-gamble { 
-    grid-area: gamble !important; 
-    height: 50px !important; /* Compacto debajo de girar */
-  }
-  
-  /* Ajustes de textos interiores de los botones para que no se desborden */
-  .control-label {
-    font-size: 9px !important;
-    margin-bottom: 0 !important;
-  }
-  #val-lines, #val-bet, #val-auto {
-    font-size: 13px !important;
-  }
-}
-	  
+      #btn-auto   { grid-area: auto !important; height: 50px !important; }
+      #btn-lines  { grid-area: lines !important; height: 50px !important; }
+      #btn-bet    { grid-area: bet !important; height: 50px !important; }
+      
+      #btn-spin   { 
+        grid-area: spin !important; 
+        height: 50px !important;
+        font-size: 20px !important; 
+      }
+      
+      #btn-gamble { 
+        grid-area: gamble !important; 
+        height: 50px !important;
+      }
+      
+      .control-label {
+        font-size: 9px !important;
+        margin-bottom: 0 !important;
+      }
+      #val-lines, #val-bet, #val-auto {
+        font-size: 13px !important;
+      }
+    }
   </style>
 </head>
 
@@ -805,7 +840,7 @@ body {
   <div class="top-bar layout-match">
     <div class="total-bet-box">
       <div class="total-bet-label">Apuesta Total</div>
-      <div class="total-bet-value" id="val-total-bet">9 Créditos</div>
+      <div class="total-bet-value" id="val-total-bet">9 C</div>
     </div>
 
     <div class="dynamic-center-area">
@@ -813,8 +848,9 @@ body {
     </div>
 
     <div class="balance-box" id="balance-box">
-      <div class="balance-label" id="balance-label">Saldo Total</div>
-      <div class="balance-value" id="display-balance-val">1.00 €</div>
+      <div class="player-name-display" id="display-player-name">JUGADOR</div>
+      <div class="player-level-display" id="display-player-level">NIVEL 1</div>
+      <div class="balance-value" id="display-balance-val">5.000 C</div>
     </div>
   </div>
 
@@ -874,7 +910,7 @@ body {
 
       <p>
         Premio en juego:
-        <span id="gamble-win-val" style="color:#00e676;font-weight:bold;">0.00 €</span>
+        <span id="gamble-win-val" style="color:#00e676;font-weight:bold;">0 C</span>
       </p>
 
       <div class="modal-actions">
@@ -884,6 +920,12 @@ body {
     </div>
   </div>
 
+  <div class="level-up-modal" id="modal-level-up">
+    <div class="level-up-card">
+      <div class="level-up-title" id="lvl-modal-title">ENHORABUENA</div>
+      <div class="level-up-sub" id="lvl-modal-sub">SUBISTE A NIVEL 1</div>
+    </div>
+  </div>
 
   <div class="fullscreen-dev-panel" id="fullscreen-dev">
     <div class="dev-header">
@@ -891,8 +933,6 @@ body {
     </div>
 
     <div class="dev-content">
-		  
-      <!-- SECCIÓN 3: ESTADÍSTICAS DEL MOTOR -->
       <div class="dev-section-title">📊 ESTADÍSTICAS DEL MOTOR</div>
       <p style="margin-bottom: 10px; font-size: 13px; color: #aaa; text-align: left; width: 100%; max-width: 700px;">
         Métricas de rendimiento en tiempo real basadas en las jugadas realizadas durante la sesión actual.
@@ -937,7 +977,6 @@ body {
         </div>
       </div>
 
-      <!-- SECCIÓN 1: ECONOMÍA Y BANCA -->
       <div class="dev-section-title">🏦 ECONOMÍA Y BANCA</div>
       <p style="margin-bottom: 10px; font-size: 13px; color: #aaa; text-align: left; width: 100%; max-width: 700px;">
         Parte de las pérdidas del "Doble o Nada" nutren los Jackpots. El resto son beneficios para la Banca.
@@ -963,19 +1002,13 @@ body {
         <div class="dev-economy-box">
           <label>Super Jackpot (5+)</label>
           <input type="number" id="dev-jp-5" value="0">
-			</div>
-		
-			
-			<div class="dev-economy-box">
-  			<label>Créditos Iniciales (al resetear):</label>
-  <input type="number" id="dev-starting-credits" class="dev-input">
-
+        </div>
+        <div class="dev-economy-box">
+          <label>Créditos Iniciales (al resetear):</label>
+          <input type="number" id="dev-starting-credits" class="dev-input">
         </div>
       </div>
 
-
-
-      <!-- SECCIÓN 2: EMOJIS Y PROBABILIDADES -->
       <div class="dev-section-title">🎰 SÍMBOLOS Y PREMIOS</div>
       <p style="margin-bottom: 15px; font-size: 13px; color: #aaa; text-align: left; width: 100%; max-width: 700px;">
         A mayor <strong>Peso</strong>, más frecuencia de aparición (menor volatilidad). Edita el Emoji directamente para cambiarlo.
@@ -992,14 +1025,11 @@ body {
               <th>Pago x5</th>
             </tr>
           </thead>
-          <tbody id="dev-emoji-tbody">
-            <!-- Rellenado vía JS -->
-          </tbody>
+          <tbody id="dev-emoji-tbody"></tbody>
         </table>
       </div>
     </div>
 
-        <!-- 💡 FOOTER CON BOTONES MÁS PEQUEÑOS -->
     <div class="dev-footer" style="padding: 15px 20px;">
       <button class="btn-action" onclick="resetStats()" style="background:#0288d1; width: min(100%, 200px); font-size: 13px; height: 38px;">
         📊 RESET ESTADÍSTICAS
@@ -1011,14 +1041,14 @@ body {
         ❌ CERRAR PANEL
       </button>
     </div>
+  </div>
 
+  <script>
 
-
-    <script>
     // --- 1. CONFIGURACIÓN DE EMOJIS ---     
     const DEFAULT_CONFIG = [
-      { symbol: '🍒', weight: 45, pay3: 5,   pay4: 15,  pay5: 30 },
-      { symbol: '🌀', weight: 35, pay3: 10,  pay4: 20,  pay5: 40 },
+      { symbol: '🌀', weight: 45, pay3: 5,   pay4: 15,  pay5: 30 },
+      { symbol: '🍒', weight: 35, pay3: 10,  pay4: 20,  pay5: 40 },
       { symbol: '⚡', weight: 25, pay3: 15,  pay4: 30,  pay5: 60 },
       { symbol: '🧠', weight: 20, pay3: 20,  pay4: 40,  pay5: 80 },
       { symbol: '🔮', weight: 15, pay3: 30,  pay4: 60,  pay5: 120 },
@@ -1040,6 +1070,14 @@ body {
     const savedEconomy = JSON.parse(localStorage.getItem('slot_economy')) || {};
     let ECONOMY = { ...DEFAULT_ECONOMY, ...savedEconomy };
 
+    // --- PERFIL DE JUGADOR Y PROGRESIÓN ---
+    const DEFAULT_PROFILE = {
+      name: '',
+      level: 1,
+      spinsToNextLevel: 0
+    };
+
+    let playerProfile = JSON.parse(localStorage.getItem('slot_player_profile')) || { ...DEFAULT_PROFILE };
     const savedPlayer = JSON.parse(localStorage.getItem('slot_player')) || {};
 
     // --- 3. ESTADÍSTICAS DEL MOTOR ---
@@ -1064,10 +1102,19 @@ body {
     function saveConfig() { localStorage.setItem('slot_config', JSON.stringify(EMOJI_CONFIG)); }
     function saveEconomy() { localStorage.setItem('slot_economy', JSON.stringify(ECONOMY)); }
     function savePlayer() { localStorage.setItem('slot_player', JSON.stringify({ credits: state.credits })); }
+    function saveProfile() { localStorage.setItem('slot_player_profile', JSON.stringify(playerProfile)); }
     
     function saveAndUpdateStats() {
       localStorage.setItem('machine_stats', JSON.stringify(gameStats));
       renderStats();
+    }
+
+    function requestPlayerName() {
+      let name = prompt('Ingresa el Nombre del Jugador (Máximo 10 caracteres):', playerProfile.name || 'MeteOritO');
+      if (!name || name.trim() === '') name = 'JUGADOR';
+      playerProfile.name = name.trim().substring(0, 10);
+      saveProfile();
+      updateUI();
     }
 
     function renderStats() {
@@ -1126,7 +1173,10 @@ body {
       grid: Array.from({ length: 5 }, () => Array(5).fill('')),
       totalSpins: 0,
       totalPayout: 0,
-      currentWinningLines: []
+      currentWinningLines: [],
+      freeSpinsLeft: 0,
+      freeSpinTotalWon: 0,
+      isFreeSpinMode: false
     };
 
     let jackpotIndex = 0;
@@ -1138,9 +1188,6 @@ body {
     const badgesLeft = $('badges-left');
     const badgesRight = $('badges-right');
     const dynamicDisplay = $('dynamic-display');
-    const balanceBox = $('balance-box');
-    const balanceLabel = $('balance-label');
-    const balanceVal = $('display-balance-val');
     const valLines = $('val-lines');
     const valBet = $('val-bet');
     const valTotalBet = $('val-total-bet');
@@ -1152,6 +1199,10 @@ body {
     const btnGamble = $('btn-gamble');
 
     document.addEventListener('DOMContentLoaded', () => {
+      if (!playerProfile.name) {
+        requestPlayerName();
+      }
+
       initBadges();
       initGridUI();
       registerEvents();
@@ -1290,7 +1341,7 @@ body {
 
     function startJackpotRotation() {
       setInterval(() => {
-        if (!state.isSpinning && !state.hasActiveWin) {
+        if (!state.isSpinning && !state.hasActiveWin && !state.isFreeSpinMode) {
           const currentJackpots = getJackpotsDisplay();
           jackpotIndex = (jackpotIndex + 1) % currentJackpots.length;
           showJackpotText(jackpotIndex);
@@ -1331,9 +1382,10 @@ body {
       const bet = BET_OPTIONS[state.selectedBetIdx];
       const totalBet = lines * bet;
 
-      balanceLabel.textContent = 'CRÉDITOS TOTALES';
-      balanceVal.textContent = `${Math.floor(state.credits).toLocaleString('es-ES')} C`;
-      valTotalBet.textContent = `${totalBet} Créditos`;
+      $('display-player-name').textContent = playerProfile.name || 'MeteOritO';
+      $('display-player-level').textContent = `NIVEL ${playerProfile.level}`;
+      $('display-balance-val').textContent = `${Math.floor(state.credits).toLocaleString('es-ES')} C`;
+      valTotalBet.textContent = `${totalBet} C`;
 
       valLines.textContent = lines;
       valBet.textContent = `x${bet}`;
@@ -1342,8 +1394,22 @@ body {
         badge.classList.toggle('active', Number(badge.dataset.line) <= lines);
       });
 
-      btnGamble.classList.toggle('disabled', state.lastWinCredits <= 0 || state.isSpinning);
-      [btnSpin, btnLines, btnBet].forEach(button => button.classList.toggle('disabled', state.isSpinning));
+      btnGamble.classList.toggle('disabled', state.lastWinCredits <= 0 || state.isSpinning || state.isFreeSpinMode);
+      [btnSpin, btnLines, btnBet].forEach(button => button.classList.toggle('disabled', state.isSpinning || state.isFreeSpinMode));
+    }
+
+    function showLevelUpModal(title, sub, duration = 4000) {
+      const modal = $('modal-level-up');
+      $('lvl-modal-title').innerHTML = title;
+      $('lvl-modal-sub').innerHTML = sub;
+      modal.classList.add('active');
+
+      return new Promise(resolve => {
+        setTimeout(() => {
+          modal.classList.remove('active');
+          setTimeout(resolve, 400); 
+        }, duration);
+      });
     }
 
     function clearPaylinesSVG() {
@@ -1386,13 +1452,13 @@ body {
 
     function registerEvents() {
       btnLines.addEventListener('click', () => {
-        if (state.isSpinning) return;
+        if (state.isSpinning || state.isFreeSpinMode) return;
         state.selectedLinesIdx = (state.selectedLinesIdx + 1) % LINE_OPTIONS.length;
         updateUI();
       });
 
       btnBet.addEventListener('click', () => {
-        if (state.isSpinning) return;
+        if (state.isSpinning || state.isFreeSpinMode) return;
         state.selectedBetIdx = (state.selectedBetIdx + 1) % BET_OPTIONS.length;
         updateUI();
       });
@@ -1400,6 +1466,7 @@ body {
       btnSpin.addEventListener('click', triggerSpin);
 
       btnAuto.addEventListener('click', () => {
+        if (state.isFreeSpinMode) return;
         state.autoSpin = !state.autoSpin;
         valAuto.textContent = state.autoSpin ? 'AUTO: ON' : 'AUTO: OFF';
         btnAuto.style.background = state.autoSpin ? 'linear-gradient(180deg,#2e7d32 0%,#1b5e20 100%)' : '';
@@ -1407,7 +1474,7 @@ body {
       });
 
       btnGamble.addEventListener('click', () => {
-        if (state.lastWinCredits <= 0) return;
+        if (state.lastWinCredits <= 0 || state.isFreeSpinMode) return;
         state.gambleFailCount = 0;
         $('gamble-win-val').textContent = formatValue(state.lastWinCredits);
         $('gamble-card').textContent = '❓';
@@ -1429,14 +1496,18 @@ body {
       });
 
       $('btn-dev-reset').addEventListener('click', () => {
-        if(confirm('¿Seguro que quieres borrar todos tus cambios y restaurar la economía y emojis por defecto?')) {
+        if(confirm('¿Seguro que quieres borrar todos tus cambios y restaurar la economía, emojis y perfil del jugador por defecto?')) {
           EMOJI_CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
           ECONOMY = JSON.parse(JSON.stringify(DEFAULT_ECONOMY));
+          playerProfile = { ...DEFAULT_PROFILE };
           localStorage.removeItem('slot_player');
+          localStorage.removeItem('slot_player_profile');
           state.credits = ECONOMY.startingCredits;
           saveConfig();
           saveEconomy();
           savePlayer();
+          
+          requestPlayerName();
           renderDevPanel();
           updateUI();
         }
@@ -1459,7 +1530,7 @@ body {
     }
 
     function playGamble() {
-      if (state.lastWinCredits <= 0) return;
+      if (state.lastWinCredits <= 0 || state.isFreeSpinMode) return;
 
       gameStats.doubleAttempts++;
 
@@ -1526,28 +1597,52 @@ body {
       updateUI();
     }
 
+    function checkLevelProgress() {
+      playerProfile.spinsToNextLevel++;
+
+      if (playerProfile.spinsToNextLevel >= 100) {
+        playerProfile.level++;
+        playerProfile.spinsToNextLevel = 0;
+        saveProfile();
+        updateUI();
+
+        state.isFreeSpinMode = true;
+        state.freeSpinsLeft = 20;
+        state.freeSpinTotalWon = 0;
+
+        showLevelUpModal('ENHORABUENA', `SUBISTE A NIVEL ${playerProfile.level}`, 4000).then(() => {
+          triggerSpin();
+        });
+        return true;
+      }
+      saveProfile();
+      return false;
+    }
+
     function triggerSpin() {
       const lines = LINE_OPTIONS[state.selectedLinesIdx];
       const bet = BET_OPTIONS[state.selectedBetIdx];
       const totalBet = lines * bet;
 
-      if (state.credits < totalBet) {
-        setStatusText('⚠️ Saldo insuficiente');
-        state.autoSpin = false;
-        valAuto.textContent = 'AUTO: OFF';
-        btnAuto.style.background = '';
-        return;
+      if (!state.isFreeSpinMode) {
+        if (state.credits < totalBet) {
+          setStatusText('⚠️ Saldo insuficiente');
+          state.autoSpin = false;
+          valAuto.textContent = 'AUTO: OFF';
+          btnAuto.style.background = '';
+          return;
+        }
+
+        state.credits -= totalBet;
+        savePlayer();
+        ECONOMY.bankProfit += totalBet; 
+        saveEconomy();
+
+        gameStats.totalPlays++;
+        gameStats.totalBet += totalBet;
+        gameStats.currentNoPrizeStreak++; 
+        saveAndUpdateStats();
       }
-
-      state.credits -= totalBet;
-      savePlayer();
-      ECONOMY.bankProfit += totalBet; 
-      saveEconomy();
-
-      gameStats.totalPlays++;
-      gameStats.totalBet += totalBet;
-      gameStats.currentNoPrizeStreak++; 
-      saveAndUpdateStats();
 
       state.isSpinning = true;
       state.lastWinCredits = 0;
@@ -1564,157 +1659,161 @@ body {
         badge.classList.remove('badge-winning-pulse');
       });
 
-      setStatusText('🌀 Buena Suerte !!!');
+      if (state.isFreeSpinMode) {
+        setStatusText(`🎁 TIRADA GRATIS (${21 - state.freeSpinsLeft}/20)`);
+      } else {
+        setStatusText('🌀 Buena Suerte !!!');
+      }
+      
       updateUI();
 
-      for (let i = 0; i < 5; i++) {
-        const strip = $(`strip-${i}`);
-        strip.classList.remove('bounce');
+      // Animación de rodillos y generación de nueva cuadrícula
+      const reels = gridContainer.querySelectorAll('.reel-strip');
+      reels.forEach(strip => {
         strip.classList.add('spinning');
-      }
+        strip.classList.remove('bounce');
+      });
 
       for (let col = 0; col < 5; col++) {
-        setTimeout(() => stopReel(col), 500 + col * 250);
+        for (let row = 0; row < 5; row++) {
+          state.grid[col][row] = getRandomSymbol();
+        }
       }
+
+      // Detener los rodillos secuencialmente
+      reels.forEach((strip, i) => {
+        setTimeout(() => {
+          strip.classList.remove('spinning');
+          strip.classList.add('bounce');
+          
+          const cells = strip.querySelectorAll('.symbol-cell');
+          cells.forEach((cell, r) => {
+            cell.innerHTML = `<span class="emoji-wrapper">${state.grid[i][r]}</span>`;
+          });
+
+          // Verificar resultados cuando termine el último rodillo
+          if (i === 4) {
+            setTimeout(checkResults, 300);
+          }
+        }, 500 + i * 250);
+      });
     }
 
-    function stopReel(col) {
-      const strip = $(`strip-${col}`);
-      strip.classList.remove('spinning');
-      strip.classList.add('bounce');
-
-      for (let row = 0; row < 5; row++) {
-        const symbol = getRandomSymbol();
-        state.grid[col][row] = symbol;
-
-        const cell = strip.querySelector(`[data-row="${row}"]`);
-        cell.innerHTML = `<span class="emoji-wrapper">${symbol}</span>`;
-      }
-
-      if (col === 4) {
-        setTimeout(finalizeSpin, 300);
-      }
-    }
-
-    function evaluateWins() {
-      const activeLines = LINE_OPTIONS[state.selectedLinesIdx];
+    // --- NUEVA FUNCIÓN AÑADIDA PARA EVALUAR RESULTADOS ---
+    function checkResults() {
+      state.isSpinning = false;
+      const lines = LINE_OPTIONS[state.selectedLinesIdx];
       const bet = BET_OPTIONS[state.selectedBetIdx];
-      let totalWin = 0;
-      let maxWinMatchCount = 0; 
-      const winningCells = new Set();
+      
+      let winCredits = 0;
       const winningLines = [];
+      let highestMatchCount = 0;
 
-      for (let lineIndex = 0; lineIndex < activeLines; lineIndex++) {
-        const path = PAYLINES[lineIndex];
-        const firstSymbol = state.grid[0][path[0]];
+      // Calcular líneas ganadoras
+      for (let l = 0; l < lines; l++) {
+        const payline = PAYLINES[l];
+        let firstSymbol = state.grid[0][payline[0]];
         let matchCount = 1;
 
-        for (let reel = 1; reel < 5; reel++) {
-          if (state.grid[reel][path[reel]] === firstSymbol) matchCount++;
-          else break;
+        for (let i = 1; i < 5; i++) {
+          if (state.grid[i][payline[i]] === firstSymbol) {
+            matchCount++;
+          } else {
+            break;
+          }
         }
 
-        if (matchCount < 3) continue;
+        if (matchCount >= 3) {
+          const symbolConfig = EMOJI_CONFIG.find(c => c.symbol === firstSymbol);
+          if (symbolConfig) {
+            let payout = matchCount === 3 ? symbolConfig.pay3 : (matchCount === 4 ? symbolConfig.pay4 : symbolConfig.pay5);
+            const lineWin = payout * bet;
+            winCredits += lineWin;
+            highestMatchCount = Math.max(highestMatchCount, matchCount);
 
-        if (matchCount > maxWinMatchCount) {
-          maxWinMatchCount = matchCount;
+            winningLines.push({
+              lineIdx: l,
+              matchCount: matchCount,
+              credits: lineWin
+            });
+          }
         }
-
-        const configItem = EMOJI_CONFIG.find(c => c.symbol === firstSymbol);
-        if (!configItem) continue;
-        
-        const multiplier = configItem[`pay${matchCount}`];
-        const winAmount = multiplier * bet;
-        
-        totalWin += winAmount;
-        winningLines.push({ lineIdx: lineIndex, matchCount });
-
-        for (let reel = 0; reel < matchCount; reel++) {
-          winningCells.add(`${reel}-${path[reel]}`);
-        }
-
-        const badge = document.querySelector(`.badge-line[data-line="${lineIndex + 1}"]`);
-        if (badge) badge.classList.add('badge-winning-pulse');
       }
 
-      if (!totalWin) {
-        state.hasActiveWin = false;
-        showJackpotText(jackpotIndex);
-        return;
-      }
-
-      ECONOMY.bankProfit -= totalWin;
-      saveEconomy();
-
-      state.credits += totalWin;
-      savePlayer();
-      state.lastWinCredits = totalWin;
-      state.lastWinMatchCount = maxWinMatchCount; 
-      state.totalPayout += totalWin;
       state.currentWinningLines = winningLines;
 
-      gameStats.prizesGiven++;
-      gameStats.currentNoPrizeStreak = 0; 
-      gameStats.totalWon += totalWin;
-      saveAndUpdateStats();
+      if (winCredits > 0) {
+        state.lastWinCredits = winCredits;
+        state.lastWinMatchCount = highestMatchCount;
 
-      setStatusText(`🎉 ¡PREMIO! +${formatValue(totalWin)} 🎉`, true);
+        gameStats.currentNoPrizeStreak = 0;
+        gameStats.prizesGiven++;
+        gameStats.totalWon += winCredits;
+        saveAndUpdateStats();
 
-      document.querySelectorAll('.symbol-cell').forEach(cell => {
-        const key = `${cell.dataset.reel}-${cell.dataset.row}`;
-        cell.classList.toggle('winning', winningCells.has(key));
-        cell.classList.toggle('dimmed', !winningCells.has(key));
-      });
+        // Evaluar Jackpots
+        if (highestMatchCount >= 3) {
+          const jpAmount = Math.floor(ECONOMY.jackpots[highestMatchCount]);
+          if (jpAmount > 0) {
+            winCredits += jpAmount;
+            ECONOMY.jackpots[highestMatchCount] = 0;
+            saveEconomy();
+            setStatusText(`🏆 ¡JACKPOT! +${formatValue(jpAmount)}`, true);
+          }
+        }
 
-      drawPaylinesSVG(winningLines);
-    }
+        if (state.isFreeSpinMode) {
+          state.freeSpinTotalWon += winCredits;
+          setStatusText(`🎁 TIRADA GRATIS: +${formatValue(winCredits)}`, true);
+        } else {
+          state.credits += winCredits;
+          savePlayer();
+          setStatusText(`🔥 ¡GANASTE +${formatValue(winCredits)}!`, true);
+          ECONOMY.bankProfit -= winCredits;
+          saveEconomy();
+        }
 
-    function finalizeSpin() {
-      state.isSpinning = false;
-      evaluateWins();
+        // Iluminar celdas ganadoras
+        document.querySelectorAll('.symbol-cell').forEach(cell => cell.classList.add('dimmed'));
+        winningLines.forEach(win => {
+          for (let i = 0; i < win.matchCount; i++) {
+            const row = PAYLINES[win.lineIdx][i];
+            const cell = gridContainer.querySelector(`.symbol-cell[data-reel="${i}"][data-row="${row}"]`);
+            if (cell) {
+              cell.classList.remove('dimmed');
+              cell.classList.add('winning');
+            }
+          }
+          const badge = document.querySelector(`.badge-line[data-line="${win.lineIdx + 1}"]`);
+          if (badge) badge.classList.add('badge-winning-pulse');
+        });
+
+        drawPaylinesSVG(winningLines);
+      }
+
       updateUI();
 
-      if (state.autoSpin) {
-        setTimeout(() => {
-          if (state.autoSpin) triggerSpin();
-        }, 1500);
+      // Lógica de Continuación (Auto Spin, Tiradas Gratis, Nivel)
+      if (state.isFreeSpinMode) {
+        state.freeSpinsLeft--;
+        if (state.freeSpinsLeft > 0) {
+          setTimeout(triggerSpin, 1600);
+        } else {
+          state.isFreeSpinMode = false;
+          state.credits += state.freeSpinTotalWon;
+          savePlayer();
+          showLevelUpModal('MODO COMPLETADO', `Premio Total: <br><span>${formatValue(state.freeSpinTotalWon)}</span>`, 4000).then(() => {
+             updateUI();
+             if (state.autoSpin) setTimeout(triggerSpin, 1000);
+          });
+        }
+      } else {
+        const leveledUp = checkLevelProgress();
+        if (!leveledUp && state.autoSpin) {
+          setTimeout(triggerSpin, winCredits > 0 ? 2500 : 1000);
+        }
       }
     }
-
-
-
-	function initializeMachineState() {
-    // 1. Inicializar créditos del jugador si no existen
-    if (localStorage.getItem('pawsitive_credits') === null) {
-        localStorage.setItem('pawsitive_credits', DEFAULT_CONFIG.credits);
-    }
-
-    // 2. Inicializar porcentaje de riesgo para jackpots si no existe
-    if (localStorage.getItem('pawsitive_risk_jackpot_percent') === null) {
-        localStorage.setItem('pawsitive_risk_jackpot_percent', DEFAULT_CONFIG.riskJackpotPercent);
-    }
-
-    // 3. Inicializar los Jackpots si no existen
-    if (localStorage.getItem('pawsitive_jackpots') === null) {
-        localStorage.setItem('pawsitive_jackpots', JSON.stringify(DEFAULT_CONFIG.jackpots));
-    }
-}
-
-// Ejecutar al cargar la aplicación
-initializeMachineState();
-
-
-
-
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(reg => console.log('Service Worker registrado', reg))
-          .catch(err => console.log('Error al registrar Service Worker', err));
-      });
-    }
   </script>
-
 </body>
 </html>
