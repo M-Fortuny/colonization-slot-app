@@ -3,711 +3,124 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-
   <title>Slot Machine PWA</title>
 
-  <!-- Vinculación del archivo Manifest -->
   <link rel="manifest" href="manifest.json">
-
-  <!-- Configuración de color de barra de estado en móviles -->
   <meta name="theme-color" content="#000000">
-
-  <!-- Soporte optimizado para iOS (Safari) -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="icono-app.png">
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: manipulation;
-    }
-
-    :root {
-      --purple: #7b2cbf;
-      --light-purple: #ab47bc;
-      --dark-bg: #08020f;
-      --panel-bg: rgba(15, 5, 25, .95);
-      --gold: #ffd700;
-      --green: #00e676;
-    }
-
-    html {
-      width: 100%;
-      height: 100%;
-      height: -webkit-fill-available; 
-      background-color: #08020f; 
-      overflow: hidden;
-    }
-
-    body {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      
-      width: 100%;
-      height: 100%;
-      min-height: 100vh;
-      min-height: -webkit-fill-available;
-      
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 16px;
-      
-      padding: max(20px, env(safe-area-inset-top))
-               max(20px, env(safe-area-inset-right))
-               max(20px, env(safe-area-inset-bottom))
-               max(20px, env(safe-area-inset-left));
-               
-      color: #fff;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: radial-gradient(circle at center, #1b092b 0%, #08020f 100%);
-      overflow: hidden;
-    }
-
-    button {
-      font-family: inherit;
-    }
-
-    .layout-match {
-      width: 100%;
-      max-width: 980px;
-      margin-inline: auto;
-    }
-
-    .top-bar {
-      min-height: 85px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-      padding: 10px 20px;
-      background: rgba(20, 10, 35, .85);
-      border: 2px solid var(--purple);
-      border-radius: 14px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, .5);
-    }
-
-    .total-bet-box,
-    .balance-box {
-      min-width: 160px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 6px 14px;
-      background: rgba(0, 0, 0, .55);
-      border-radius: 10px;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+    :root { --purple: #7b2cbf; --light-purple: #ab47bc; --dark-bg: #08020f; --panel-bg: rgba(15, 5, 25, .95); --gold: #ffd700; --green: #00e676; }
+    html { width: 100%; height: 100%; height: -webkit-fill-available; background-color: #08020f; overflow: hidden; }
+    body { position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; min-height: 100vh; min-height: -webkit-fill-available; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left)); color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: radial-gradient(circle at center, #1b092b 0%, #08020f 100%); overflow: hidden; }
+    button { font-family: inherit; }
+    .layout-match { width: 100%; max-width: 980px; margin-inline: auto; }
+    .top-bar { min-height: 85px; display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 10px 20px; background: rgba(20, 10, 35, .85); border: 2px solid var(--purple); border-radius: 14px; box-shadow: 0 4px 15px rgba(0, 0, 0, .5); }
+    .total-bet-box, .balance-box { min-width: 160px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 6px 14px; background: rgba(0, 0, 0, .55); border-radius: 10px; }
     .total-bet-box { border: 1px solid var(--light-purple); }
     .balance-box { border: 1px solid var(--green); }
-
-    .total-bet-label,
-    .balance-label,
-    .control-label {
-      font-size: 11px;
-      font-weight: bold;
-      text-transform: uppercase;
-      text-align: center;
-    }
-
+    .total-bet-label, .balance-label, .control-label { font-size: 11px; font-weight: bold; text-transform: uppercase; text-align: center; }
     .total-bet-label { color: #e0b0ff; }
     .balance-label { color: #b9f6ca; }
-
-    .total-bet-value,
-    .balance-value {
-      margin-top: 2px;
-      font-size: 22px;
-      font-weight: 900;
-      white-space: nowrap;
-      text-align: center;
-    }
-
+    .total-bet-value, .balance-value { margin-top: 2px; font-size: 22px; font-weight: 900; white-space: nowrap; text-align: center; }
     .total-bet-value { color: var(--gold); }
-    .balance-value { color: var(--green); }
+    
+    /* Ajustes específicos para el nuevo orden del panel de jugador */
+    .balance-value { margin-top: 4px; margin-bottom: 6px; color: var(--green); }
+    .player-name-display { font-size: 18px; font-weight: 900; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; line-height: 1.1; text-align: center; }
+    .player-level-display { font-size: 13px; font-weight: bold; color: var(--light-purple); margin-bottom: 2px; text-align: center; }
+    .level-progress-container { width: 100%; height: 8px; background: rgba(0, 0, 0, 0.6); border-radius: 4px; overflow: hidden; margin-top: 2px; border: 1px solid var(--purple); }
+    .level-progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--light-purple), var(--green)); transition: width 0.4s ease-out; box-shadow: 0 0 10px rgba(0, 230, 118, 0.5); }
 
-    .player-name-display {
-      font-size: 18px;
-      font-weight: 900;
-      color: var(--gold);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      line-height: 1.1;
-      text-align: center;
-    }
-
-    .player-level-display {
-      font-size: 13px;
-      font-weight: bold;
-      color: var(--light-purple);
-      margin-bottom: 2px;
-      text-align: center;
-    }
-
-    .dynamic-center-area {
-      flex: 1;
-      min-width: 350px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
-
-    .dynamic-text-display {
-      color: #fff;
-      font-size: 25px;
-      font-weight: 900;
-      text-align: center;
-      white-space: nowrap;
-      text-shadow: 0 0 10px rgba(255, 215, 0, .7);
-      transition: opacity .35s ease, transform .35s ease;
-    }
-
-    .dynamic-text-display.win-text {
-      color: #00ff88;
-      font-size: 28px;
-      text-shadow: 0 0 15px #00ff88, 0 0 25px #00ff88;
-      animation: pulseWinText .8s infinite alternate ease-in-out;
-    }
-
-    .dynamic-text-display.jackpot-text {
-      color: var(--gold);
-      font-size: 26px;
-      text-shadow: 0 0 12px #ff9800, 0 0 22px var(--gold);
-    }
-
+    .dynamic-center-area { flex: 1; min-width: 350px; display: flex; align-items: center; justify-content: center; text-align: center; }
+    .dynamic-text-display { color: #fff; font-size: 25px; font-weight: 900; text-align: center; white-space: nowrap; text-shadow: 0 0 10px rgba(255, 215, 0, .7); transition: opacity .35s ease, transform .35s ease; line-height: 1.1; }
+    .dynamic-text-display.win-text { color: #00ff88; font-size: 28px; text-shadow: 0 0 15px #00ff88, 0 0 25px #00ff88; animation: pulseWinText .8s infinite alternate ease-in-out; }
+    .dynamic-text-display.jackpot-text { color: var(--gold); font-size: 26px; text-shadow: 0 0 12px #ff9800, 0 0 22px var(--gold); }
     .jackpot-name, .jackpot-value { display: block; }
     .jackpot-value { color: #fff; }
+    
+    .sub-text-free { font-size: 0.75em; color: var(--gold); display: inline-block; margin-top: 3px; font-weight: normal; }
+    .dynamic-text-display.win-text .sub-text-free { color: #fff; text-shadow: none; font-size: 0.65em; font-weight: bold; }
 
-    @keyframes pulseWinText {
-      from { transform: scale(.98); }
-      to { transform: scale(1.06); }
-    }
+    @keyframes pulseWinText { from { transform: scale(.98); } to { transform: scale(1.06); } }
 
-    .lockers-container {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
-      padding: 8px 10px;
-      background: rgba(15, 5, 25, .85);
-      border: 2px solid var(--purple);
-      border-radius: 14px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, .4);
-    }
+    .lockers-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 8px 10px; background: rgba(15, 5, 25, .85); border: 2px solid var(--purple); border-radius: 14px; box-shadow: 0 4px 15px rgba(0, 0, 0, .4); }
+    .locker-box { height: 42px; display: flex; align-items: center; justify-content: center; overflow: hidden; color: #777; font-size: 13px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; background: rgba(0, 0, 0, .55); border: 1px dashed var(--light-purple); border-radius: 10px; }
+    .locker-icon { margin-right: 6px; font-size: 16px; opacity: .7; }
 
-    .locker-box {
-      height: 42px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      color: #777;
-      font-size: 13px;
-      font-weight: bold;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      white-space: nowrap;
-      background: rgba(0, 0, 0, .55);
-      border: 1px dashed var(--light-purple);
-      border-radius: 10px;
-    }
+    .slot-stage { width: 100%; max-width: 1050px; min-height: 0; flex: 1; display: flex; align-items: center; justify-content: center; gap: 12px; margin: 0 auto; position: relative; }
+    .badges-column { width: 40px; height: 100%; display: grid; grid-template-rows: repeat(5, 1fr); gap: 10px; align-items: center; justify-items: center; padding: 10px 0; z-index: 5; }
+    .badge-line { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; font-weight: bold; background: #33184a; border: 2px solid #8e44ad; border-radius: 50%; box-shadow: 0 2px 5px rgba(0, 0, 0, .4); }
+    .badge-line.active { color: #000; background: #ff9800; border-color: #ffe082; box-shadow: 0 0 10px #ff9800; transform: scale(1.1); }
+    .slot-grid-container { width: 100%; height: 100%; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 8px; position: relative; background: #0d0417; border: 4px solid var(--purple); border-radius: 20px; box-shadow: inset 0 0 20px rgba(0, 0, 0, .8), 0 0 25px rgba(123, 44, 191, .4); }
+    .payline-overlay { width: 100%; height: 100%; position: absolute; inset: 0; pointer-events: none; z-index: 10; }
+    .payline-polyline { animation: pulsePayline .8s infinite alternate ease-in-out; }
+    @keyframes pulsePayline { from { stroke-width: 5px; opacity: .85; filter: drop-shadow(0 0 4px currentColor); } to { stroke-width: 8px; opacity: 1; filter: drop-shadow(0 0 12px currentColor); } }
 
-    .locker-icon {
-      margin-right: 6px;
-      font-size: 16px;
-      opacity: .7;
-    }
+    .reel-column { min-width: 0; display: flex; flex-direction: column; overflow: hidden; padding: 4px; position: relative; background: linear-gradient(180deg, #180928 0%, #0e0418 100%); border: 1px solid rgba(255, 255, 255, .08); border-radius: 12px; }
+    .reel-strip { width: 100%; height: 100%; display: grid; grid-template-rows: repeat(5, 1fr); gap: 6px; transition: filter .2s; }
+    .reel-strip.spinning { animation: reelScroll .12s linear infinite; filter: blur(3px); }
+    .reel-strip.bounce { animation: reelBounceStop .25s ease-out forwards; }
+    @keyframes reelScroll { from { transform: translateY(0); } to { transform: translateY(-20%); } }
+    @keyframes reelBounceStop { 0% { transform: translateY(-15px); } 70% { transform: translateY(8px); } 100% { transform: translateY(0); } }
 
-    .slot-stage {
-      width: 100%;
-      max-width: 1050px;
-      min-height: 0;
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin: 0 auto;
-      position: relative;
-    }
-
-    .badges-column {
-      width: 40px;
-      height: 100%;
-      display: grid;
-      grid-template-rows: repeat(5, 1fr);
-      gap: 10px;
-      align-items: center;
-      justify-items: center;
-      padding: 10px 0;
-      z-index: 5;
-    }
-
-    .badge-line {
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 14px;
-      font-weight: bold;
-      background: #33184a;
-      border: 2px solid #8e44ad;
-      border-radius: 50%;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, .4);
-    }
-
-    .badge-line.active {
-      color: #000;
-      background: #ff9800;
-      border-color: #ffe082;
-      box-shadow: 0 0 10px #ff9800;
-      transform: scale(1.1);
-    }
-
-    .slot-grid-container {
-      width: 100%;
-      height: 100%;
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
-      padding: 8px;
-      position: relative;
-      background: #0d0417;
-      border: 4px solid var(--purple);
-      border-radius: 20px;
-      box-shadow: inset 0 0 20px rgba(0, 0, 0, .8), 0 0 25px rgba(123, 44, 191, .4);
-    }
-
-    .payline-overlay {
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    .payline-polyline {
-      animation: pulsePayline .8s infinite alternate ease-in-out;
-    }
-
-    @keyframes pulsePayline {
-      from { stroke-width: 5px; opacity: .85; filter: drop-shadow(0 0 4px currentColor); }
-      to { stroke-width: 8px; opacity: 1; filter: drop-shadow(0 0 12px currentColor); }
-    }
-
-    .reel-column {
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      padding: 4px;
-      position: relative;
-      background: linear-gradient(180deg, #180928 0%, #0e0418 100%);
-      border: 1px solid rgba(255, 255, 255, .08);
-      border-radius: 12px;
-    }
-
-    .reel-strip {
-      width: 100%;
-      height: 100%;
-      display: grid;
-      grid-template-rows: repeat(5, 1fr);
-      gap: 6px;
-      transition: filter .2s;
-    }
-
-    .reel-strip.spinning {
-      animation: reelScroll .12s linear infinite;
-      filter: blur(3px);
-    }
-
-    .reel-strip.bounce {
-      animation: reelBounceStop .25s ease-out forwards;
-    }
-
-    @keyframes reelScroll {
-      from { transform: translateY(0); }
-      to { transform: translateY(-20%); }
-    }
-
-    @keyframes reelBounceStop {
-      0% { transform: translateY(-15px); }
-      70% { transform: translateY(8px); }
-      100% { transform: translateY(0); }
-    }
-
-    .symbol-cell {
-      min-width: 0;
-      min-height: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      font-size: 75px;
-      background: rgba(255, 255, 255, .03);
-      border-radius: 10px;
-      transition: opacity .3s ease;
-      z-index: 2;
-    }
-
-    .emoji-wrapper {
-      display: inline-block;
-      transition: transform .2s ease;
-    }
-
+    .symbol-cell { min-width: 0; min-height: 0; display: flex; align-items: center; justify-content: center; position: relative; font-size: 75px; background: rgba(255, 255, 255, .03); border-radius: 10px; transition: opacity .3s ease; z-index: 2; }
+    .emoji-wrapper { display: inline-block; transition: transform .2s ease; }
     .symbol-cell.dimmed { opacity: .2; }
+    .symbol-cell.winning { opacity: 1; background: rgba(255, 215, 0, .15); border: 3px solid var(--gold); box-shadow: 0 0 20px rgba(255, 215, 0, .6); z-index: 5; }
+    .symbol-cell.winning .emoji-wrapper { animation: pulseEmoji .6s infinite alternate; }
+    @keyframes pulseEmoji { from { transform: scale(1); } to { transform: scale(1.25); } }
 
-    .symbol-cell.winning {
-      opacity: 1;
-      background: rgba(255, 215, 0, .15);
-      border: 3px solid var(--gold);
-      box-shadow: 0 0 20px rgba(255, 215, 0, .6);
-      z-index: 5;
-    }
-
-    .symbol-cell.winning .emoji-wrapper {
-      animation: pulseEmoji .6s infinite alternate;
-    }
-
-    @keyframes pulseEmoji {
-      from { transform: scale(1); }
-      to { transform: scale(1.25); }
-    }
-
-    .control-panel {
-      display: grid;
-      grid-template-columns: 1fr 1.1fr 1fr 1.5fr 1fr;
-      gap: 12px;
-      align-items: center;
-      padding: 12px 16px;
-      background: var(--panel-bg);
-      border: 2px solid var(--purple);
-      border-radius: 16px;
-    }
-
-    .control-label {
-      display: block;
-      margin-bottom: 2px;
-      color: var(--light-purple);
-    }
-
-    .btn-action {
-      width: 100%;
-      height: 55px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      background: linear-gradient(180deg, #4a148c 0%, #311b92 100%);
-      border: 0;
-      border-radius: 10px;
-      box-shadow: 0 4px 0 #1a0033;
-    }
-
-    .btn-action:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 #1a0033;
-    }
-
-    .btn-spin {
-      height: 65px;
-      color: #fff;
-      font-size: 20px;
-      font-weight: 900;
-      background: linear-gradient(180deg, #ff9800 0%, #e65100 100%);
-      box-shadow: 0 5px 0 #b23c00;
-    }
-
+    .control-panel { display: grid; grid-template-columns: 1fr 1.1fr 1fr 1.5fr 1fr; gap: 12px; align-items: center; padding: 12px 16px; background: var(--panel-bg); border: 2px solid var(--purple); border-radius: 16px; }
+    .control-label { display: block; margin-bottom: 2px; color: var(--light-purple); }
+    .btn-action { width: 100%; height: 55px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(180deg, #4a148c 0%, #311b92 100%); border: 0; border-radius: 10px; box-shadow: 0 4px 0 #1a0033; }
+    .btn-action:active { transform: translateY(3px); box-shadow: 0 1px 0 #1a0033; }
+    .btn-spin { height: 65px; color: #fff; font-size: 20px; font-weight: 900; background: linear-gradient(180deg, #ff9800 0%, #e65100 100%); box-shadow: 0 5px 0 #b23c00; }
     .btn-spin:active { box-shadow: 0 2px 0 #b23c00; }
+    .btn-gamble { background: linear-gradient(180deg, #e91e63 0%, #880e4f 100%); box-shadow: 0 4px 0 #4a0072; }
+    .btn-action.disabled, .btn-spin.disabled { opacity: .35; pointer-events: none; }
 
-    .btn-gamble {
-      background: linear-gradient(180deg, #e91e63 0%, #880e4f 100%);
-      box-shadow: 0 4px 0 #4a0072;
-    }
+    .modal-overlay, .fullscreen-dev-panel { position: fixed; inset: 0; z-index: 100; }
+    .modal-overlay { display: flex; align-items: center; justify-content: center; padding: 15px; background: rgba(0, 0, 0, .85); opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-card { width: min(90%, 500px); padding: 30px; text-align: center; background: #1a0933; border: 3px solid var(--light-purple); border-radius: 16px; box-shadow: 0 0 30px rgba(171, 71, 188, .5); }
+    .modal-title { margin-bottom: 16px; color: var(--gold); font-size: 24px; }
+    .gamble-card-display { height: 110px; display: flex; align-items: center; justify-content: center; margin: 20px 0; font-size: 70px; background: rgba(0, 0, 0, .4); border: 2px dashed var(--light-purple); border-radius: 14px; }
+    .modal-actions { display: flex; gap: 15px; margin-top: 20px; }
 
-    .btn-action.disabled,
-    .btn-spin.disabled {
-      opacity: .35;
-      pointer-events: none;
-    }
+    .level-up-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.85); opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+    .level-up-modal.active { opacity: 1; pointer-events: auto; }
+    .level-up-card { background: linear-gradient(135deg, #2a085c 0%, #0d001a 100%); border: 4px solid var(--gold); border-radius: 20px; padding: 35px 25px; text-align: center; box-shadow: 0 0 50px rgba(255, 215, 0, 0.6); transform: scale(0.5); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-width: 90%; width: 400px; }
+    .level-up-modal.active .level-up-card { transform: scale(1); }
+    .level-up-title { font-size: 32px; font-weight: 900; color: var(--gold); letter-spacing: 2px; margin-bottom: 15px; text-shadow: 0 0 15px var(--gold); text-align: center; }
+    .level-up-sub { font-size: 22px; font-weight: 800; color: #fff; text-align: center; line-height: 1.3; }
+    .level-up-sub span { color: var(--green); display: block; font-size: 28px; margin-top: 5px; }
 
-    .modal-overlay,
-    .fullscreen-dev-panel {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-    }
-
-    .modal-overlay {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 15px;
-      background: rgba(0, 0, 0, .85);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .3s ease;
-    }
-
-    .modal-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .modal-card {
-      width: min(90%, 500px);
-      padding: 30px;
-      text-align: center;
-      background: #1a0933;
-      border: 3px solid var(--light-purple);
-      border-radius: 16px;
-      box-shadow: 0 0 30px rgba(171, 71, 188, .5);
-    }
-
-    .modal-title {
-      margin-bottom: 16px;
-      color: var(--gold);
-      font-size: 24px;
-    }
-
-    .gamble-card-display {
-      height: 110px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 20px 0;
-      font-size: 70px;
-      background: rgba(0, 0, 0, .4);
-      border: 2px dashed var(--light-purple);
-      border-radius: 14px;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 15px;
-      margin-top: 20px;
-    }
-
-    /* --- VENTANA EMERGENTE DE LEVEL UP Y PREMIOS ANIMADA --- */
-    .level-up-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 200;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.85);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.4s ease;
-    }
-
-    .level-up-modal.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .level-up-card {
-      background: linear-gradient(135deg, #2a085c 0%, #0d001a 100%);
-      border: 4px solid var(--gold);
-      border-radius: 20px;
-      padding: 35px 25px;
-      text-align: center;
-      box-shadow: 0 0 50px rgba(255, 215, 0, 0.6);
-      transform: scale(0.5);
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      max-width: 90%;
-      width: 400px;
-    }
-
-    .level-up-modal.active .level-up-card {
-      transform: scale(1);
-    }
-
-    .level-up-title {
-      font-size: 32px;
-      font-weight: 900;
-      color: var(--gold);
-      letter-spacing: 2px;
-      margin-bottom: 15px;
-      text-shadow: 0 0 15px var(--gold);
-      text-align: center;
-    }
-
-    .level-up-sub {
-      font-size: 22px;
-      font-weight: 800;
-      color: #fff;
-      text-align: center;
-      line-height: 1.3;
-    }
-
-    .level-up-sub span {
-      color: var(--green);
-      display: block;
-      font-size: 28px;
-      margin-top: 5px;
-    }
-
-    /* --- ESTILOS PANEL DESARROLLADOR --- */
-    .fullscreen-dev-panel {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 100%;
-      
-      display: flex;
-      flex-direction: column;
-      color: #fff;
-      background: #0a0514;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .3s ease;
-      z-index: 9999;
-    }
-
-    .fullscreen-dev-panel.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .dev-header,
-    .dev-footer {
-      padding: 20px;
-      text-align: center;
-      background: #1a0933;
-      flex-shrink: 0;
-    }
-
+    .fullscreen-dev-panel { position: fixed; top: 0; left: 0; right: 0; bottom: 0; height: 100%; display: flex; flex-direction: column; color: #fff; background: #0a0514; opacity: 0; pointer-events: none; transition: opacity .3s ease; z-index: 9999; }
+    .fullscreen-dev-panel.active { opacity: 1; pointer-events: auto; }
+    .dev-header, .dev-footer { padding: 20px; text-align: center; background: #1a0933; flex-shrink: 0; }
     .dev-header { border-bottom: 3px solid var(--purple); }
-    
-    .dev-header h2, .dev-header h1 {
-      color: var(--gold);
-      font-size: 24px;
-      letter-spacing: 2px;
-      margin: 0;
-    }
-
-    .dev-content {
-      flex: 1 1 auto;
-      min-height: 0;
-      display: block;
-      padding: 20px;
-      overflow-y: scroll;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .dev-content > * {
-      margin-left: auto !important;
-      margin-right: auto !important;
-    }
-
-    .dev-section-title {
-      width: 100%;
-      max-width: 700px;
-      margin: 20px 0 10px;
-      padding-bottom: 8px;
-      color: var(--green);
-      font-size: 18px;
-      font-weight: bold;
-      text-align: left;
-      border-bottom: 2px solid rgba(0, 230, 118, 0.4);
-    }
-    
+    .dev-header h2, .dev-header h1 { color: var(--gold); font-size: 24px; letter-spacing: 2px; margin: 0; }
+    .dev-content { flex: 1 1 auto; min-height: 0; display: block; padding: 20px; overflow-y: scroll; -webkit-overflow-scrolling: touch; }
+    .dev-content > * { margin-left: auto !important; margin-right: auto !important; }
+    .dev-section-title { width: 100%; max-width: 700px; margin: 20px 0 10px; padding-bottom: 8px; color: var(--green); font-size: 18px; font-weight: bold; text-align: left; border-bottom: 2px solid rgba(0, 230, 118, 0.4); }
     .dev-table { width: 100%; max-width: 700px; border-collapse: collapse; margin-bottom: 20px; }
     .dev-table th { color: var(--light-purple); padding: 8px; font-size: 13px; border-bottom: 1px solid var(--purple); }
     .dev-table td { padding: 6px; text-align: center; border-bottom: 1px solid rgba(123, 44, 191, 0.2); }
-    
-    .dev-input { 
-      width: 100%; max-width: 65px; background: #000; color: #fff; 
-      border: 1px solid var(--purple); border-radius: 6px; padding: 6px; 
-      text-align: center; font-weight: bold; font-family: inherit;
-    }
+    .dev-input { width: 100%; max-width: 65px; background: #000; color: #fff; border: 1px solid var(--purple); border-radius: 6px; padding: 6px; text-align: center; font-weight: bold; font-family: inherit; }
     .dev-input:focus { border-color: var(--gold); outline: none; background: #1a0933; }
     .dev-emoji-input { font-size: 18px; max-width: 80px; }
+    .dev-economy-grid { width: 100%; max-width: 700px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px; }
+    .dev-economy-box { background: rgba(20, 10, 35, 0.8); padding: 12px; border: 1px solid var(--purple); border-radius: 10px; text-align: center; }
+    .dev-economy-box label { display: block; font-size: 11px; color: #aaa; margin-bottom: 8px; text-transform: uppercase; font-weight: bold; }
+    .dev-economy-box input { width: 100%; max-width: 120px; background: #000; color: var(--gold); border: 1px dashed var(--light-purple); border-radius: 6px; padding: 8px; text-align: center; font-weight: bold; font-family: inherit; font-size: 14px; }
+    .dev-footer { display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; gap: 15px; padding: 20px; background: #1a0933; border-top: 3px solid var(--purple); }
 
-    .dev-economy-grid {
-      width: 100%;
-      max-width: 700px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 15px;
-      margin-bottom: 30px;
-    }
-
-    .dev-economy-box {
-      background: rgba(20, 10, 35, 0.8);
-      padding: 12px;
-      border: 1px solid var(--purple);
-      border-radius: 10px;
-      text-align: center;
-    }
-
-    .dev-economy-box label {
-      display: block;
-      font-size: 11px;
-      color: #aaa;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      font-weight: bold;
-    }
-
-    .dev-economy-box input {
-      width: 100%;
-      max-width: 120px;
-      background: #000;
-      color: var(--gold);
-      border: 1px dashed var(--light-purple);
-      border-radius: 6px;
-      padding: 8px;
-      text-align: center;
-      font-weight: bold;
-      font-family: inherit;
-      font-size: 14px;
-    }
-
-    .dev-footer {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 15px;
-      padding: 20px;
-      background: #1a0933;
-      border-top: 3px solid var(--purple);
-    }
-
-    @keyframes badgePulse {
-      0% { transform: scale(1); filter: brightness(1); box-shadow: 0 0 5px orange; }
-      50% { transform: scale(1.15); filter: brightness(1.4); box-shadow: 0 0 15px yellow; }
-      100% { transform: scale(1); filter: brightness(1); box-shadow: 0 0 5px orange; }
-    }
-
-    .badge-line.badge-winning-pulse {
-      background-color: #ff9800;
-      border-color: #fff;
-      animation: badgePulse .6s infinite ease-in-out;
-    }
+    @keyframes badgePulse { 0% { transform: scale(1); filter: brightness(1); box-shadow: 0 0 5px orange; } 50% { transform: scale(1.15); filter: brightness(1.4); box-shadow: 0 0 15px yellow; } 100% { transform: scale(1); filter: brightness(1); box-shadow: 0 0 5px orange; } }
+    .badge-line.badge-winning-pulse { background-color: #ff9800; border-color: #fff; animation: badgePulse .6s infinite ease-in-out; }
 
     @media (orientation: landscape) and (min-width: 601px) {
       body { gap: 8px; padding: 10px 24px; }
@@ -719,27 +132,23 @@
     }
 
     @media screen and (max-width: 600px) and (orientation: portrait) {
-      body {
-        gap: 6px;
-        padding: max(6px, env(safe-area-inset-top))
-                 max(6px, env(safe-area-inset-right))
-                 max(6px, env(safe-area-inset-bottom))
-                 max(6px, env(safe-area-inset-left));
-      }
+      body { gap: 6px; padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left)); }
       .top-bar { min-height: 58px; gap: 5px; padding: 5px; border-width: 1px; border-radius: 9px; }
       .total-bet-box, .balance-box { width: 28%; min-width: 0; padding: 4px 5px; border-radius: 6px; }
-      .dynamic-center-area { width: 44%; min-width: 0; }
+      .dynamic-center-area { width: 44%; min-width: 0; padding: 0 2px; }
       .total-bet-label, .balance-label { overflow: hidden; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
       .total-bet-value, .balance-value { overflow: hidden; font-size: clamp(12px, 3.5vw, 16px); text-overflow: ellipsis; }
       .player-name-display { font-size: clamp(11px, 3.2vw, 14px); }
       .player-level-display { font-size: clamp(9px, 2.8vw, 11px); }
-      .dynamic-text-display { overflow: hidden; font-size: clamp(11px, 3.8vw, 17px); text-overflow: ellipsis; }
       
+      .dynamic-text-display { overflow: visible; font-size: clamp(11px, 3.8vw, 17px); text-overflow: clip; white-space: normal; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; padding: 2px 0; }
+      .sub-text-free { margin-top: 1px; font-size: 0.9em; }
+      .dynamic-text-display.win-text .sub-text-free { font-size: 0.85em; line-height: 1.1; }
+
       .dynamic-text-display.jackpot-text { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: 100%; max-width: 100%; min-width: 0; padding-inline: 2px; line-height: 1.05; white-space: normal; text-align: center; }
       .dynamic-text-display.jackpot-text .jackpot-name, .dynamic-text-display.jackpot-text .jackpot-value { display: block; width: 100%; max-width: 100%; overflow: visible; text-align: center; text-overflow: clip; }
       .dynamic-text-display.jackpot-text .jackpot-name { font-size: clamp(9px, 3vw, 15px); line-height: 1.1; white-space: normal; overflow-wrap: anywhere; }
       .dynamic-text-display.jackpot-text .jackpot-value { font-size: clamp(10px, 3.2vw, 17px); line-height: 1.1; white-space: nowrap; }
-      
       .dynamic-text-display.win-text { font-size: clamp(12px, 4vw, 18px); }
       .lockers-container { gap: 3px; padding: 4px; border-width: 1px; border-radius: 9px; }
       .locker-box { height: 27px; overflow: hidden; font-size: 7px; letter-spacing: 0; white-space: nowrap; }
@@ -765,73 +174,21 @@
     }
 
     @media screen and (max-width: 768px) and (orientation: portrait) {
-      .top-bar {
-        min-height: 75px !important;
-        padding: 8px !important;
-      }
-
-      .lockers-container {
-        gap: 6px !important;
-        padding: 6px !important;
-      }
-      .locker-box {
-        flex-direction: column !important;
-        height: 60px !important;
-        font-size: 11px !important;
-        justify-content: center !important;
-      }
-      .locker-icon {
-        font-size: 22px !important;
-        margin-right: 0 !important;
-        margin-bottom: 4px !important;
-      }
-
-      .slot-grid-container {
-        padding: 10px !important;
-        margin-top: 10px !important;
-        margin-bottom: 10px !important;
-      }
-      .symbol-cell {
-        font-size: 38px !important;
-      }
-      .badge-line {
-        width: 24px !important;
-        height: 24px !important;
-        font-size: 11px !important;
-      }
-
-      .control-panel {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr 1fr 1fr !important;
-        grid-template-areas: 
-          "auto auto spin spin"
-          "lines bet gamble gamble" !important;
-        gap: 8px !important;
-        padding: 10px !important;
-      }
-
-      #btn-auto   { grid-area: auto !important; height: 50px !important; }
-      #btn-lines  { grid-area: lines !important; height: 50px !important; }
-      #btn-bet    { grid-area: bet !important; height: 50px !important; }
-      
-      #btn-spin   { 
-        grid-area: spin !important; 
-        height: 50px !important;
-        font-size: 20px !important; 
-      }
-      
-      #btn-gamble { 
-        grid-area: gamble !important; 
-        height: 50px !important;
-      }
-      
-      .control-label {
-        font-size: 9px !important;
-        margin-bottom: 0 !important;
-      }
-      #val-lines, #val-bet, #val-auto {
-        font-size: 13px !important;
-      }
+      .top-bar { min-height: 75px !important; padding: 8px !important; }
+      .lockers-container { gap: 6px !important; padding: 6px !important; }
+      .locker-box { flex-direction: column !important; height: 60px !important; font-size: 11px !important; justify-content: center !important; }
+      .locker-icon { font-size: 22px !important; margin-right: 0 !important; margin-bottom: 4px !important; }
+      .slot-grid-container { padding: 10px !important; margin-top: 10px !important; margin-bottom: 10px !important; }
+      .symbol-cell { font-size: 38px !important; }
+      .badge-line { width: 24px !important; height: 24px !important; font-size: 11px !important; }
+      .control-panel { display: grid !important; grid-template-columns: 1fr 1fr 1fr 1fr !important; grid-template-areas: "auto auto spin spin" "lines bet gamble gamble" !important; gap: 8px !important; padding: 10px !important; }
+      #btn-auto { grid-area: auto !important; height: 50px !important; }
+      #btn-lines { grid-area: lines !important; height: 50px !important; }
+      #btn-bet { grid-area: bet !important; height: 50px !important; }
+      #btn-spin { grid-area: spin !important; height: 50px !important; font-size: 20px !important; }
+      #btn-gamble { grid-area: gamble !important; height: 50px !important; }
+      .control-label { font-size: 9px !important; margin-bottom: 0 !important; }
+      #val-lines, #val-bet, #val-auto { font-size: 13px !important; }
     }
   </style>
 </head>
@@ -847,10 +204,14 @@
       <div class="dynamic-text-display" id="dynamic-display">✨ ¡Mucha suerte!</div>
     </div>
 
+    <!-- NUEVO ORDEN DEL PANEL DEL JUGADOR -->
     <div class="balance-box" id="balance-box">
       <div class="player-name-display" id="display-player-name">JUGADOR</div>
       <div class="player-level-display" id="display-player-level">NIVEL 1</div>
       <div class="balance-value" id="display-balance-val">5.000 C</div>
+      <div class="level-progress-container">
+        <div class="level-progress-fill" id="level-progress-fill"></div>
+      </div>
     </div>
   </div>
 
@@ -908,10 +269,7 @@
 
       <div class="gamble-card-display" id="gamble-card">❓</div>
 
-      <p>
-        Premio en juego:
-        <span id="gamble-win-val" style="color:#00e676;font-weight:bold;">0 C</span>
-      </p>
+      <p>Premio en juego: <span id="gamble-win-val" style="color:#00e676;font-weight:bold;">0 C</span></p>
 
       <div class="modal-actions">
         <button class="btn-action btn-gamble" id="btn-gamble-play">🃏 JUGAR 2X</button>
@@ -927,6 +285,7 @@
     </div>
   </div>
 
+  <!-- PANEL DE DESARROLLADOR -->
   <div class="fullscreen-dev-panel" id="fullscreen-dev">
     <div class="dev-header">
       <h1>🎰 Slot Machine PWA</h1>
@@ -935,7 +294,7 @@
     <div class="dev-content">
       <div class="dev-section-title">📊 ESTADÍSTICAS DEL MOTOR</div>
       <p style="margin-bottom: 10px; font-size: 13px; color: #aaa; text-align: left; width: 100%; max-width: 700px;">
-        Métricas de rendimiento en tiempo real basadas en las jugadas realizadas durante la sesión actual.
+        Métricas de rendimiento en tiempo real.
       </p>
       
       <div class="dev-economy-grid" style="margin-bottom: 30px;">
@@ -963,26 +322,22 @@
           <label>Media Jugadas / Premio</label>
           <span id="stat-avg-win" style="font-weight: bold; font-size: 16px; color: #fff; margin-top: 5px; display: block;">0</span>
         </div>
-        <div class="dev-economy-box" style="background: rgba(255,255,255,0.03);">
-          <label>Racha Actual sin Premio</label>
-          <span id="stat-current-streak" style="font-weight: bold; font-size: 16px; color: #fff; margin-top: 5px; display: block;">0</span>
-        </div>
-        <div class="dev-economy-box" style="background: rgba(255,255,255,0.03);">
-          <label>Veces que ha Doblado</label>
-          <span id="stat-double-attempts" style="font-weight: bold; font-size: 16px; color: #fff; margin-top: 5px; display: block;">0</span>
-        </div>
-        <div class="dev-economy-box" style="background: rgba(255,255,255,0.03);">
-          <label>Racha Máx. Doblando</label>
-          <span id="stat-max-double" style="font-weight: bold; font-size: 16px; color: #fff; margin-top: 5px; display: block;">0</span>
-        </div>
       </div>
 
-      <div class="dev-section-title">🏦 ECONOMÍA Y BANCA</div>
+      <div class="dev-section-title">🏦 ECONOMÍA, BANCA Y NIVELES</div>
       <p style="margin-bottom: 10px; font-size: 13px; color: #aaa; text-align: left; width: 100%; max-width: 700px;">
-        Parte de las pérdidas del "Doble o Nada" nutren los Jackpots. El resto son beneficios para la Banca.
+        Modifica la economía global en tiempo real, incluyendo el sistema de progreso de nivel.
       </p>
       
       <div class="dev-economy-grid">
+        <div class="dev-economy-box">
+          <label>Giros por Nivel</label>
+          <input type="number" id="dev-spins-req" value="100" title="Cantidad de giros para subir un nivel">
+        </div>
+        <div class="dev-economy-box">
+          <label>Premio Giros Gratis</label>
+          <input type="number" id="dev-spins-reward" value="20" title="Tiradas gratis al subir de nivel">
+        </div>
         <div class="dev-economy-box">
           <label title="Beneficios acumulados por la banca">Beneficio Banca</label>
           <input type="number" id="dev-bank-profit" value="0">
@@ -1004,7 +359,7 @@
           <input type="number" id="dev-jp-5" value="0">
         </div>
         <div class="dev-economy-box">
-          <label>Créditos Iniciales (al resetear):</label>
+          <label>Créditos Iniciales (reset):</label>
           <input type="number" id="dev-starting-credits" class="dev-input">
         </div>
       </div>
@@ -1044,8 +399,6 @@
   </div>
 
   <script>
-
-    // --- 1. CONFIGURACIÓN DE EMOJIS ---     
     const DEFAULT_CONFIG = [
       { symbol: '🌀', weight: 45, pay3: 5,   pay4: 15,  pay5: 30 },
       { symbol: '🍒', weight: 35, pay3: 10,  pay4: 20,  pay5: 40 },
@@ -1059,87 +412,60 @@
 
     let EMOJI_CONFIG = JSON.parse(localStorage.getItem('slot_config')) || JSON.parse(JSON.stringify(DEFAULT_CONFIG));
 
-    // --- 2. CONFIGURACIÓN DE LA ECONOMÍA Y JUGADOR ---
     const DEFAULT_ECONOMY = {
       startingCredits: 5000, 
       bankProfit: 0,
       jackpotPercent: 80,
-      jackpots: { 3: 0, 4: 0, 5: 0 }
+      jackpots: { 3: 0, 4: 0, 5: 0 },
+      spinsToLevelUp: 100,
+      freeSpinsReward: 20
     };
     
     const savedEconomy = JSON.parse(localStorage.getItem('slot_economy')) || {};
     let ECONOMY = { ...DEFAULT_ECONOMY, ...savedEconomy };
 
-    // --- PERFIL DE JUGADOR Y PROGRESIÓN ---
-    const DEFAULT_PROFILE = {
-      name: '',
-      level: 1,
-      spinsToNextLevel: 0
-    };
-
+    const DEFAULT_PROFILE = { name: '', level: 1, spinsToNextLevel: 0 };
     let playerProfile = JSON.parse(localStorage.getItem('slot_player_profile')) || { ...DEFAULT_PROFILE };
     const savedPlayer = JSON.parse(localStorage.getItem('slot_player')) || {};
 
-    // --- 3. ESTADÍSTICAS DEL MOTOR ---
     const defaultStats = {
-      totalPlays: 0,
-      totalBet: 0,
-      totalWon: 0,
-      totalLostRisking: 0,
-      doubleAttempts: 0,
-      maxDoubleStreak: 0,
-      currentDoubleStreak: 0,
-      currentNoPrizeStreak: 0,
-      prizesGiven: 0
+      totalPlays: 0, totalBet: 0, totalWon: 0, totalLostRisking: 0,
+      doubleAttempts: 0, maxDoubleStreak: 0, currentDoubleStreak: 0,
+      currentNoPrizeStreak: 0, prizesGiven: 0
     };
-
     const savedStats = JSON.parse(localStorage.getItem('machine_stats')) || {};
     let gameStats = { ...defaultStats, ...savedStats };
 
-    // --- HELPERS Y GUARDADO ---
     const $ = id => document.getElementById(id);
 
     function saveConfig() { localStorage.setItem('slot_config', JSON.stringify(EMOJI_CONFIG)); }
     function saveEconomy() { localStorage.setItem('slot_economy', JSON.stringify(ECONOMY)); }
     function savePlayer() { localStorage.setItem('slot_player', JSON.stringify({ credits: state.credits })); }
     function saveProfile() { localStorage.setItem('slot_player_profile', JSON.stringify(playerProfile)); }
-    
-    function saveAndUpdateStats() {
-      localStorage.setItem('machine_stats', JSON.stringify(gameStats));
-      renderStats();
-    }
+    function saveAndUpdateStats() { localStorage.setItem('machine_stats', JSON.stringify(gameStats)); renderStats(); }
 
     function requestPlayerName() {
       let name = prompt('Ingresa el Nombre del Jugador (Máximo 10 caracteres):', playerProfile.name || 'MeteOritO');
       if (!name || name.trim() === '') name = 'JUGADOR';
       playerProfile.name = name.trim().substring(0, 10);
-      saveProfile();
-      updateUI();
+      saveProfile(); updateUI();
     }
 
     function renderStats() {
       if (!$('stat-plays')) return;
-      
       $('stat-plays').innerText = gameStats.totalPlays;
       $('stat-bet').innerText = gameStats.totalBet.toFixed(2);
       $('stat-won').innerText = gameStats.totalWon.toFixed(2);
       $('stat-lost-risk').innerText = gameStats.totalLostRisking.toFixed(2);
-      
       let rtp = gameStats.totalBet > 0 ? (gameStats.totalWon / gameStats.totalBet) * 100 : 0;
       $('stat-rtp').innerText = rtp.toFixed(2) + '%';
-      
       let avgPlaysPerWin = gameStats.prizesGiven > 0 ? (gameStats.totalPlays / gameStats.prizesGiven) : 0;
       $('stat-avg-win').innerText = avgPlaysPerWin.toFixed(1);
-      
-      $('stat-current-streak').innerText = gameStats.currentNoPrizeStreak;
-      $('stat-double-attempts').innerText = gameStats.doubleAttempts;
-      $('stat-max-double').innerText = gameStats.maxDoubleStreak;
     }
 
     function resetStats() {
       if(confirm('¿Estás seguro de que quieres borrar todas las estadísticas?')) {
-        gameStats = { ...defaultStats };
-        saveAndUpdateStats();
+        gameStats = { ...defaultStats }; saveAndUpdateStats();
       }
     }
 
@@ -1156,79 +482,45 @@
       [0, 0, 0, 0, 0], [4, 4, 4, 4, 4], [4, 3, 2, 1, 0],
       [0, 1, 2, 3, 4], [0, 2, 4, 2, 0], [4, 2, 0, 2, 4]
     ];
-
     const LINE_OPTIONS = [1, 3, 5, 7, 9];
     const BET_OPTIONS = [1, 2, 3, 5, 10];
     
     const state = {
       credits: savedPlayer.credits !== undefined ? savedPlayer.credits : ECONOMY.startingCredits,
-      selectedLinesIdx: 4,
-      selectedBetIdx: 0,
-      isSpinning: false,
-      autoSpin: false,
-      lastWinCredits: 0,
-      lastWinMatchCount: 3, 
-      hasActiveWin: false,
-      gambleFailCount: 0,
+      selectedLinesIdx: 4, selectedBetIdx: 0,
+      isSpinning: false, autoSpin: false,
+      lastWinCredits: 0, lastWinMatchCount: 3, hasActiveWin: false, gambleFailCount: 0,
       grid: Array.from({ length: 5 }, () => Array(5).fill('')),
-      totalSpins: 0,
-      totalPayout: 0,
-      currentWinningLines: [],
-      freeSpinsLeft: 0,
-      freeSpinTotalWon: 0,
-      isFreeSpinMode: false
+      totalSpins: 0, totalPayout: 0, currentWinningLines: [],
+      freeSpinsLeft: 0, freeSpinTotalWon: 0, isFreeSpinMode: false
     };
 
-    let jackpotIndex = 0;
-    let secretBuffer = '';
-    let secretTimeout = null;
+    let jackpotIndex = 0; let secretBuffer = ''; let secretTimeout = null;
+    let idleTimer = null; let isIdle = true;
 
-    const gridContainer = $('slot-grid');
-    const paylineSvg = $('payline-svg');
-    const badgesLeft = $('badges-left');
-    const badgesRight = $('badges-right');
+    const gridContainer = $('slot-grid'); const paylineSvg = $('payline-svg');
+    const badgesLeft = $('badges-left'); const badgesRight = $('badges-right');
     const dynamicDisplay = $('dynamic-display');
-    const valLines = $('val-lines');
-    const valBet = $('val-bet');
-    const valTotalBet = $('val-total-bet');
-    const btnLines = $('btn-lines');
-    const btnBet = $('btn-bet');
-    const btnSpin = $('btn-spin');
-    const btnAuto = $('btn-auto');
-    const valAuto = $('val-auto');
+    const btnSpin = $('btn-spin'); const btnAuto = $('btn-auto');
     const btnGamble = $('btn-gamble');
 
     document.addEventListener('DOMContentLoaded', () => {
-      if (!playerProfile.name) {
-        requestPlayerName();
-      }
-
-      initBadges();
-      initGridUI();
-      registerEvents();
-      updateUI();
-      startJackpotRotation();
-      renderDevPanel();
-      renderStats();
+      if (!playerProfile.name) requestPlayerName();
+      initBadges(); initGridUI(); registerEvents(); updateUI();
+      startJackpotRotation(); renderDevPanel(); renderStats(); resetIdleState();
 
       window.addEventListener('resize', () => {
-        if (state.currentWinningLines.length) {
-          drawPaylinesSVG(state.currentWinningLines);
-        }
+        if (state.currentWinningLines.length) drawPaylinesSVG(state.currentWinningLines);
       });
     });
 
-    function formatValue(credits) {
-      return `${Math.floor(credits).toLocaleString('es-ES')} C`;
-    }
+    function formatValue(credits) { return `${Math.floor(credits).toLocaleString('es-ES')} C`; }
 
     function checkSecretCode(value) {
       secretBuffer += value;
       if (secretBuffer.length > 4) secretBuffer = secretBuffer.slice(-4);
       if (secretBuffer === '1974') {
-        renderDevPanel();
-        $('fullscreen-dev').classList.add('active');
-        secretBuffer = '';
+        renderDevPanel(); $('fullscreen-dev').classList.add('active'); secretBuffer = '';
       }
       clearTimeout(secretTimeout);
       secretTimeout = setTimeout(() => { secretBuffer = ''; }, 3000);
@@ -1253,13 +545,9 @@
 
       tbody.querySelectorAll('.dev-input').forEach(input => {
         input.addEventListener('change', (e) => {
-          const idx = e.target.dataset.idx;
-          const key = e.target.dataset.key;
-          if (key === 'symbol') {
-            EMOJI_CONFIG[idx][key] = e.target.value || '❓';
-          } else {
-            EMOJI_CONFIG[idx][key] = parseInt(e.target.value) || 0;
-          }
+          const idx = e.target.dataset.idx; const key = e.target.dataset.key;
+          if (key === 'symbol') EMOJI_CONFIG[idx][key] = e.target.value || '❓';
+          else EMOJI_CONFIG[idx][key] = parseInt(e.target.value) || 0;
           saveConfig();
         });
       });
@@ -1270,6 +558,8 @@
       if ($('dev-jp-3')) $('dev-jp-3').value = Math.floor(ECONOMY.jackpots[3]);
       if ($('dev-jp-4')) $('dev-jp-4').value = Math.floor(ECONOMY.jackpots[4]);
       if ($('dev-jp-5')) $('dev-jp-5').value = Math.floor(ECONOMY.jackpots[5]);
+      if ($('dev-spins-req')) $('dev-spins-req').value = ECONOMY.spinsToLevelUp;
+      if ($('dev-spins-reward')) $('dev-spins-reward').value = ECONOMY.freeSpinsReward;
 
       const saveEcoFields = () => {
         ECONOMY.startingCredits = parseFloat($('dev-starting-credits')?.value) || 5000;
@@ -1278,30 +568,27 @@
         ECONOMY.jackpots[3] = parseFloat($('dev-jp-3')?.value) || 0;
         ECONOMY.jackpots[4] = parseFloat($('dev-jp-4')?.value) || 0;
         ECONOMY.jackpots[5] = parseFloat($('dev-jp-5')?.value) || 0;
-        saveEconomy();
+        ECONOMY.spinsToLevelUp = parseInt($('dev-spins-req')?.value) || 100;
+        ECONOMY.freeSpinsReward = parseInt($('dev-spins-reward')?.value) || 20;
+        saveEconomy(); updateUI();
       };
 
-      ['dev-starting-credits', 'dev-bank-profit', 'dev-jp-percent', 'dev-jp-3', 'dev-jp-4', 'dev-jp-5'].forEach(id => {
+      ['dev-starting-credits', 'dev-bank-profit', 'dev-jp-percent', 'dev-jp-3', 'dev-jp-4', 'dev-jp-5', 'dev-spins-req', 'dev-spins-reward'].forEach(id => {
         if ($(id)) $(id).addEventListener('change', saveEcoFields);
       });
     }
 
     function initBadges() {
-      badgesLeft.innerHTML = '';
-      badgesRight.innerHTML = '';
-      const leftMapping = [4, 2, 1, 3, 5];
-      const rightMapping = [6, 8, null, 9, 7];
+      badgesLeft.innerHTML = ''; badgesRight.innerHTML = '';
+      const leftMapping = [4, 2, 1, 3, 5]; const rightMapping = [6, 8, null, 9, 7];
 
       [...leftMapping, ...rightMapping].forEach((line, index) => {
         const badge = document.createElement('div');
         if (line) {
-          badge.className = 'badge-line';
-          badge.dataset.line = line;
-          badge.textContent = line;
-          badge.addEventListener('click', () => checkSecretCode(String(line)));
+          badge.className = 'badge-line'; badge.dataset.line = line; badge.textContent = line;
+          badge.addEventListener('click', () => { checkSecretCode(String(line)); resetIdleState(); });
         } else {
-          badge.style.width = '21px';
-          badge.style.height = '21px';
+          badge.style.width = '21px'; badge.style.height = '21px';
         }
         (index < 5 ? badgesLeft : badgesRight).appendChild(badge);
       });
@@ -1322,15 +609,11 @@
       gridContainer.querySelectorAll('.reel-column').forEach((reel, reelIndex) => {
         reel.innerHTML = '';
         const strip = document.createElement('div');
-        strip.className = 'reel-strip';
-        strip.id = `strip-${reelIndex}`;
-
+        strip.className = 'reel-strip'; strip.id = `strip-${reelIndex}`;
         for (let row = 0; row < 5; row++) {
           const cell = document.createElement('div');
           const symbol = getRandomSymbol();
-          cell.className = 'symbol-cell';
-          cell.dataset.reel = reelIndex;
-          cell.dataset.row = row;
+          cell.className = 'symbol-cell'; cell.dataset.reel = reelIndex; cell.dataset.row = row;
           cell.innerHTML = `<span class="emoji-wrapper">${symbol}</span>`;
           state.grid[reelIndex][row] = symbol;
           strip.appendChild(cell);
@@ -1339,9 +622,23 @@
       });
     }
 
+    function resetIdleState() {
+      isIdle = false;
+      clearTimeout(idleTimer);
+      // Sólo cuenta como inactivo si NO hay premios esperando acción y NO giran los rodillos
+      if (!state.hasActiveWin && !state.isSpinning && !state.isFreeSpinMode) {
+        // Reducido a 2 segundos según lo solicitado
+        idleTimer = setTimeout(() => {
+          isIdle = true;
+          jackpotIndex = 0;
+          showJackpotText(jackpotIndex);
+        }, 2000); 
+      }
+    }
+
     function startJackpotRotation() {
       setInterval(() => {
-        if (!state.isSpinning && !state.hasActiveWin && !state.isFreeSpinMode) {
+        if (isIdle && !state.isSpinning && !state.hasActiveWin && !state.isFreeSpinMode) {
           const currentJackpots = getJackpotsDisplay();
           jackpotIndex = (jackpotIndex + 1) % currentJackpots.length;
           showJackpotText(jackpotIndex);
@@ -1350,16 +647,12 @@
     }
 
     function showJackpotText(index) {
-      const currentJackpots = getJackpotsDisplay();
-      const jackpot = currentJackpots[index];
+      const jackpot = getJackpotsDisplay()[index];
       dynamicDisplay.style.opacity = '0';
       dynamicDisplay.style.transform = 'scale(.9)';
       setTimeout(() => {
         dynamicDisplay.className = 'dynamic-text-display jackpot-text';
-        dynamicDisplay.innerHTML = `
-          <span class="jackpot-name">🏆 ${jackpot.name}</span>
-          <span class="jackpot-value">${formatValue(jackpot.credits)}</span>
-        `;
+        dynamicDisplay.innerHTML = `<span class="jackpot-name">🏆 ${jackpot.name}</span><span class="jackpot-value">${formatValue(jackpot.credits)}</span>`;
         dynamicDisplay.style.opacity = '1';
         dynamicDisplay.style.transform = 'scale(1)';
       }, 350);
@@ -1380,22 +673,23 @@
     function updateUI() {
       const lines = LINE_OPTIONS[state.selectedLinesIdx];
       const bet = BET_OPTIONS[state.selectedBetIdx];
-      const totalBet = lines * bet;
-
+      
       $('display-player-name').textContent = playerProfile.name || 'MeteOritO';
       $('display-player-level').textContent = `NIVEL ${playerProfile.level}`;
-      $('display-balance-val').textContent = `${Math.floor(state.credits).toLocaleString('es-ES')} C`;
-      valTotalBet.textContent = `${totalBet} C`;
-
-      valLines.textContent = lines;
-      valBet.textContent = `x${bet}`;
+      $('display-balance-val').textContent = formatValue(state.credits);
+      $('val-total-bet').textContent = `${lines * bet} C`;
+      $('val-lines').textContent = lines;
+      $('val-bet').textContent = `x${bet}`;
+      
+      let progressPercent = (playerProfile.spinsToNextLevel / ECONOMY.spinsToLevelUp) * 100;
+      $('level-progress-fill').style.width = `${Math.min(100, progressPercent)}%`;
 
       document.querySelectorAll('.badge-line').forEach(badge => {
         badge.classList.toggle('active', Number(badge.dataset.line) <= lines);
       });
 
       btnGamble.classList.toggle('disabled', state.lastWinCredits <= 0 || state.isSpinning || state.isFreeSpinMode);
-      [btnSpin, btnLines, btnBet].forEach(button => button.classList.toggle('disabled', state.isSpinning || state.isFreeSpinMode));
+      [$('btn-spin'), $('btn-lines'), $('btn-bet')].forEach(button => button.classList.toggle('disabled', state.isSpinning || state.isFreeSpinMode));
     }
 
     function showLevelUpModal(title, sub, duration = 4000) {
@@ -1403,26 +697,17 @@
       $('lvl-modal-title').innerHTML = title;
       $('lvl-modal-sub').innerHTML = sub;
       modal.classList.add('active');
-
       return new Promise(resolve => {
-        setTimeout(() => {
-          modal.classList.remove('active');
-          setTimeout(resolve, 400); 
-        }, duration);
+        setTimeout(() => { modal.classList.remove('active'); setTimeout(resolve, 400); }, duration);
       });
     }
 
-    function clearPaylinesSVG() {
-      paylineSvg.innerHTML = '';
-      state.currentWinningLines = [];
-    }
+    function clearPaylinesSVG() { paylineSvg.innerHTML = ''; state.currentWinningLines = []; }
 
     function drawPaylinesSVG(winningLines) {
       paylineSvg.innerHTML = '';
       const gridRect = gridContainer.getBoundingClientRect();
-      paylineSvg.setAttribute('width', gridRect.width);
-      paylineSvg.setAttribute('height', gridRect.height);
-
+      paylineSvg.setAttribute('width', gridRect.width); paylineSvg.setAttribute('height', gridRect.height);
       const colors = ['#ffd700', '#00ff88', '#ff0055', '#00e5ff', '#ff9900', '#e040fb', '#76ff03', '#1de9b6', '#ff3d00'];
 
       winningLines.forEach(win => {
@@ -1434,9 +719,7 @@
           const rect = cell.getBoundingClientRect();
           points.push(`${rect.left + rect.width / 2 - gridRect.left},${rect.top + rect.height / 2 - gridRect.top}`);
         }
-
         if (points.length < 2) return;
-
         const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
         polyline.setAttribute('points', points.join(' '));
         polyline.setAttribute('stroke', colors[win.lineIdx % colors.length]);
@@ -1445,37 +728,35 @@
         polyline.setAttribute('stroke-linejoin', 'round');
         polyline.setAttribute('fill', 'none');
         polyline.classList.add('payline-polyline');
-
         paylineSvg.appendChild(polyline);
       });
     }
 
     function registerEvents() {
-      btnLines.addEventListener('click', () => {
+      $('btn-lines').addEventListener('click', () => {
         if (state.isSpinning || state.isFreeSpinMode) return;
-        state.selectedLinesIdx = (state.selectedLinesIdx + 1) % LINE_OPTIONS.length;
-        updateUI();
+        state.selectedLinesIdx = (state.selectedLinesIdx + 1) % LINE_OPTIONS.length; updateUI(); resetIdleState();
       });
 
-      btnBet.addEventListener('click', () => {
+      $('btn-bet').addEventListener('click', () => {
         if (state.isSpinning || state.isFreeSpinMode) return;
-        state.selectedBetIdx = (state.selectedBetIdx + 1) % BET_OPTIONS.length;
-        updateUI();
+        state.selectedBetIdx = (state.selectedBetIdx + 1) % BET_OPTIONS.length; updateUI(); resetIdleState();
       });
 
-      btnSpin.addEventListener('click', triggerSpin);
+      btnSpin.addEventListener('click', () => { triggerSpin(); resetIdleState(); });
 
       btnAuto.addEventListener('click', () => {
         if (state.isFreeSpinMode) return;
         state.autoSpin = !state.autoSpin;
-        valAuto.textContent = state.autoSpin ? 'AUTO: ON' : 'AUTO: OFF';
+        $('val-auto').textContent = state.autoSpin ? 'AUTO: ON' : 'AUTO: OFF';
         btnAuto.style.background = state.autoSpin ? 'linear-gradient(180deg,#2e7d32 0%,#1b5e20 100%)' : '';
+        resetIdleState();
         if (state.autoSpin && !state.isSpinning) triggerSpin();
       });
 
       btnGamble.addEventListener('click', () => {
         if (state.lastWinCredits <= 0 || state.isFreeSpinMode) return;
-        state.gambleFailCount = 0;
+        state.gambleFailCount = 0; resetIdleState();
         $('gamble-win-val').textContent = formatValue(state.lastWinCredits);
         $('gamble-card').textContent = '❓';
         $('modal-gamble').classList.add('active');
@@ -1485,31 +766,20 @@
 
       $('btn-gamble-collect').addEventListener('click', () => {
         $('modal-gamble').classList.remove('active');
-        state.lastWinCredits = 0;
-        state.hasActiveWin = false;
-        updateUI();
+        state.lastWinCredits = 0; state.hasActiveWin = false; updateUI(); resetIdleState(); checkAutoSpin();
       });
 
-      $('btn-dev-close').addEventListener('click', () => {
-        $('fullscreen-dev').classList.remove('active');
-        initGridUI();
-      });
+      $('btn-dev-close').addEventListener('click', () => { $('fullscreen-dev').classList.remove('active'); initGridUI(); resetIdleState(); });
 
       $('btn-dev-reset').addEventListener('click', () => {
-        if(confirm('¿Seguro que quieres borrar todos tus cambios y restaurar la economía, emojis y perfil del jugador por defecto?')) {
+        if(confirm('¿Restaurar economía, emojis y borrar datos del jugador?')) {
           EMOJI_CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
           ECONOMY = JSON.parse(JSON.stringify(DEFAULT_ECONOMY));
           playerProfile = { ...DEFAULT_PROFILE };
-          localStorage.removeItem('slot_player');
-          localStorage.removeItem('slot_player_profile');
+          localStorage.removeItem('slot_player'); localStorage.removeItem('slot_player_profile');
           state.credits = ECONOMY.startingCredits;
-          saveConfig();
-          saveEconomy();
-          savePlayer();
-          
-          requestPlayerName();
-          renderDevPanel();
-          updateUI();
+          saveConfig(); saveEconomy(); savePlayer();
+          requestPlayerName(); renderDevPanel(); updateUI(); resetIdleState();
         }
       });
     }
@@ -1518,32 +788,21 @@
       const jpPercentage = ECONOMY.jackpotPercent / 100;
       const jackpotCut = lostAmount * jpPercentage;
       const bankCut = lostAmount - jackpotCut;
-
       ECONOMY.bankProfit += bankCut;
-      
-      let match = state.lastWinMatchCount;
-      if (match < 3) match = 3; 
-      if (match > 5) match = 5; 
-      
+      let match = Math.max(3, Math.min(5, state.lastWinMatchCount));
       ECONOMY.jackpots[match] += jackpotCut;
       saveEconomy();
     }
 
     function playGamble() {
       if (state.lastWinCredits <= 0 || state.isFreeSpinMode) return;
-
       gameStats.doubleAttempts++;
 
       if (Math.random() >= .5) {
-        state.credits += state.lastWinCredits;
-        savePlayer();
-        
+        state.credits += state.lastWinCredits; savePlayer();
         gameStats.currentDoubleStreak++;
-        if (gameStats.currentDoubleStreak > gameStats.maxDoubleStreak) {
-          gameStats.maxDoubleStreak = gameStats.currentDoubleStreak;
-        }
-        gameStats.totalWon += state.lastWinCredits; 
-        saveAndUpdateStats();
+        if (gameStats.currentDoubleStreak > gameStats.maxDoubleStreak) gameStats.maxDoubleStreak = gameStats.currentDoubleStreak;
+        gameStats.totalWon += state.lastWinCredits; saveAndUpdateStats();
 
         state.lastWinCredits *= 2;
         $('gamble-card').textContent = '✨ 2X ✨';
@@ -1551,72 +810,28 @@
         setStatusText(`🎉 ¡PREMIO DUPLICADO! +${formatValue(state.lastWinCredits)}`, true);
       } else {
         state.gambleFailCount++;
-
         if (state.gambleFailCount === 1) {
           const half = Math.floor(state.lastWinCredits / 2);
           const lostAmount = state.lastWinCredits - half; 
-          
           processGambleLoss(lostAmount);
-
-          gameStats.currentDoubleStreak = 0;
-          gameStats.totalLostRisking += lostAmount;
-          gameStats.totalWon -= lostAmount; 
-          saveAndUpdateStats();
-
-          state.credits -= lostAmount;
-          savePlayer();
+          gameStats.currentDoubleStreak = 0; gameStats.totalLostRisking += lostAmount; gameStats.totalWon -= lostAmount; saveAndUpdateStats();
+          state.credits -= lostAmount; savePlayer();
           state.lastWinCredits = half;
-          $('gamble-card').textContent = '💔 1/2';
-          $('gamble-win-val').textContent = formatValue(half);
+          $('gamble-card').textContent = '💔 1/2'; $('gamble-win-val').textContent = formatValue(half);
           setStatusText(`⚠️ Te quedan: ${formatValue(half)}`);
         } else {
           const lostAmount = state.lastWinCredits;
           processGambleLoss(lostAmount);
-
-          gameStats.currentDoubleStreak = 0;
-          gameStats.totalLostRisking += lostAmount;
-          gameStats.totalWon -= lostAmount; 
-          saveAndUpdateStats();
-
-          state.credits -= lostAmount;
-          state.credits = Math.max(0, state.credits);
-          savePlayer();
-          state.lastWinCredits = 0;
-          state.hasActiveWin = false;
-
-          $('gamble-card').textContent = '💥 0X';
-          $('gamble-win-val').textContent = formatValue(0);
+          gameStats.currentDoubleStreak = 0; gameStats.totalLostRisking += lostAmount; gameStats.totalWon -= lostAmount; saveAndUpdateStats();
+          state.credits -= lostAmount; state.credits = Math.max(0, state.credits); savePlayer();
+          state.lastWinCredits = 0; state.hasActiveWin = false; 
+          $('gamble-card').textContent = '💥 0X'; $('gamble-win-val').textContent = formatValue(0);
           setStatusText('❌ Has perdido todo el premio.');
-
-          setTimeout(() => {
-            $('modal-gamble').classList.remove('active');
-            updateUI();
-          }, 1200);
+          resetIdleState(); 
+          setTimeout(() => { $('modal-gamble').classList.remove('active'); updateUI(); checkAutoSpin(); }, 1200);
         }
       }
       updateUI();
-    }
-
-    function checkLevelProgress() {
-      playerProfile.spinsToNextLevel++;
-
-      if (playerProfile.spinsToNextLevel >= 100) {
-        playerProfile.level++;
-        playerProfile.spinsToNextLevel = 0;
-        saveProfile();
-        updateUI();
-
-        state.isFreeSpinMode = true;
-        state.freeSpinsLeft = 20;
-        state.freeSpinTotalWon = 0;
-
-        showLevelUpModal('ENHORABUENA', `SUBISTE A NIVEL ${playerProfile.level}`, 4000).then(() => {
-          triggerSpin();
-        });
-        return true;
-      }
-      saveProfile();
-      return false;
     }
 
     function triggerSpin() {
@@ -1627,193 +842,173 @@
       if (!state.isFreeSpinMode) {
         if (state.credits < totalBet) {
           setStatusText('⚠️ Saldo insuficiente');
-          state.autoSpin = false;
-          valAuto.textContent = 'AUTO: OFF';
-          btnAuto.style.background = '';
-          return;
+          state.autoSpin = false; $('val-auto').textContent = 'AUTO: OFF'; btnAuto.style.background = '';
+          resetIdleState(); return;
         }
 
-        state.credits -= totalBet;
-        savePlayer();
-        ECONOMY.bankProfit += totalBet; 
-        saveEconomy();
+        state.credits -= totalBet; savePlayer();
+        ECONOMY.bankProfit += totalBet; saveEconomy();
+        gameStats.totalPlays++; gameStats.totalBet += totalBet; gameStats.currentNoPrizeStreak++; saveAndUpdateStats();
+        
+        playerProfile.spinsToNextLevel++;
+        saveProfile(); updateUI();
 
-        gameStats.totalPlays++;
-        gameStats.totalBet += totalBet;
-        gameStats.currentNoPrizeStreak++; 
-        saveAndUpdateStats();
+        if (playerProfile.spinsToNextLevel >= ECONOMY.spinsToLevelUp) {
+          playerProfile.level++;
+          playerProfile.spinsToNextLevel = 0;
+          state.isFreeSpinMode = true;
+          state.freeSpinsLeft = ECONOMY.freeSpinsReward;
+          state.freeSpinTotalWon = 0;
+          saveProfile(); state.isSpinning = true; updateUI();
+          
+          showLevelUpModal('ENHORABUENA', `SUBISTE A NIVEL ${playerProfile.level}<br><span>¡${ECONOMY.freeSpinsReward} TIRADAS GRATIS!</span>`, 3500).then(() => {
+            executeSpinVisuals();
+          });
+          return;
+        }
       }
+      executeSpinVisuals();
+    }
 
-      state.isSpinning = true;
-      state.lastWinCredits = 0;
-      state.hasActiveWin = false;
-      state.gambleFailCount = 0;
-      state.totalSpins++;
-
+    function executeSpinVisuals() {
+      state.isSpinning = true; isIdle = false; clearTimeout(idleTimer);
+      state.lastWinCredits = 0; state.hasActiveWin = false; state.gambleFailCount = 0; state.totalSpins++;
       clearPaylinesSVG();
 
-      document.querySelectorAll('.symbol-cell').forEach(cell => {
-        cell.classList.remove('winning', 'dimmed');
-      });
-      document.querySelectorAll('.badge-line').forEach(badge => {
-        badge.classList.remove('badge-winning-pulse');
-      });
+      document.querySelectorAll('.symbol-cell').forEach(cell => cell.classList.remove('winning', 'dimmed'));
+      document.querySelectorAll('.badge-line').forEach(badge => badge.classList.remove('badge-winning-pulse'));
 
       if (state.isFreeSpinMode) {
-        setStatusText(`🎁 TIRADA GRATIS (${21 - state.freeSpinsLeft}/20)`);
+        let currentSpin = ECONOMY.freeSpinsReward - state.freeSpinsLeft + 1;
+        setStatusText(`🎁 TIRADA GRATIS<br><span class="sub-text-free">(${currentSpin} / ${ECONOMY.freeSpinsReward})</span>`);
       } else {
         setStatusText('🌀 Buena Suerte !!!');
       }
-      
       updateUI();
 
-      // Animación de rodillos y generación de nueva cuadrícula
       const reels = gridContainer.querySelectorAll('.reel-strip');
-      reels.forEach(strip => {
-        strip.classList.add('spinning');
-        strip.classList.remove('bounce');
-      });
+      reels.forEach(strip => { strip.classList.add('spinning'); strip.classList.remove('bounce'); });
 
       for (let col = 0; col < 5; col++) {
-        for (let row = 0; row < 5; row++) {
-          state.grid[col][row] = getRandomSymbol();
-        }
+        for (let row = 0; row < 5; row++) state.grid[col][row] = getRandomSymbol();
       }
 
-      // Detener los rodillos secuencialmente
-      reels.forEach((strip, i) => {
+      reels.forEach((strip, index) => {
         setTimeout(() => {
-          strip.classList.remove('spinning');
-          strip.classList.add('bounce');
-          
-          const cells = strip.querySelectorAll('.symbol-cell');
-          cells.forEach((cell, r) => {
-            cell.innerHTML = `<span class="emoji-wrapper">${state.grid[i][r]}</span>`;
+          strip.classList.remove('spinning'); strip.classList.add('bounce');
+          const cells = gridContainer.querySelectorAll(`.symbol-cell[data-reel="${index}"]`);
+          cells.forEach(cell => {
+            const row = cell.dataset.row;
+            cell.innerHTML = `<span class="emoji-wrapper">${state.grid[index][row]}</span>`;
           });
-
-          // Verificar resultados cuando termine el último rodillo
-          if (i === 4) {
-            setTimeout(checkResults, 300);
-          }
-        }, 500 + i * 250);
+          if (index === 4) setTimeout(evaluateWins, 350);
+        }, 500 + (index * 250));
       });
     }
 
-    // --- NUEVA FUNCIÓN AÑADIDA PARA EVALUAR RESULTADOS ---
-    function checkResults() {
+    function evaluateWins() {
       state.isSpinning = false;
       const lines = LINE_OPTIONS[state.selectedLinesIdx];
       const bet = BET_OPTIONS[state.selectedBetIdx];
-      
-      let winCredits = 0;
-      const winningLines = [];
-      let highestMatchCount = 0;
+      let totalSpinWin = 0; let winningLines = []; let maxMatchCount = 0;
 
-      // Calcular líneas ganadoras
-      for (let l = 0; l < lines; l++) {
-        const payline = PAYLINES[l];
-        let firstSymbol = state.grid[0][payline[0]];
+      for (let i = 0; i < lines; i++) {
+        const line = PAYLINES[i];
+        let symbol = state.grid[0][line[0]];
         let matchCount = 1;
 
-        for (let i = 1; i < 5; i++) {
-          if (state.grid[i][payline[i]] === firstSymbol) {
-            matchCount++;
-          } else {
-            break;
-          }
+        for (let col = 1; col < 5; col++) {
+          if (state.grid[col][line[col]] === symbol) matchCount++;
+          else break;
         }
 
         if (matchCount >= 3) {
-          const symbolConfig = EMOJI_CONFIG.find(c => c.symbol === firstSymbol);
-          if (symbolConfig) {
-            let payout = matchCount === 3 ? symbolConfig.pay3 : (matchCount === 4 ? symbolConfig.pay4 : symbolConfig.pay5);
-            const lineWin = payout * bet;
-            winCredits += lineWin;
-            highestMatchCount = Math.max(highestMatchCount, matchCount);
-
-            winningLines.push({
-              lineIdx: l,
-              matchCount: matchCount,
-              credits: lineWin
-            });
+          const config = EMOJI_CONFIG.find(c => c.symbol === symbol);
+          if (config) {
+            let winMultiplier = matchCount === 5 ? config.pay5 : (matchCount === 4 ? config.pay4 : config.pay3);
+            let winAmount = winMultiplier * bet;
+            totalSpinWin += winAmount;
+            winningLines.push({ lineIdx: i, matchCount, symbol, winAmount });
+            if (matchCount > maxMatchCount) maxMatchCount = matchCount;
           }
         }
       }
 
       state.currentWinningLines = winningLines;
 
-      if (winCredits > 0) {
-        state.lastWinCredits = winCredits;
-        state.lastWinMatchCount = highestMatchCount;
-
-        gameStats.currentNoPrizeStreak = 0;
-        gameStats.prizesGiven++;
-        gameStats.totalWon += winCredits;
-        saveAndUpdateStats();
-
-        // Evaluar Jackpots
-        if (highestMatchCount >= 3) {
-          const jpAmount = Math.floor(ECONOMY.jackpots[highestMatchCount]);
-          if (jpAmount > 0) {
-            winCredits += jpAmount;
-            ECONOMY.jackpots[highestMatchCount] = 0;
-            saveEconomy();
-            setStatusText(`🏆 ¡JACKPOT! +${formatValue(jpAmount)}`, true);
-          }
-        }
-
+      if (totalSpinWin > 0) {
+        state.lastWinCredits = totalSpinWin; state.lastWinMatchCount = maxMatchCount; state.hasActiveWin = true;
+        
         if (state.isFreeSpinMode) {
-          state.freeSpinTotalWon += winCredits;
-          setStatusText(`🎁 TIRADA GRATIS: +${formatValue(winCredits)}`, true);
+          state.freeSpinTotalWon += totalSpinWin;
+          setStatusText(`🔥 ¡GANAS ${formatValue(totalSpinWin)}!<br><span class="sub-text-free">(Acumulado: ${formatValue(state.freeSpinTotalWon)})</span>`, true);
         } else {
-          state.credits += winCredits;
-          savePlayer();
-          setStatusText(`🔥 ¡GANASTE +${formatValue(winCredits)}!`, true);
-          ECONOMY.bankProfit -= winCredits;
-          saveEconomy();
+          state.credits += totalSpinWin; savePlayer();
+          setStatusText(`🎉 ¡PREMIO! ${formatValue(totalSpinWin)}`, true);
+          gameStats.prizesGiven++; gameStats.totalWon += totalSpinWin; gameStats.currentNoPrizeStreak = 0; saveAndUpdateStats();
         }
 
-        // Iluminar celdas ganadoras
         document.querySelectorAll('.symbol-cell').forEach(cell => cell.classList.add('dimmed'));
         winningLines.forEach(win => {
-          for (let i = 0; i < win.matchCount; i++) {
-            const row = PAYLINES[win.lineIdx][i];
-            const cell = gridContainer.querySelector(`.symbol-cell[data-reel="${i}"][data-row="${row}"]`);
-            if (cell) {
-              cell.classList.remove('dimmed');
-              cell.classList.add('winning');
-            }
+          for (let col = 0; col < win.matchCount; col++) {
+            const row = PAYLINES[win.lineIdx][col];
+            const cell = gridContainer.querySelector(`.symbol-cell[data-reel="${col}"][data-row="${row}"]`);
+            if (cell) { cell.classList.remove('dimmed'); cell.classList.add('winning'); }
           }
           const badge = document.querySelector(`.badge-line[data-line="${win.lineIdx + 1}"]`);
           if (badge) badge.classList.add('badge-winning-pulse');
         });
-
         drawPaylinesSVG(winningLines);
+      } else {
+        if (state.isFreeSpinMode) setStatusText(`Tirada sin premio...`, false);
+        else setStatusText('Suerte en la próxima', false);
       }
 
       updateUI();
+      resetIdleState(); 
 
-      // Lógica de Continuación (Auto Spin, Tiradas Gratis, Nivel)
       if (state.isFreeSpinMode) {
         state.freeSpinsLeft--;
         if (state.freeSpinsLeft > 0) {
           setTimeout(triggerSpin, 1600);
         } else {
-          state.isFreeSpinMode = false;
-          state.credits += state.freeSpinTotalWon;
-          savePlayer();
-          showLevelUpModal('MODO COMPLETADO', `Premio Total: <br><span>${formatValue(state.freeSpinTotalWon)}</span>`, 4000).then(() => {
-             updateUI();
-             if (state.autoSpin) setTimeout(triggerSpin, 1000);
-          });
+          setTimeout(() => {
+            state.isFreeSpinMode = false;
+            if (state.freeSpinTotalWon > 0) {
+              state.credits += state.freeSpinTotalWon; savePlayer();
+              showLevelUpModal('FIN TIRADAS GRATIS', `GANANCIA TOTAL: <br><span>${formatValue(state.freeSpinTotalWon)}</span>`, 4000);
+            } else {
+              setStatusText('Fin de tiradas gratis', false);
+            }
+            state.freeSpinTotalWon = 0; updateUI(); resetIdleState(); checkAutoSpin();
+          }, 2000);
         }
       } else {
-        const leveledUp = checkLevelProgress();
-        if (!leveledUp && state.autoSpin) {
-          setTimeout(triggerSpin, winCredits > 0 ? 2500 : 1000);
+        if (state.hasActiveWin && state.autoSpin) {
+          setTimeout(() => {
+            if (state.hasActiveWin && !document.querySelector('#modal-gamble').classList.contains('active')) {
+              state.lastWinCredits = 0; state.hasActiveWin = false; updateUI(); resetIdleState(); checkAutoSpin();
+            }
+          }, 2000);
+        } else {
+          checkAutoSpin();
         }
       }
     }
+
+    function checkAutoSpin() {
+      if (state.autoSpin && !state.isFreeSpinMode && !state.hasActiveWin) {
+        const totalBet = LINE_OPTIONS[state.selectedLinesIdx] * BET_OPTIONS[state.selectedBetIdx];
+        if (state.credits >= totalBet) {
+          setTimeout(() => { if (state.autoSpin && !state.hasActiveWin) triggerSpin(); }, 1000);
+        } else {
+          state.autoSpin = false; $('val-auto').textContent = 'AUTO: OFF'; btnAuto.style.background = '';
+          setStatusText('⚠️ Saldo insuficiente para AUTO');
+          resetIdleState();
+        }
+      }
+    }
+
   </script>
 </body>
 </html>
