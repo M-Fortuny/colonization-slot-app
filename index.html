@@ -190,6 +190,19 @@
       .control-label { font-size: 9px !important; margin-bottom: 0 !important; }
       #val-lines, #val-bet, #val-auto { font-size: 13px !important; }
     }
+
+@keyframes screenShakeAnim {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  20% { transform: translate(-8px, 6px) rotate(-1.5deg); }
+  40% { transform: translate(8px, -6px) rotate(1.5deg); }
+  60% { transform: translate(-5px, -3px) rotate(-1deg); }
+  80% { transform: translate(5px, 3px) rotate(1deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+.screen-shake { animation: screenShakeAnim 0.5s ease-in-out; }
+
+
+
   </style>
 </head>
 
@@ -324,6 +337,40 @@
         </div>
       </div>
 
+
+		<div class="dev-section-title">🌀 CONFIGURACIÓN DE BONUS (SCATTERS)</div>
+<p style="margin-bottom: 10px; font-size: 13px; color: #aaa; text-align: left; width: 100%; max-width: 700px;">
+  Los Scatters dan tiradas gratis independientemente de su posición, siempre que no haya líneas ganadoras superiores (5 aciertos).
+</p>
+<div class="dev-economy-grid" style="margin-bottom: 30px;">
+  <div class="dev-economy-box">
+    <label>Símbolo Bonus</label>
+    <input type="text" id="dev-bonus-symbol" maxlength="2">
+  </div>
+  <div class="dev-economy-box">
+    <label>Mínimo Requerido</label>
+    <input type="number" id="dev-bonus-min-req" min="3" max="25">
+  </div>
+  <div class="dev-economy-box">
+    <label>Giros Otorgados</label>
+    <input type="number" id="dev-bonus-spins-granted" min="1">
+  </div>
+  <div class="dev-economy-box">
+    <label>Máx Retriggers</label>
+    <input type="number" id="dev-bonus-max-retrigger" min="1" max="20">
+  </div>
+  <div class="dev-economy-box">
+    <label>Multiplicador Bonus</label>
+    <input type="number" id="dev-bonus-multiplier" step="0.1" min="1">
+  </div>
+  <div class="dev-economy-box">
+    <label>Peso Scatter Bonus</label>
+    <input type="number" id="dev-bonus-weight-mult" step="0.05" min="0.5">
+  </div>
+</div>
+
+
+
       <div class="dev-section-title">🏦 ECONOMÍA, BANCA Y NIVELES</div>
       <p style="margin-bottom: 10px; font-size: 13px; color: #aaa; text-align: left; width: 100%; max-width: 700px;">
         Modifica la economía global en tiempo real, incluyendo el sistema de progreso de nivel.
@@ -410,8 +457,10 @@
       { symbol: '🎰', weight: 2,  pay3: 250, pay4: 500, pay5: 1500 }
     ];
 
+    // 1. Configuración de Emojis
     let EMOJI_CONFIG = JSON.parse(localStorage.getItem('slot_config')) || JSON.parse(JSON.stringify(DEFAULT_CONFIG));
 
+    // 2. Economía
     const DEFAULT_ECONOMY = {
       startingCredits: 5000, 
       bankProfit: 0,
@@ -420,14 +469,31 @@
       spinsToLevelUp: 100,
       freeSpinsReward: 20
     };
-    
     const savedEconomy = JSON.parse(localStorage.getItem('slot_economy')) || {};
-    let ECONOMY = { ...DEFAULT_ECONOMY, ...savedEconomy };
+    let ECONOMY = { 
+      ...DEFAULT_ECONOMY, 
+      ...savedEconomy,
+      jackpots: { ...DEFAULT_ECONOMY.jackpots, ...(savedEconomy.jackpots || {}) } 
+    };
 
-    const DEFAULT_PROFILE = { name: '', level: 1, spinsToNextLevel: 0 };
+    // 3. --- CONFIGURACIÓN DE BONUS ---
+    const DEFAULT_BONUS_CONFIG = {
+      scatterSymbol: '🌀',
+      minRequired: 8,
+      spinsGranted: 20,
+      maxRetriggers: 5,
+      multiplierOnBonus: 1.5,
+      bonusSymbolWeight: 1.25
+    };
+    let savedBonus = JSON.parse(localStorage.getItem('slot_bonus_config')) || {};
+    let BONUS_CONFIG = { ...DEFAULT_BONUS_CONFIG, ...savedBonus };
+
+    // 4. Perfil del Jugador
+    const DEFAULT_PROFILE = { name: '', level: 0, spinsToNextLevel: 0 };
     let playerProfile = JSON.parse(localStorage.getItem('slot_player_profile')) || { ...DEFAULT_PROFILE };
-    const savedPlayer = JSON.parse(localStorage.getItem('slot_player')) || {};
+    const savedPlayer = JSON.parse(localStorage.getItem('slot_player')) || {}; 
 
+    // 5. Estadísticas de la Máquina
     const defaultStats = {
       totalPlays: 0, totalBet: 0, totalWon: 0, totalLostRisking: 0,
       doubleAttempts: 0, maxDoubleStreak: 0, currentDoubleStreak: 0,
@@ -436,8 +502,11 @@
     const savedStats = JSON.parse(localStorage.getItem('machine_stats')) || {};
     let gameStats = { ...defaultStats, ...savedStats };
 
+    // 6. Selector Helper
     const $ = id => document.getElementById(id);
 
+    // 7. --- FUNCIONES DE GUARDADO ---
+    function saveBonusConfig() { localStorage.setItem('slot_bonus_config', JSON.stringify(BONUS_CONFIG)); }
     function saveConfig() { localStorage.setItem('slot_config', JSON.stringify(EMOJI_CONFIG)); }
     function saveEconomy() { localStorage.setItem('slot_economy', JSON.stringify(ECONOMY)); }
     function savePlayer() { localStorage.setItem('slot_player', JSON.stringify({ credits: state.credits })); }
@@ -492,7 +561,8 @@
       lastWinCredits: 0, lastWinMatchCount: 3, hasActiveWin: false, gambleFailCount: 0,
       grid: Array.from({ length: 5 }, () => Array(5).fill('')),
       totalSpins: 0, totalPayout: 0, currentWinningLines: [],
-      freeSpinsLeft: 0, freeSpinTotalWon: 0, isFreeSpinMode: false
+      freeSpinsLeft: 0, freeSpinTotalWon: 0, isFreeSpinMode: false,
+      bonusModalShown: false // AÑADIDO EL FLAG PARA EL MODAL DE BONUS
     };
 
     let jackpotIndex = 0; let secretBuffer = ''; let secretTimeout = null;
@@ -561,6 +631,13 @@
       if ($('dev-spins-req')) $('dev-spins-req').value = ECONOMY.spinsToLevelUp;
       if ($('dev-spins-reward')) $('dev-spins-reward').value = ECONOMY.freeSpinsReward;
 
+      if ($('dev-bonus-symbol')) $('dev-bonus-symbol').value = BONUS_CONFIG.scatterSymbol;
+      if ($('dev-bonus-min-req')) $('dev-bonus-min-req').value = BONUS_CONFIG.minRequired;
+      if ($('dev-bonus-spins-granted')) $('dev-bonus-spins-granted').value = BONUS_CONFIG.spinsGranted;
+      if ($('dev-bonus-max-retrigger')) $('dev-bonus-max-retrigger').value = BONUS_CONFIG.maxRetriggers;
+      if ($('dev-bonus-multiplier')) $('dev-bonus-multiplier').value = BONUS_CONFIG.multiplierOnBonus;
+      if ($('dev-bonus-weight-mult')) $('dev-bonus-weight-mult').value = BONUS_CONFIG.bonusSymbolWeight;
+
       const saveEcoFields = () => {
         ECONOMY.startingCredits = parseFloat($('dev-starting-credits')?.value) || 5000;
         ECONOMY.bankProfit = parseFloat($('dev-bank-profit')?.value) || 0;
@@ -570,10 +647,24 @@
         ECONOMY.jackpots[5] = parseFloat($('dev-jp-5')?.value) || 0;
         ECONOMY.spinsToLevelUp = parseInt($('dev-spins-req')?.value) || 100;
         ECONOMY.freeSpinsReward = parseInt($('dev-spins-reward')?.value) || 20;
-        saveEconomy(); updateUI();
+        
+        BONUS_CONFIG.scatterSymbol = $('dev-bonus-symbol')?.value || '🌀';
+        BONUS_CONFIG.minRequired = parseInt($('dev-bonus-min-req')?.value) || 8;
+        BONUS_CONFIG.spinsGranted = parseInt($('dev-bonus-spins-granted')?.value) || 20;
+        BONUS_CONFIG.maxRetriggers = parseInt($('dev-bonus-max-retrigger')?.value) || 5;
+        BONUS_CONFIG.multiplierOnBonus = parseFloat($('dev-bonus-multiplier')?.value) || 1.5;
+        BONUS_CONFIG.bonusSymbolWeight = parseFloat($('dev-bonus-weight-mult')?.value) || 1.25;
+
+        saveEconomy(); 
+        saveBonusConfig(); 
+        updateUI();
       };
 
       ['dev-starting-credits', 'dev-bank-profit', 'dev-jp-percent', 'dev-jp-3', 'dev-jp-4', 'dev-jp-5', 'dev-spins-req', 'dev-spins-reward'].forEach(id => {
+        if ($(id)) $(id).addEventListener('change', saveEcoFields);
+      });
+
+      ['dev-bonus-symbol', 'dev-bonus-min-req', 'dev-bonus-spins-granted', 'dev-bonus-max-retrigger', 'dev-bonus-multiplier', 'dev-bonus-weight-mult'].forEach(id => {
         if ($(id)) $(id).addEventListener('change', saveEcoFields);
       });
     }
@@ -625,9 +716,7 @@
     function resetIdleState() {
       isIdle = false;
       clearTimeout(idleTimer);
-      // Sólo cuenta como inactivo si NO hay premios esperando acción y NO giran los rodillos
       if (!state.hasActiveWin && !state.isSpinning && !state.isFreeSpinMode) {
-        // Reducido a 2 segundos según lo solicitado
         idleTimer = setTimeout(() => {
           isIdle = true;
           jackpotIndex = 0;
@@ -670,7 +759,7 @@
       dynamicDisplay.style.transform = 'scale(1)';
     }
 
-    function updateUI() {
+        function updateUI() {
       const lines = LINE_OPTIONS[state.selectedLinesIdx];
       const bet = BET_OPTIONS[state.selectedBetIdx];
       
@@ -681,7 +770,9 @@
       $('val-lines').textContent = lines;
       $('val-bet').textContent = `x${bet}`;
       
-      let progressPercent = (playerProfile.spinsToNextLevel / ECONOMY.spinsToLevelUp) * 100;
+      // NUEVO CÁLCULO DE PROGRESO
+      const targetSpins = ECONOMY.spinsToLevelUp * (playerProfile.level + 1);
+      let progressPercent = (playerProfile.spinsToNextLevel / targetSpins) * 100;
       $('level-progress-fill').style.width = `${Math.min(100, progressPercent)}%`;
 
       document.querySelectorAll('.badge-line').forEach(badge => {
@@ -691,6 +782,7 @@
       btnGamble.classList.toggle('disabled', state.lastWinCredits <= 0 || state.isSpinning || state.isFreeSpinMode);
       [$('btn-spin'), $('btn-lines'), $('btn-bet')].forEach(button => button.classList.toggle('disabled', state.isSpinning || state.isFreeSpinMode));
     }
+
 
     function showLevelUpModal(title, sub, duration = 4000) {
       const modal = $('modal-level-up');
@@ -834,7 +926,7 @@
       updateUI();
     }
 
-    function triggerSpin() {
+            function triggerSpin() {
       const lines = LINE_OPTIONS[state.selectedLinesIdx];
       const bet = BET_OPTIONS[state.selectedBetIdx];
       const totalBet = lines * bet;
@@ -850,12 +942,17 @@
         ECONOMY.bankProfit += totalBet; saveEconomy();
         gameStats.totalPlays++; gameStats.totalBet += totalBet; gameStats.currentNoPrizeStreak++; saveAndUpdateStats();
         
-        playerProfile.spinsToNextLevel++;
+        // Sumamos el valor de la apuesta al progreso
+        playerProfile.spinsToNextLevel += bet;
         saveProfile(); updateUI();
 
-        if (playerProfile.spinsToNextLevel >= ECONOMY.spinsToLevelUp) {
+        // Meta del nivel actual (Base * (Nivel + 1))
+        const targetSpins = ECONOMY.spinsToLevelUp * (playerProfile.level + 1);
+
+        if (playerProfile.spinsToNextLevel >= targetSpins) {
           playerProfile.level++;
-          playerProfile.spinsToNextLevel = 0;
+          playerProfile.spinsToNextLevel = 0; // REINICIO ESTRICTO A CERO
+          
           state.isFreeSpinMode = true;
           state.freeSpinsLeft = ECONOMY.freeSpinsReward;
           state.freeSpinTotalWon = 0;
@@ -870,6 +967,8 @@
       executeSpinVisuals();
     }
 
+
+
     function executeSpinVisuals() {
       state.isSpinning = true; isIdle = false; clearTimeout(idleTimer);
       state.lastWinCredits = 0; state.hasActiveWin = false; state.gambleFailCount = 0; state.totalSpins++;
@@ -878,9 +977,9 @@
       document.querySelectorAll('.symbol-cell').forEach(cell => cell.classList.remove('winning', 'dimmed'));
       document.querySelectorAll('.badge-line').forEach(badge => badge.classList.remove('badge-winning-pulse'));
 
+      // MODIFICADO: AHORA MUESTRA SOLO LAS TIRADAS RESTANTES
       if (state.isFreeSpinMode) {
-        let currentSpin = ECONOMY.freeSpinsReward - state.freeSpinsLeft + 1;
-        setStatusText(`🎁 TIRADA GRATIS<br><span class="sub-text-free">(${currentSpin} / ${ECONOMY.freeSpinsReward})</span>`);
+        setStatusText(`🎁 TIRADAS GRATIS<br><span class="sub-text-free">(${state.freeSpinsLeft} restantes)</span>`);
       } else {
         setStatusText('🌀 Buena Suerte !!!');
       }
@@ -910,7 +1009,20 @@
       state.isSpinning = false;
       const lines = LINE_OPTIONS[state.selectedLinesIdx];
       const bet = BET_OPTIONS[state.selectedBetIdx];
-      let totalSpinWin = 0; let winningLines = []; let maxMatchCount = 0;
+      let totalSpinWin = 0; 
+      let winningLines = []; 
+      let maxMatchCount = 0;
+
+      let scatterCount = 0;
+      let scatterPositions = [];
+      for (let col = 0; col < 5; col++) {
+        for (let row = 0; row < 5; row++) {
+          if (state.grid[col][row] === BONUS_CONFIG.scatterSymbol) {
+            scatterCount++;
+            scatterPositions.push({ col, row });
+          }
+        }
+      }
 
       for (let i = 0; i < lines; i++) {
         const line = PAYLINES[i];
@@ -927,6 +1039,11 @@
           if (config) {
             let winMultiplier = matchCount === 5 ? config.pay5 : (matchCount === 4 ? config.pay4 : config.pay3);
             let winAmount = winMultiplier * bet;
+
+            if (state.isFreeSpinMode) {
+              winAmount *= BONUS_CONFIG.multiplierOnBonus;
+            }
+
             totalSpinWin += winAmount;
             winningLines.push({ lineIdx: i, matchCount, symbol, winAmount });
             if (matchCount > maxMatchCount) maxMatchCount = matchCount;
@@ -936,19 +1053,53 @@
 
       state.currentWinningLines = winningLines;
 
-      if (totalSpinWin > 0) {
-        state.lastWinCredits = totalSpinWin; state.lastWinMatchCount = maxMatchCount; state.hasActiveWin = true;
-        
+      let bonusTriggered = false;
+      if (scatterCount >= BONUS_CONFIG.minRequired) {
+        state.retriggerCount = state.retriggerCount || 0;
+
+        if (!state.isFreeSpinMode) {
+          bonusTriggered = true;
+          state.isFreeSpinMode = true;
+          state.freeSpinsLeft = BONUS_CONFIG.spinsGranted;
+          state.freeSpinTotalWon = 0;
+          state.retriggerCount = 0;
+        } else if (state.retriggerCount < BONUS_CONFIG.maxRetriggers) {
+          bonusTriggered = true;
+          state.retriggerCount++;
+          state.freeSpinsLeft += BONUS_CONFIG.spinsGranted;
+        }
+      }
+
+      if (bonusTriggered) {
+        const slotContainer = $('slot-grid') || document.body;
+        slotContainer.classList.add('screen-shake');
+        setTimeout(() => slotContainer.classList.remove('screen-shake'), 500);
+      }
+
+      if (totalSpinWin > 0 || bonusTriggered) {
+        state.lastWinCredits = totalSpinWin; 
+        state.lastWinMatchCount = maxMatchCount; 
+        state.hasActiveWin = totalSpinWin > 0;
+
         if (state.isFreeSpinMode) {
           state.freeSpinTotalWon += totalSpinWin;
-          setStatusText(`🔥 ¡GANAS ${formatValue(totalSpinWin)}!<br><span class="sub-text-free">(Acumulado: ${formatValue(state.freeSpinTotalWon)})</span>`, true);
+          if (bonusTriggered) {
+            setStatusText(`🌀 ¡BONUS! +${BONUS_CONFIG.spinsGranted} TIRADAS<br><span class="sub-text-free">(Acumulado: ${formatValue(state.freeSpinTotalWon)})</span>`, true);
+          } else {
+            setStatusText(`🔥 ¡GANAS ${formatValue(totalSpinWin)}!<br><span class="sub-text-free">(Acumulado: ${formatValue(state.freeSpinTotalWon)})</span>`, true);
+          }
         } else {
-          state.credits += totalSpinWin; savePlayer();
+          state.credits += totalSpinWin; 
+          savePlayer();
           setStatusText(`🎉 ¡PREMIO! ${formatValue(totalSpinWin)}`, true);
-          gameStats.prizesGiven++; gameStats.totalWon += totalSpinWin; gameStats.currentNoPrizeStreak = 0; saveAndUpdateStats();
+          gameStats.prizesGiven++; 
+          gameStats.totalWon += totalSpinWin; 
+          gameStats.currentNoPrizeStreak = 0; 
+          saveAndUpdateStats();
         }
 
         document.querySelectorAll('.symbol-cell').forEach(cell => cell.classList.add('dimmed'));
+        
         winningLines.forEach(win => {
           for (let col = 0; col < win.matchCount; col++) {
             const row = PAYLINES[win.lineIdx][col];
@@ -958,6 +1109,14 @@
           const badge = document.querySelector(`.badge-line[data-line="${win.lineIdx + 1}"]`);
           if (badge) badge.classList.add('badge-winning-pulse');
         });
+
+        if (scatterCount >= BONUS_CONFIG.minRequired) {
+          scatterPositions.forEach(pos => {
+            const cell = gridContainer.querySelector(`.symbol-cell[data-reel="${pos.col}"][data-row="${pos.row}"]`);
+            if (cell) { cell.classList.remove('dimmed'); cell.classList.add('winning'); }
+          });
+        }
+
         drawPaylinesSVG(winningLines);
       } else {
         if (state.isFreeSpinMode) setStatusText(`Tirada sin premio...`, false);
@@ -967,27 +1126,60 @@
       updateUI();
       resetIdleState(); 
 
+      // MODIFICADO: CONTROL DE MODAL Y RETRIGGER EN TIRADAS GRATIS
       if (state.isFreeSpinMode) {
         state.freeSpinsLeft--;
+
         if (state.freeSpinsLeft > 0) {
-          setTimeout(triggerSpin, 1600);
+          // Evalúa el flag para no mostrar la ventana tras retriggers
+          if (bonusTriggered && !state.bonusModalShown) {
+            state.bonusModalShown = true; 
+            showLevelUpModal(
+              '🎉 ¡BONUS ACTIVADO!',
+              `¡Encontraste ${scatterCount} símbolos!<br>
+               <span>¡${BONUS_CONFIG.spinsGranted} TIRADAS GRATIS!</span>`,
+              3500
+            ).then(() => {
+              setTimeout(triggerSpin, 300);
+            });
+          } else {
+            setTimeout(triggerSpin, 1600);
+          }
         } else {
           setTimeout(() => {
             state.isFreeSpinMode = false;
+            state.retriggerCount = 0;
+            state.bonusModalShown = false; // Reinicio del flag al terminar
+
             if (state.freeSpinTotalWon > 0) {
-              state.credits += state.freeSpinTotalWon; savePlayer();
-              showLevelUpModal('FIN TIRADAS GRATIS', `GANANCIA TOTAL: <br><span>${formatValue(state.freeSpinTotalWon)}</span>`, 4000);
+              state.credits += state.freeSpinTotalWon;
+              savePlayer();
+
+              showLevelUpModal(
+                'FIN DEL BONUS',
+                `GANANCIA TOTAL:<br>
+                 <span>${formatValue(state.freeSpinTotalWon)}</span>`,
+                4000
+              );
             } else {
               setStatusText('Fin de tiradas gratis', false);
             }
-            state.freeSpinTotalWon = 0; updateUI(); resetIdleState(); checkAutoSpin();
+
+            state.freeSpinTotalWon = 0;
+            updateUI();
+            resetIdleState();
+            checkAutoSpin();
           }, 2000);
         }
       } else {
         if (state.hasActiveWin && state.autoSpin) {
           setTimeout(() => {
             if (state.hasActiveWin && !document.querySelector('#modal-gamble').classList.contains('active')) {
-              state.lastWinCredits = 0; state.hasActiveWin = false; updateUI(); resetIdleState(); checkAutoSpin();
+              state.lastWinCredits = 0;
+              state.hasActiveWin = false;
+              updateUI();
+              resetIdleState();
+              checkAutoSpin();
             }
           }, 2000);
         } else {
@@ -1008,7 +1200,7 @@
         }
       }
     }
+</script>
 
-  </script>
 </body>
 </html>
