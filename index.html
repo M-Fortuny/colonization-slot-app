@@ -493,15 +493,18 @@
   </div>
 
   <script>
+    // ==========================================
+    // 1. CONFIGURACIONES Y DATOS POR DEFECTO
+    // ==========================================
     const DEFAULT_CONFIG = [
-      { symbol: '🌀', weight: 45, pay3: 5,   pay4: 15,  pay5: 30 },
-      { symbol: '🍒', weight: 35, pay3: 10,  pay4: 20,  pay5: 40 },
-      { symbol: '⚡', weight: 25, pay3: 15,  pay4: 30,  pay5: 60 },
-      { symbol: '🧠', weight: 20, pay3: 20,  pay4: 40,  pay5: 80 },
-      { symbol: '🔮', weight: 15, pay3: 30,  pay4: 60,  pay5: 120 },
-      { symbol: '💎', weight: 10, pay3: 50,  pay4: 100, pay5: 250 },
-      { symbol: '👑', weight: 5,  pay3: 100, pay4: 250, pay5: 500 },
-      { symbol: '🎰', weight: 2,  pay3: 250, pay4: 500, pay5: 1500 }
+      { symbol: '🌀', weight: 32, pay3: 5,   pay4: 15,  pay5: 30 },
+      { symbol: '🍒', weight: 31, pay3: 10,  pay4: 20,  pay5: 40 },
+      { symbol: '⚡', weight: 30, pay3: 15,  pay4: 30,  pay5: 60 },
+      { symbol: '🧠', weight: 29, pay3: 20,  pay4: 40,  pay5: 80 },
+      { symbol: '🔮', weight: 28, pay3: 30,  pay4: 60,  pay5: 120 },
+      { symbol: '💎', weight: 27, pay3: 50,  pay4: 100, pay5: 250 },
+      { symbol: '👑', weight: 26,  pay3: 100, pay4: 250, pay5: 500 },
+      { symbol: '🎰', weight: 25,  pay3: 250, pay4: 500, pay5: 1500 }
     ];
 
     function loadSafeData(key, defaultData) {
@@ -522,7 +525,7 @@
       jackpotPercent: 80,
       jackpots: { 3: 0, 4: 0, 5: 0 },
       spinsToLevelUp: 100,
-      freeSpinsReward: 20
+      freeSpinsReward: 25
     };
     const savedEconomy = loadSafeData('slot_economy', {});
     let ECONOMY = { 
@@ -569,58 +572,9 @@
     const savedStats = loadSafeData('machine_stats', {});
     let gameStats = { ...defaultStats, ...savedStats };
 
-    const $ = id => document.getElementById(id);
-
-    function saveBonusConfig() { localStorage.setItem('slot_bonus_config', JSON.stringify(BONUS_CONFIG)); }
-    function saveHoldWinConfig() { localStorage.setItem('slot_hw_config', JSON.stringify(HOLD_WIN_CONFIG)); }
-    function saveConfig() { localStorage.setItem('slot_config', JSON.stringify(EMOJI_CONFIG)); }
-    function saveEconomy() { localStorage.setItem('slot_economy', JSON.stringify(ECONOMY)); }
-    function savePlayer() { localStorage.setItem('slot_player', JSON.stringify({ credits: state.credits })); }
-    function saveProfile() { localStorage.setItem('slot_player_profile', JSON.stringify(playerProfile)); }
-    function saveAndUpdateStats() { localStorage.setItem('machine_stats', JSON.stringify(gameStats)); renderStats(); }
-
-    function requestPlayerName() {
-      let name = prompt('Ingresa el Nombre del Jugador (Máximo 10 caracteres):', playerProfile.name || 'MeteOritO');
-      if (!name || name.trim() === '') name = 'JUGADOR';
-      playerProfile.name = name.trim().substring(0, 10);
-      saveProfile(); updateUI();
-    }
-
-    function renderStats() {
-      if (!$('stat-plays')) return;
-      $('stat-plays').innerText = gameStats.totalPlays;
-      $('stat-bet').innerText = gameStats.totalBet.toFixed(2);
-      $('stat-won').innerText = gameStats.totalWon.toFixed(2);
-      $('stat-lost-risk').innerText = gameStats.totalLostRisking.toFixed(2);
-      
-      let rtpTotal = gameStats.totalBet > 0 ? (gameStats.totalWon / gameStats.totalBet) * 100 : 0;
-      let rtpBase = gameStats.totalBet > 0 ? ((gameStats.baseWon || 0) / gameStats.totalBet) * 100 : 0;
-      
-      if ($('stat-rtp-base')) $('stat-rtp-base').innerText = rtpBase.toFixed(2) + '%';
-      if ($('stat-rtp')) $('stat-rtp').innerText = rtpTotal.toFixed(2) + '%';
-      
-      let avgPlaysPerWin = (gameStats.basePrizesGiven || 0) > 0 ? ((gameStats.basePlays || 0) / gameStats.basePrizesGiven) : 0;
-      $('stat-avg-win').innerText = avgPlaysPerWin.toFixed(1);
-
-      let gambleWinRate = gameStats.doubleAttempts > 0 ? (gameStats.doubleWins / gameStats.doubleAttempts) * 100 : 0;
-      if ($('stat-gamble-rate')) $('stat-gamble-rate').innerText = gambleWinRate.toFixed(2) + '%';
-      if ($('stat-gamble-max-streak')) $('stat-gamble-max-streak').innerText = gameStats.maxDoubleStreak;
-    }
-
-    function resetStats() {
-      if(confirm('¿Estás seguro de que quieres borrar todas las estadísticas?')) {
-        gameStats = { ...defaultStats }; saveAndUpdateStats();
-      }
-    }
-
-    function getJackpotsDisplay() {
-      return [
-        { name: 'MINI JACKPOTS', credits: ECONOMY.jackpots[3] },
-        { name: 'GRAND JACKPOTS', credits: ECONOMY.jackpots[4] },
-        { name: 'SÚPER JACKPOTS', credits: ECONOMY.jackpots[5] }
-      ];
-    }
-
+    // ==========================================
+    // 2. CONSTANTES DE JUEGO Y ESTADO (STATE)
+    // ==========================================
     const PAYLINES = [
       [2, 2, 2, 2, 2], [1, 1, 1, 1, 1], [3, 3, 3, 3, 3],
       [0, 0, 0, 0, 0], [4, 4, 4, 4, 4], [4, 3, 2, 1, 0],
@@ -637,18 +591,37 @@
       grid: Array.from({ length: 5 }, () => Array(5).fill('')),
       totalSpins: 0, totalPayout: 0, currentWinningLines: [],
       freeSpinsLeft: 0, freeSpinTotalWon: 0, isFreeSpinMode: false,
-      bonusModalShown: false 
+      bonusModalShown: false,
+      
+      isHoldWinMode: false,
+      hwSpinsLeft: 0,
+      hwLockedCells: Array.from({ length: 5 }, () => Array(5).fill(false)) 
     };
 
     let jackpotIndex = 0; let secretBuffer = ''; let secretTimeout = null;
     let idleTimer = null; let isIdle = true;
 
+    const $ = id => document.getElementById(id);
     const gridContainer = $('slot-grid'); const paylineSvg = $('payline-svg');
     const badgesLeft = $('badges-left'); const badgesRight = $('badges-right');
     const dynamicDisplay = $('dynamic-display');
     const btnSpin = $('btn-spin'); const btnAuto = $('btn-auto');
     const btnGamble = $('btn-gamble');
 
+    // ==========================================
+    // 3. FUNCIONES DE GUARDADO
+    // ==========================================
+    function saveBonusConfig() { localStorage.setItem('slot_bonus_config', JSON.stringify(BONUS_CONFIG)); }
+    function saveHoldWinConfig() { localStorage.setItem('slot_hw_config', JSON.stringify(HOLD_WIN_CONFIG)); }
+    function saveConfig() { localStorage.setItem('slot_config', JSON.stringify(EMOJI_CONFIG)); }
+    function saveEconomy() { localStorage.setItem('slot_economy', JSON.stringify(ECONOMY)); }
+    function savePlayer() { localStorage.setItem('slot_player', JSON.stringify({ credits: state.credits })); }
+    function saveProfile() { localStorage.setItem('slot_player_profile', JSON.stringify(playerProfile)); }
+    function saveAndUpdateStats() { localStorage.setItem('machine_stats', JSON.stringify(gameStats)); renderStats(); }
+
+    // ==========================================
+    // 4. INICIALIZACIÓN Y EVENTOS PRINCIPALES
+    // ==========================================
     document.addEventListener('DOMContentLoaded', () => {
       if (!playerProfile.name) requestPlayerName();
       initBadges(); initGridUI(); registerEvents(); updateUI();
@@ -659,7 +632,72 @@
       });
     });
 
+    function registerEvents() {
+      $('btn-lines').addEventListener('click', () => {
+        if (state.isSpinning || state.isFreeSpinMode || state.isHoldWinMode) return;
+        state.selectedLinesIdx = (state.selectedLinesIdx + 1) % LINE_OPTIONS.length; updateUI(); resetIdleState();
+      });
+
+      $('btn-bet').addEventListener('click', () => {
+        if (state.isSpinning || state.isFreeSpinMode || state.isHoldWinMode) return;
+        state.selectedBetIdx = (state.selectedBetIdx + 1) % BET_OPTIONS.length; updateUI(); resetIdleState();
+      });
+
+      btnSpin.addEventListener('click', () => { triggerSpin(); resetIdleState(); });
+
+      btnAuto.addEventListener('click', () => {
+        if (state.isFreeSpinMode || state.isHoldWinMode) return;
+        state.autoSpin = !state.autoSpin;
+        $('val-auto').textContent = state.autoSpin ? 'AUTO: ON' : 'AUTO: OFF';
+        btnAuto.style.background = state.autoSpin ? 'linear-gradient(180deg,#2e7d32 0%,#1b5e20 100%)' : '';
+        resetIdleState();
+        if (state.autoSpin && !state.isSpinning) triggerSpin();
+      });
+
+      btnGamble.addEventListener('click', () => {
+        if (state.lastWinCredits <= 0 || state.isFreeSpinMode || state.isHoldWinMode) return;
+        state.gambleFailCount = 0; resetIdleState();
+        $('gamble-win-val').textContent = formatValue(state.lastWinCredits);
+        $('gamble-card').textContent = '❓';
+        $('modal-gamble').classList.add('active');
+      });
+
+      $('btn-gamble-play').addEventListener('click', playGamble);
+
+      $('btn-gamble-collect').addEventListener('click', () => {
+        $('modal-gamble').classList.remove('active');
+        state.lastWinCredits = 0; state.hasActiveWin = false; updateUI(); resetIdleState(); checkAutoSpin();
+      });
+
+      $('btn-dev-close').addEventListener('click', () => { $('fullscreen-dev').classList.remove('active'); initGridUI(); resetIdleState(); });
+
+      $('btn-dev-reset').addEventListener('click', () => {
+        if(confirm('¿Restaurar economía, emojis y borrar datos del jugador?')) {
+          EMOJI_CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+          ECONOMY = JSON.parse(JSON.stringify(DEFAULT_ECONOMY));
+          BONUS_CONFIG = JSON.parse(JSON.stringify(DEFAULT_BONUS_CONFIG));
+          HOLD_WIN_CONFIG = JSON.parse(JSON.stringify(DEFAULT_HOLD_WIN_CONFIG));
+          playerProfile = { ...DEFAULT_PROFILE };
+          localStorage.removeItem('slot_player'); localStorage.removeItem('slot_player_profile');
+          localStorage.removeItem('slot_bonus_config'); localStorage.removeItem('slot_hw_config');
+          state.credits = ECONOMY.startingCredits;
+          saveConfig(); saveEconomy(); savePlayer(); saveBonusConfig(); saveHoldWinConfig();
+          requestPlayerName(); renderDevPanel(); updateUI(); resetIdleState();
+        }
+      });
+    }
+
+    // ==========================================
+    // 5. INTERFAZ DE USUARIO (UI) Y PANELES
+    // ==========================================
     function formatValue(credits) { return `${Math.floor(credits).toLocaleString('es-ES')} C`; }
+
+    function requestPlayerName() {
+      let name = prompt('Ingresa el Nombre del Jugador (Máximo 10 caracteres):', playerProfile.name || 'MeteOritO');
+      if (!name || name.trim() === '') name = 'JUGADOR';
+      playerProfile.name = name.trim().substring(0, 10);
+      saveProfile(); updateUI();
+    }
 
     function checkSecretCode(value) {
       secretBuffer += value;
@@ -697,7 +735,6 @@
         });
       });
 
-      // Carga de Economía
       if ($('dev-starting-credits')) $('dev-starting-credits').value = ECONOMY.startingCredits;
       if ($('dev-bank-profit')) $('dev-bank-profit').value = Math.floor(ECONOMY.bankProfit);
       if ($('dev-jp-percent')) $('dev-jp-percent').value = ECONOMY.jackpotPercent;
@@ -707,7 +744,6 @@
       if ($('dev-spins-req')) $('dev-spins-req').value = ECONOMY.spinsToLevelUp;
       if ($('dev-spins-reward')) $('dev-spins-reward').value = ECONOMY.freeSpinsReward;
 
-      // Carga de Configuración Bonus (Scatters)
       if ($('dev-bonus-symbol')) $('dev-bonus-symbol').value = BONUS_CONFIG.scatterSymbol;
       if ($('dev-bonus-min-req')) $('dev-bonus-min-req').value = BONUS_CONFIG.minRequired;
       if ($('dev-bonus-spins-granted')) $('dev-bonus-spins-granted').value = BONUS_CONFIG.spinsGranted;
@@ -715,7 +751,6 @@
       if ($('dev-bonus-multiplier')) $('dev-bonus-multiplier').value = BONUS_CONFIG.multiplierOnBonus;
       if ($('dev-bonus-weight-mult')) $('dev-bonus-weight-mult').value = BONUS_CONFIG.bonusSymbolWeight;
 
-      // Carga de Configuración Hold & Win
       if ($('dev-jp-symbol')) $('dev-jp-symbol').value = HOLD_WIN_CONFIG.symbol;
       if ($('dev-jp-weight')) $('dev-jp-weight').value = HOLD_WIN_CONFIG.weight;
       if ($('dev-bonus-reset-spins')) $('dev-bonus-reset-spins').checked = HOLD_WIN_CONFIG.resetSpinsOnHit;
@@ -751,10 +786,7 @@
         HOLD_WIN_CONFIG.reqGrand = parseInt($('dev-jp-req-grand')?.value) || 9;
         HOLD_WIN_CONFIG.reqSuper = parseInt($('dev-jp-req-super')?.value) || 10;
 
-        saveEconomy(); 
-        saveBonusConfig(); 
-        saveHoldWinConfig();
-        updateUI();
+        saveEconomy(); saveBonusConfig(); saveHoldWinConfig(); updateUI();
       };
 
       ['dev-starting-credits', 'dev-bank-profit', 'dev-jp-percent', 'dev-jp-3', 'dev-jp-4', 'dev-jp-5', 'dev-spins-req', 'dev-spins-reward', 
@@ -765,6 +797,81 @@
       });
     }
 
+    function renderStats() {
+      if (!$('stat-plays')) return;
+      $('stat-plays').innerText = gameStats.totalPlays;
+      $('stat-bet').innerText = gameStats.totalBet.toFixed(2);
+      $('stat-won').innerText = gameStats.totalWon.toFixed(2);
+      $('stat-lost-risk').innerText = gameStats.totalLostRisking.toFixed(2);
+      
+      let rtpTotal = gameStats.totalBet > 0 ? (gameStats.totalWon / gameStats.totalBet) * 100 : 0;
+      let rtpBase = gameStats.totalBet > 0 ? ((gameStats.baseWon || 0) / gameStats.totalBet) * 100 : 0;
+      
+      if ($('stat-rtp-base')) $('stat-rtp-base').innerText = rtpBase.toFixed(2) + '%';
+      if ($('stat-rtp')) $('stat-rtp').innerText = rtpTotal.toFixed(2) + '%';
+      
+      let avgPlaysPerWin = (gameStats.basePrizesGiven || 0) > 0 ? ((gameStats.basePlays || 0) / gameStats.basePrizesGiven) : 0;
+      $('stat-avg-win').innerText = avgPlaysPerWin.toFixed(1);
+
+      let gambleWinRate = gameStats.doubleAttempts > 0 ? (gameStats.doubleWins / gameStats.doubleAttempts) * 100 : 0;
+      if ($('stat-gamble-rate')) $('stat-gamble-rate').innerText = gambleWinRate.toFixed(2) + '%';
+      if ($('stat-gamble-max-streak')) $('stat-gamble-max-streak').innerText = gameStats.maxDoubleStreak;
+    }
+
+    function resetStats() {
+      if(confirm('¿Estás seguro de que quieres borrar todas las estadísticas?')) {
+        gameStats = { ...defaultStats }; saveAndUpdateStats();
+      }
+    }
+
+    function updateUI() {
+      const lines = LINE_OPTIONS[state.selectedLinesIdx];
+      const bet = BET_OPTIONS[state.selectedBetIdx];
+      
+      $('display-player-name').textContent = playerProfile.name || 'MeteOritO';
+      $('display-player-level').textContent = `NIVEL ${playerProfile.level}`;
+      $('display-balance-val').textContent = formatValue(state.credits);
+      $('val-total-bet').textContent = `${lines * bet} C`;
+      $('val-lines').textContent = lines;
+      $('val-bet').textContent = `x${bet}`;
+      
+      const targetSpins = ECONOMY.spinsToLevelUp * (playerProfile.level + 1);
+      let progressPercent = (playerProfile.spinsToNextLevel / targetSpins) * 100;
+      $('level-progress-fill').style.width = `${Math.min(100, progressPercent)}%`;
+
+      document.querySelectorAll('.badge-line').forEach(badge => {
+        badge.classList.toggle('active', Number(badge.dataset.line) <= lines);
+      });
+
+      btnGamble.classList.toggle('disabled', state.lastWinCredits <= 0 || state.isSpinning || state.isFreeSpinMode || state.isHoldWinMode);
+      [$('btn-spin'), $('btn-lines'), $('btn-bet')].forEach(button => button.classList.toggle('disabled', state.isSpinning || state.isFreeSpinMode || state.isHoldWinMode));
+    }
+
+    function showLevelUpModal(title, sub, duration = 4000) {
+      const modal = $('modal-level-up');
+      $('lvl-modal-title').innerHTML = title;
+      $('lvl-modal-sub').innerHTML = sub;
+      modal.classList.add('active');
+      return new Promise(resolve => {
+        setTimeout(() => { modal.classList.remove('active'); setTimeout(resolve, 400); }, duration);
+      });
+    }
+
+    function setStatusText(message, isWin = false) {
+      if (isWin) {
+        state.hasActiveWin = true;
+        dynamicDisplay.className = 'dynamic-text-display win-text';
+      } else {
+        dynamicDisplay.className = 'dynamic-text-display';
+      }
+      dynamicDisplay.innerHTML = message;
+      dynamicDisplay.style.opacity = '1';
+      dynamicDisplay.style.transform = 'scale(1)';
+    }
+
+    // ==========================================
+    // 6. LÓGICA DE REJILLA Y ROTACIÓN
+    // ==========================================
     function initBadges() {
       badgesLeft.innerHTML = ''; badgesRight.innerHTML = '';
       const leftMapping = [4, 2, 1, 3, 5]; const rightMapping = [6, 8, null, 9, 7];
@@ -812,18 +919,16 @@
     function resetIdleState() {
       isIdle = false;
       clearTimeout(idleTimer);
-      if (!state.hasActiveWin && !state.isSpinning && !state.isFreeSpinMode) {
+      if (!state.hasActiveWin && !state.isSpinning && !state.isFreeSpinMode && !state.isHoldWinMode) {
         idleTimer = setTimeout(() => {
-          isIdle = true;
-          jackpotIndex = 0;
-          showJackpotText(jackpotIndex);
+          isIdle = true; jackpotIndex = 0; showJackpotText(jackpotIndex);
         }, 2000); 
       }
     }
 
     function startJackpotRotation() {
       setInterval(() => {
-        if (isIdle && !state.isSpinning && !state.hasActiveWin && !state.isFreeSpinMode) {
+        if (isIdle && !state.isSpinning && !state.hasActiveWin && !state.isFreeSpinMode && !state.isHoldWinMode) {
           const currentJackpots = getJackpotsDisplay();
           jackpotIndex = (jackpotIndex + 1) % currentJackpots.length;
           showJackpotText(jackpotIndex);
@@ -843,49 +948,12 @@
       }, 350);
     }
 
-    function setStatusText(message, isWin = false) {
-      if (isWin) {
-        state.hasActiveWin = true;
-        dynamicDisplay.className = 'dynamic-text-display win-text';
-      } else {
-        dynamicDisplay.className = 'dynamic-text-display';
-      }
-      dynamicDisplay.innerHTML = message;
-      dynamicDisplay.style.opacity = '1';
-      dynamicDisplay.style.transform = 'scale(1)';
-    }
-
-    function updateUI() {
-      const lines = LINE_OPTIONS[state.selectedLinesIdx];
-      const bet = BET_OPTIONS[state.selectedBetIdx];
-      
-      $('display-player-name').textContent = playerProfile.name || 'MeteOritO';
-      $('display-player-level').textContent = `NIVEL ${playerProfile.level}`;
-      $('display-balance-val').textContent = formatValue(state.credits);
-      $('val-total-bet').textContent = `${lines * bet} C`;
-      $('val-lines').textContent = lines;
-      $('val-bet').textContent = `x${bet}`;
-      
-      const targetSpins = ECONOMY.spinsToLevelUp * (playerProfile.level + 1);
-      let progressPercent = (playerProfile.spinsToNextLevel / targetSpins) * 100;
-      $('level-progress-fill').style.width = `${Math.min(100, progressPercent)}%`;
-
-      document.querySelectorAll('.badge-line').forEach(badge => {
-        badge.classList.toggle('active', Number(badge.dataset.line) <= lines);
-      });
-
-      btnGamble.classList.toggle('disabled', state.lastWinCredits <= 0 || state.isSpinning || state.isFreeSpinMode);
-      [$('btn-spin'), $('btn-lines'), $('btn-bet')].forEach(button => button.classList.toggle('disabled', state.isSpinning || state.isFreeSpinMode));
-    }
-
-    function showLevelUpModal(title, sub, duration = 4000) {
-      const modal = $('modal-level-up');
-      $('lvl-modal-title').innerHTML = title;
-      $('lvl-modal-sub').innerHTML = sub;
-      modal.classList.add('active');
-      return new Promise(resolve => {
-        setTimeout(() => { modal.classList.remove('active'); setTimeout(resolve, 400); }, duration);
-      });
+    function getJackpotsDisplay() {
+      return [
+        { name: 'MINI JACKPOTS', credits: ECONOMY.jackpots[3] },
+        { name: 'GRAND JACKPOTS', credits: ECONOMY.jackpots[4] },
+        { name: 'SÚPER JACKPOTS', credits: ECONOMY.jackpots[5] }
+      ];
     }
 
     function clearPaylinesSVG() { paylineSvg.innerHTML = ''; state.currentWinningLines = []; }
@@ -918,61 +986,9 @@
       });
     }
 
-    function registerEvents() {
-      $('btn-lines').addEventListener('click', () => {
-        if (state.isSpinning || state.isFreeSpinMode) return;
-        state.selectedLinesIdx = (state.selectedLinesIdx + 1) % LINE_OPTIONS.length; updateUI(); resetIdleState();
-      });
-
-      $('btn-bet').addEventListener('click', () => {
-        if (state.isSpinning || state.isFreeSpinMode) return;
-        state.selectedBetIdx = (state.selectedBetIdx + 1) % BET_OPTIONS.length; updateUI(); resetIdleState();
-      });
-
-      btnSpin.addEventListener('click', () => { triggerSpin(); resetIdleState(); });
-
-      btnAuto.addEventListener('click', () => {
-        if (state.isFreeSpinMode) return;
-        state.autoSpin = !state.autoSpin;
-        $('val-auto').textContent = state.autoSpin ? 'AUTO: ON' : 'AUTO: OFF';
-        btnAuto.style.background = state.autoSpin ? 'linear-gradient(180deg,#2e7d32 0%,#1b5e20 100%)' : '';
-        resetIdleState();
-        if (state.autoSpin && !state.isSpinning) triggerSpin();
-      });
-
-      btnGamble.addEventListener('click', () => {
-        if (state.lastWinCredits <= 0 || state.isFreeSpinMode) return;
-        state.gambleFailCount = 0; resetIdleState();
-        $('gamble-win-val').textContent = formatValue(state.lastWinCredits);
-        $('gamble-card').textContent = '❓';
-        $('modal-gamble').classList.add('active');
-      });
-
-      $('btn-gamble-play').addEventListener('click', playGamble);
-
-      $('btn-gamble-collect').addEventListener('click', () => {
-        $('modal-gamble').classList.remove('active');
-        state.lastWinCredits = 0; state.hasActiveWin = false; updateUI(); resetIdleState(); checkAutoSpin();
-      });
-
-      $('btn-dev-close').addEventListener('click', () => { $('fullscreen-dev').classList.remove('active'); initGridUI(); resetIdleState(); });
-
-      $('btn-dev-reset').addEventListener('click', () => {
-        if(confirm('¿Restaurar economía, emojis y borrar datos del jugador?')) {
-          EMOJI_CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
-          ECONOMY = JSON.parse(JSON.stringify(DEFAULT_ECONOMY));
-          BONUS_CONFIG = JSON.parse(JSON.stringify(DEFAULT_BONUS_CONFIG));
-          HOLD_WIN_CONFIG = JSON.parse(JSON.stringify(DEFAULT_HOLD_WIN_CONFIG));
-          playerProfile = { ...DEFAULT_PROFILE };
-          localStorage.removeItem('slot_player'); localStorage.removeItem('slot_player_profile');
-          localStorage.removeItem('slot_bonus_config'); localStorage.removeItem('slot_hw_config');
-          state.credits = ECONOMY.startingCredits;
-          saveConfig(); saveEconomy(); savePlayer(); saveBonusConfig(); saveHoldWinConfig();
-          requestPlayerName(); renderDevPanel(); updateUI(); resetIdleState();
-        }
-      });
-    }
-
+    // ==========================================
+    // 7. MECÁNICAS DE JUEGO (GAMBLE, SPIN, WINS, HOLD&WIN)
+    // ==========================================
     function processGambleLoss(lostAmount) {
       const jpPercentage = ECONOMY.jackpotPercent / 100;
       const jackpotCut = lostAmount * jpPercentage;
@@ -984,14 +1000,12 @@
     }
 
     function playGamble() {
-      if (state.lastWinCredits <= 0 || state.isFreeSpinMode) return;
+      if (state.lastWinCredits <= 0 || state.isFreeSpinMode || state.isHoldWinMode) return;
       gameStats.doubleAttempts++;
 
       if (Math.random() >= .5) {
         state.credits += state.lastWinCredits; savePlayer();
-        
         gameStats.doubleWins = (gameStats.doubleWins || 0) + 1;
-        
         gameStats.currentDoubleStreak++;
         if (gameStats.currentDoubleStreak > gameStats.maxDoubleStreak) gameStats.maxDoubleStreak = gameStats.currentDoubleStreak;
         gameStats.totalWon += state.lastWinCredits; saveAndUpdateStats();
@@ -1027,6 +1041,11 @@
     }
 
     function triggerSpin() {
+      if (state.isHoldWinMode) {
+        executeSpinVisuals();
+        return;
+      }
+
       const lines = LINE_OPTIONS[state.selectedLinesIdx];
       const bet = BET_OPTIONS[state.selectedBetIdx];
       const totalBet = lines * bet;
@@ -1083,10 +1102,14 @@
       state.lastWinCredits = 0; state.hasActiveWin = false; state.gambleFailCount = 0; state.totalSpins++;
       clearPaylinesSVG();
 
-      document.querySelectorAll('.symbol-cell').forEach(cell => cell.classList.remove('winning', 'dimmed'));
-      document.querySelectorAll('.badge-line').forEach(badge => badge.classList.remove('badge-winning-pulse'));
+      if (!state.isHoldWinMode) {
+        document.querySelectorAll('.symbol-cell').forEach(cell => cell.classList.remove('winning', 'dimmed'));
+        document.querySelectorAll('.badge-line').forEach(badge => badge.classList.remove('badge-winning-pulse'));
+      }
 
-      if (state.isFreeSpinMode) {
+      if (state.isHoldWinMode) {
+        setStatusText(`🔮 RESPINS RESTANTES: ${state.hwSpinsLeft}`);
+      } else if (state.isFreeSpinMode) {
         setStatusText(`🎁 TIRADAS GRATIS<br><span class="sub-text-free">(${state.freeSpinsLeft} restantes)</span>`);
       } else {
         setStatusText('🌀 Buena Suerte !!!');
@@ -1097,7 +1120,13 @@
       reels.forEach(strip => { strip.classList.add('spinning'); strip.classList.remove('bounce'); });
 
       for (let col = 0; col < 5; col++) {
-        for (let row = 0; row < 5; row++) state.grid[col][row] = getRandomSymbol();
+        for (let row = 0; row < 5; row++) {
+          // Si estamos en Hold & Win y la celda está bloqueada, no la modificamos
+          if (state.isHoldWinMode && state.hwLockedCells[col][row]) {
+             continue; 
+          }
+          state.grid[col][row] = getRandomSymbol();
+        }
       }
 
       reels.forEach((strip, index) => {
@@ -1108,15 +1137,128 @@
             const row = cell.dataset.row;
             cell.innerHTML = `<span class="emoji-wrapper">${state.grid[index][row]}</span>`;
           });
-          if (index === 4) setTimeout(evaluateWins, 350);
+          
+          if (index === 4) {
+            setTimeout(() => {
+              state.isHoldWinMode ? evaluateHoldWin() : evaluateWins();
+            }, 350);
+          }
         }, 500 + (index * 250));
       });
+    }
+
+    // -- NUEVA FUNCIÓN PARA EVALUAR RESPINS HOLD & WIN --
+    function evaluateHoldWin() {
+      state.isSpinning = false;
+      const bet = BET_OPTIONS[state.selectedBetIdx];
+      let newSymbolsFound = 0;
+      let totalLocked = 0;
+
+      // Buscar nuevos símbolos
+      for (let col = 0; col < 5; col++) {
+        for (let row = 0; row < 5; row++) {
+          if (state.grid[col][row] === HOLD_WIN_CONFIG.symbol) {
+            if (!state.hwLockedCells[col][row]) {
+              newSymbolsFound++;
+              state.hwLockedCells[col][row] = true;
+            }
+            totalLocked++;
+          }
+        }
+      }
+
+      // Actualizar estilos visuales
+      document.querySelectorAll('.symbol-cell').forEach(cell => {
+         const c = cell.dataset.reel;
+         const r = cell.dataset.row;
+         if (state.hwLockedCells[c][r]) {
+             cell.classList.remove('dimmed');
+             cell.classList.add('winning');
+         } else {
+             cell.classList.remove('winning');
+             cell.classList.add('dimmed');
+         }
+      });
+
+      // Lógica de contadores
+      if (newSymbolsFound > 0 && HOLD_WIN_CONFIG.resetSpinsOnHit) {
+        state.hwSpinsLeft = HOLD_WIN_CONFIG.initialSpins;
+        setStatusText(`✨ ¡+${newSymbolsFound} símbolos! Respíns reiniciados a ${state.hwSpinsLeft} ✨`, true);
+      } else {
+        state.hwSpinsLeft--;
+        setStatusText(`🔮 HOLD & WIN <br><span class="sub-text-free">(${state.hwSpinsLeft} respins restantes)</span>`, false);
+      }
+
+      // Comprobar fin del minijuego
+      if (state.hwSpinsLeft <= 0 || totalLocked >= 25) {
+        let totalPrize = totalLocked * bet * 5; // Premio base por cada símbolo
+        let jackpotName = ''; 
+        let jackpotAmount = 0;
+
+        // Comprobación de Jackpots
+        if (totalLocked >= HOLD_WIN_CONFIG.reqSuper) {
+          jackpotAmount = ECONOMY.jackpots[5]; jackpotName = 'SÚPER JACKPOT'; ECONOMY.jackpots[5] = 0;
+        } else if (totalLocked >= HOLD_WIN_CONFIG.reqGrand) {
+          jackpotAmount = ECONOMY.jackpots[4]; jackpotName = 'GRAND JACKPOT'; ECONOMY.jackpots[4] = 0;
+        } else if (totalLocked >= HOLD_WIN_CONFIG.reqMini) {
+          jackpotAmount = ECONOMY.jackpots[3]; jackpotName = 'MINI JACKPOT'; ECONOMY.jackpots[3] = 0;
+        }
+
+        if (jackpotAmount > 0) saveEconomy();
+        
+        let finalWin = totalPrize + jackpotAmount;
+        state.credits += finalWin; savePlayer();
+        
+        gameStats.totalWon += finalWin; 
+        gameStats.bonusWon = (gameStats.bonusWon || 0) + finalWin; 
+        saveAndUpdateStats();
+
+        let modalSubtitle = `Símbolos recolectados: ${totalLocked}<br>Premio Base: ${formatValue(totalPrize)}`;
+        if (jackpotAmount > 0) {
+            modalSubtitle += `<br><span>¡🏆 ${jackpotName} +${formatValue(jackpotAmount)}!</span>`;
+        } else {
+            modalSubtitle += `<br><span>GANANCIA TOTAL: ${formatValue(finalWin)}</span>`;
+        }
+
+        setTimeout(() => {
+            showLevelUpModal('FIN DEL HOLD & WIN', modalSubtitle, 5000).then(() => {
+                state.isHoldWinMode = false;
+                state.hwLockedCells = Array.from({ length: 5 }, () => Array(5).fill(false));
+                updateUI(); 
+                resetIdleState(); 
+                
+                // Si veníamos de tiradas gratis, las retomamos
+                if (state.isFreeSpinMode && state.freeSpinsLeft > 0) {
+                    setTimeout(triggerSpin, 1000);
+                } else {
+                    checkAutoSpin();
+                }
+            });
+        }, 1500);
+
+      } else {
+        // Continuar modo Hold & Win automáticamente
+        setTimeout(triggerSpin, 1800);
+      }
     }
 
     function evaluateWins() {
       state.isSpinning = false;
       const lines = LINE_OPTIONS[state.selectedLinesIdx];
       const bet = BET_OPTIONS[state.selectedBetIdx];
+      
+      // 1. Detectar si activamos Hold & Win
+      let hwCount = 0;
+      let hwPositions = [];
+      for (let col = 0; col < 5; col++) {
+        for (let row = 0; row < 5; row++) {
+          if (state.grid[col][row] === HOLD_WIN_CONFIG.symbol) {
+            hwCount++;
+            hwPositions.push({ col, row });
+          }
+        }
+      }
+
       let totalSpinWin = 0; 
       let winningLines = []; 
       let maxMatchCount = 0;
@@ -1238,6 +1380,29 @@
       updateUI();
       resetIdleState(); 
 
+      // 2. Interceptar flujo normal e iniciar Hold & Win si se cumplen condiciones (mínimo 6 por defecto)
+      if (hwCount >= 6) {
+        setTimeout(() => {
+          state.isHoldWinMode = true;
+          state.hwSpinsLeft = HOLD_WIN_CONFIG.initialSpins;
+          
+          // Bloqueamos celdas visualmente antes del siguiente spin
+          hwPositions.forEach(p => state.hwLockedCells[p.col][p.row] = true);
+          
+          showLevelUpModal(
+            '🔮 ¡HOLD & WIN ACTIVADO!',
+            `¡Conseguiste ${hwCount} símbolos!<br><span>¡${state.hwSpinsLeft} RESPINS INICIALES!</span>`,
+            4000
+          ).then(() => {
+             triggerSpin();
+          });
+        }, (totalSpinWin > 0 || bonusTriggered) ? 2000 : 500); 
+        
+        // Salimos de la función para no decrementar tiradas gratis ni lanzar auto spin
+        return; 
+      }
+
+      // 3. Flujo normal de fin de tirada
       if (state.isFreeSpinMode) {
         state.freeSpinsLeft--;
 
@@ -1304,7 +1469,7 @@
     }
 
     function checkAutoSpin() {
-      if (state.autoSpin && !state.isFreeSpinMode && !state.hasActiveWin) {
+      if (state.autoSpin && !state.isFreeSpinMode && !state.hasActiveWin && !state.isHoldWinMode) {
         const totalBet = LINE_OPTIONS[state.selectedLinesIdx] * BET_OPTIONS[state.selectedBetIdx];
         if (state.credits >= totalBet) {
           setTimeout(() => { if (state.autoSpin && !state.hasActiveWin) triggerSpin(); }, 1000);
@@ -1315,6 +1480,8 @@
         }
       }
     }
-  </script>
+</script>
+
+
 </body>
 </html>
