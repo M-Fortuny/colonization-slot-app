@@ -63,6 +63,57 @@
     .reel-strip { width: 100%; height: 100%; display: grid; grid-template-rows: repeat(5, 1fr); gap: 6px; transition: filter .2s; }
     .reel-strip.spinning { animation: reelScroll .12s linear infinite; filter: blur(3px); }
     .reel-strip.bounce { animation: reelBounceStop .25s ease-out forwards; }
+
+
+
+
+/* Animación visible para las celdas libres durante Hold & Win */
+.symbol-cell.hold-spinning {
+  overflow: hidden;
+  filter: blur(3px);
+}
+
+.symbol-cell.hold-spinning .emoji-wrapper {
+  animation: holdSymbolSpin .18s linear infinite;
+  will-change: transform, opacity;
+
+}
+
+@keyframes holdSymbolSpin {
+  0% {
+    transform: translateY(-120%);
+    opacity: .35;
+  }
+
+  50% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(120%);
+    opacity: .35;
+  }
+}
+
+
+
+/* En Hold & Win solo giran las celdas libres */
+.symbol-cell.hold-spinning {
+  animation: holdCellSpin .12s linear infinite;
+  filter: blur(3px);
+}
+
+@keyframes holdCellSpin {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0); }
+}
+
+
+
+
+
     @keyframes reelScroll { from { transform: translateY(0); } to { transform: translateY(-20%); } }
     @keyframes reelBounceStop { 0% { transform: translateY(-15px); } 70% { transform: translateY(8px); } 100% { transform: translateY(0); } }
 
@@ -550,9 +601,9 @@
       weight: 1.0,
       initialSpins: 3,
       spinsAddedOnHit: 3,
-      reqMini: 8,
-      reqGrand: 9,
-      reqSuper: 10,
+      reqMini: 9,
+      reqGrand: 10,
+      reqSuper: 11,
       resetSpinsOnHit: true
     };
     let savedHW = loadSafeData('slot_hw_config', {});
@@ -595,7 +646,8 @@
       
       isHoldWinMode: false,
       hwSpinsLeft: 0,
-      hwLockedCells: Array.from({ length: 5 }, () => Array(5).fill(false)) 
+      hwLockedCells: Array.from({ length: 5 }, () => Array(5).fill(false)),
+      hwActiveJackpotTier: null // Memoria del Jackpot añadido
     };
 
     let jackpotIndex = 0; let secretBuffer = ''; let secretTimeout = null;
@@ -999,46 +1051,70 @@
       saveEconomy();
     }
 
-    function playGamble() {
+        function playGamble() {
+      // Si no hay premio, o estamos en tiradas gratis/minijuego, no hacemos nada
       if (state.lastWinCredits <= 0 || state.isFreeSpinMode || state.isHoldWinMode) return;
       gameStats.doubleAttempts++;
 
-      if (Math.random() >= .5) {
-        state.credits += state.lastWinCredits; savePlayer();
+      // Probabilidad del 50%
+      if (Math.random() >= 0.5) {
+        // GANANCIA: Doble
+        state.credits += state.lastWinCredits; 
+        savePlayer();
+        
         gameStats.doubleWins = (gameStats.doubleWins || 0) + 1;
         gameStats.currentDoubleStreak++;
-        if (gameStats.currentDoubleStreak > gameStats.maxDoubleStreak) gameStats.maxDoubleStreak = gameStats.currentDoubleStreak;
-        gameStats.totalWon += state.lastWinCredits; saveAndUpdateStats();
+        if (gameStats.currentDoubleStreak > gameStats.maxDoubleStreak) {
+            gameStats.maxDoubleStreak = gameStats.currentDoubleStreak;
+        }
+        gameStats.totalWon += state.lastWinCredits; 
+        saveAndUpdateStats();
 
         state.lastWinCredits *= 2;
         $('gamble-card').textContent = '✨ 2X ✨';
         $('gamble-win-val').textContent = formatValue(state.lastWinCredits);
         setStatusText(`🎉 ¡PREMIO DUPLICADO! +${formatValue(state.lastWinCredits)}`, true);
+        
       } else {
-        state.gambleFailCount++;
-        if (state.gambleFailCount === 1) {
-          const half = Math.floor(state.lastWinCredits / 2);
-          const lostAmount = state.lastWinCredits - half; 
-          processGambleLoss(lostAmount);
-          gameStats.currentDoubleStreak = 0; gameStats.totalLostRisking += lostAmount; gameStats.totalWon -= lostAmount; saveAndUpdateStats();
-          state.credits -= lostAmount; savePlayer();
-          state.lastWinCredits = half;
-          $('gamble-card').textContent = '💔 1/2'; $('gamble-win-val').textContent = formatValue(half);
-          setStatusText(`⚠️ Te quedan: ${formatValue(half)}`);
-        } else {
-          const lostAmount = state.lastWinCredits;
-          processGambleLoss(lostAmount);
-          gameStats.currentDoubleStreak = 0; gameStats.totalLostRisking += lostAmount; gameStats.totalWon -= lostAmount; saveAndUpdateStats();
-          state.credits -= lostAmount; state.credits = Math.max(0, state.credits); savePlayer();
-          state.lastWinCredits = 0; state.hasActiveWin = false; 
-          $('gamble-card').textContent = '💥 0X'; $('gamble-win-val').textContent = formatValue(0);
-          setStatusText('❌ Has perdido todo el premio.');
-          resetIdleState(); 
-          setTimeout(() => { $('modal-gamble').classList.remove('active'); updateUI(); checkAutoSpin(); }, 1200);
-        }
+        // PÉRDIDA: Fallo único, se pierde todo de golpe y alimenta los botes
+        const lostAmount = state.lastWinCredits;
+        
+        // Llamamos a la función original que reparte el porcentaje al Jackpot y a la banca
+        processGambleLoss(lostAmount);
+
+        // Actualizamos estadísticas
+        gameStats.currentDoubleStreak = 0; 
+        gameStats.totalLostRisking += lostAmount; 
+        gameStats.totalWon -= lostAmount; 
+        saveAndUpdateStats();
+        
+        // Restamos lo ganado del balance total del jugador
+        state.credits -= lostAmount; 
+        state.credits = Math.max(0, state.credits); 
+        savePlayer();
+        
+        // Reseteamos el premio actual
+        state.lastWinCredits = 0; 
+        state.hasActiveWin = false; 
+        
+        // UI
+        $('gamble-card').textContent = '💥 0X'; 
+        $('gamble-win-val').textContent = formatValue(0);
+        setStatusText('❌ Has perdido todo el premio.');
+        
+        resetIdleState(); 
+        
+        // Cerramos el modal automáticamente tras un instante
+        setTimeout(() => { 
+            $('modal-gamble').classList.remove('active'); 
+            updateUI(); 
+            checkAutoSpin(); 
+        }, 1200);
       }
+      
       updateUI();
     }
+
 
     function triggerSpin() {
       if (state.isHoldWinMode) {
@@ -1097,60 +1173,131 @@
       executeSpinVisuals();
     }
 
-    function executeSpinVisuals() {
-      state.isSpinning = true; isIdle = false; clearTimeout(idleTimer);
-      state.lastWinCredits = 0; state.hasActiveWin = false; state.gambleFailCount = 0; state.totalSpins++;
-      clearPaylinesSVG();
+        function executeSpinVisuals() {
+  state.isSpinning = true;
+  isIdle = false;
+  clearTimeout(idleTimer);
 
-      if (!state.isHoldWinMode) {
-        document.querySelectorAll('.symbol-cell').forEach(cell => cell.classList.remove('winning', 'dimmed'));
-        document.querySelectorAll('.badge-line').forEach(badge => badge.classList.remove('badge-winning-pulse'));
-      }
+  state.lastWinCredits = 0;
+  state.hasActiveWin = false;
+  state.gambleFailCount = 0;
+  state.totalSpins++;
 
-      if (state.isHoldWinMode) {
-        setStatusText(`🔮 RESPINS RESTANTES: ${state.hwSpinsLeft}`);
-      } else if (state.isFreeSpinMode) {
-        setStatusText(`🎁 TIRADAS GRATIS<br><span class="sub-text-free">(${state.freeSpinsLeft} restantes)</span>`);
+  clearPaylinesSVG();
+
+  if (!state.isHoldWinMode) {
+    document.querySelectorAll('.symbol-cell').forEach(cell => {
+      cell.classList.remove('winning', 'dimmed', 'hold-spinning');
+    });
+
+    document.querySelectorAll('.badge-line').forEach(badge => {
+      badge.classList.remove('badge-winning-pulse');
+    });
+  }
+
+  if (state.isHoldWinMode) {
+    setStatusText(
+      `🔮 RESPINS RESTANTES: ${state.hwSpinsLeft}`
+    );
+  } else if (state.isFreeSpinMode) {
+    setStatusText(
+      `🎁 TIRADAS GRATIS<br>
+      <span class="sub-text-free">
+      (${state.freeSpinsLeft} restantes)
+      </span>`
+    );
+  } else {
+    setStatusText('🌀 Buena Suerte !!!');
+  }
+
+  updateUI();
+
+  const reels = gridContainer.querySelectorAll('.reel-strip');
+
+  if (state.isHoldWinMode) {
+    // Las celdas bloqueadas permanecen quietas.
+    document.querySelectorAll('.symbol-cell').forEach(cell => {
+      const col = Number(cell.dataset.reel);
+      const row = Number(cell.dataset.row);
+
+      if (state.hwLockedCells[col][row]) {
+        cell.classList.remove('hold-spinning');
       } else {
-        setStatusText('🌀 Buena Suerte !!!');
+        cell.classList.add('hold-spinning');
       }
-      updateUI();
+    });
+  } else {
+    // Juego normal: giran los rodillos completos.
+    reels.forEach(strip => {
+      strip.classList.add('spinning');
+      strip.classList.remove('bounce');
+    });
+  }
 
-      const reels = gridContainer.querySelectorAll('.reel-strip');
-      reels.forEach(strip => { strip.classList.add('spinning'); strip.classList.remove('bounce'); });
-
-      for (let col = 0; col < 5; col++) {
-        for (let row = 0; row < 5; row++) {
-          // Si estamos en Hold & Win y la celda está bloqueada, no la modificamos
-          if (state.isHoldWinMode && state.hwLockedCells[col][row]) {
-             continue; 
-          }
-          state.grid[col][row] = getRandomSymbol();
-        }
+  // Crear nuevos símbolos solamente en posiciones libres.
+  for (let col = 0; col < 5; col++) {
+    for (let row = 0; row < 5; row++) {
+      if (
+        state.isHoldWinMode &&
+        state.hwLockedCells[col][row]
+      ) {
+        continue;
       }
 
-      reels.forEach((strip, index) => {
-        setTimeout(() => {
-          strip.classList.remove('spinning'); strip.classList.add('bounce');
-          const cells = gridContainer.querySelectorAll(`.symbol-cell[data-reel="${index}"]`);
-          cells.forEach(cell => {
-            const row = cell.dataset.row;
-            cell.innerHTML = `<span class="emoji-wrapper">${state.grid[index][row]}</span>`;
-          });
-          
-          if (index === 4) {
-            setTimeout(() => {
-              state.isHoldWinMode ? evaluateHoldWin() : evaluateWins();
-            }, 350);
-          }
-        }, 500 + (index * 250));
-      });
+      state.grid[col][row] = getRandomSymbol();
     }
+  }
+
+  reels.forEach((strip, index) => {
+    setTimeout(() => {
+      if (!state.isHoldWinMode) {
+        strip.classList.remove('spinning');
+        strip.classList.add('bounce');
+      }
+
+      const cells = gridContainer.querySelectorAll(
+        `.symbol-cell[data-reel="${index}"]`
+      );
+
+      cells.forEach(cell => {
+        const row = Number(cell.dataset.row);
+        const locked =
+          state.isHoldWinMode &&
+          state.hwLockedCells[index][row];
+
+        cell.classList.remove('hold-spinning');
+
+        if (locked) {
+          cell.innerHTML = `
+            <span class="emoji-wrapper">
+              ${HOLD_WIN_CONFIG.symbol}
+            </span>
+          `;
+        } else {
+          cell.innerHTML = `
+            <span class="emoji-wrapper">
+              ${state.grid[index][row]}
+            </span>
+          `;
+        }
+      });
+
+      if (index === 4) {
+        setTimeout(() => {
+          if (state.isHoldWinMode) {
+            evaluateHoldWin();
+          } else {
+            evaluateWins();
+          }
+        }, 350);
+      }
+    }, 900 + index * 350);
+  });
+}
 
     // -- NUEVA FUNCIÓN PARA EVALUAR RESPINS HOLD & WIN --
-    function evaluateHoldWin() {
+        function evaluateHoldWin() {
       state.isSpinning = false;
-      const bet = BET_OPTIONS[state.selectedBetIdx];
       let newSymbolsFound = 0;
       let totalLocked = 0;
 
@@ -1180,10 +1327,10 @@
          }
       });
 
-      // Lógica de contadores
+      // Lógica de contadores y TEXTO CORREGIDO (apilado en vertical)
       if (newSymbolsFound > 0 && HOLD_WIN_CONFIG.resetSpinsOnHit) {
         state.hwSpinsLeft = HOLD_WIN_CONFIG.initialSpins;
-        setStatusText(`✨ ¡+${newSymbolsFound} símbolos! Respíns reiniciados a ${state.hwSpinsLeft} ✨`, true);
+        setStatusText(`✨ ¡+${newSymbolsFound} SÍMBOLOS! ✨<br><span class="sub-text-free">Respíns a ${state.hwSpinsLeft}</span>`, true);
       } else {
         state.hwSpinsLeft--;
         setStatusText(`🔮 HOLD & WIN <br><span class="sub-text-free">(${state.hwSpinsLeft} respins restantes)</span>`, false);
@@ -1191,43 +1338,45 @@
 
       // Comprobar fin del minijuego
       if (state.hwSpinsLeft <= 0 || totalLocked >= 25) {
-        let totalPrize = totalLocked * bet * 5; // Premio base por cada símbolo
         let jackpotName = ''; 
-        let jackpotAmount = 0;
+        let totalJackpotPool = 0;
+        let tier = state.hwActiveJackpotTier;
 
-        // Comprobación de Jackpots
-        if (totalLocked >= HOLD_WIN_CONFIG.reqSuper) {
-          jackpotAmount = ECONOMY.jackpots[5]; jackpotName = 'SÚPER JACKPOT'; ECONOMY.jackpots[5] = 0;
-        } else if (totalLocked >= HOLD_WIN_CONFIG.reqGrand) {
-          jackpotAmount = ECONOMY.jackpots[4]; jackpotName = 'GRAND JACKPOT'; ECONOMY.jackpots[4] = 0;
-        } else if (totalLocked >= HOLD_WIN_CONFIG.reqMini) {
-          jackpotAmount = ECONOMY.jackpots[3]; jackpotName = 'MINI JACKPOT'; ECONOMY.jackpots[3] = 0;
-        }
+        // 1. Capturamos el bote total según el nivel guardado
+        if (tier === 5) { totalJackpotPool = ECONOMY.jackpots[5]; jackpotName = 'SÚPER'; }
+        else if (tier === 4) { totalJackpotPool = ECONOMY.jackpots[4]; jackpotName = 'GRAND'; }
+        else if (tier === 3) { totalJackpotPool = ECONOMY.jackpots[3]; jackpotName = 'MINI'; }
 
-        if (jackpotAmount > 0) saveEconomy();
+        // 2. NUEVA FÓRMULA: Fraccionamos el bote entre 25 casillas
+        let valuePerSymbol = totalJackpotPool / 25; 
+        let finalWin = Math.floor(totalLocked * valuePerSymbol); // Premio conseguido
+        let remainder = totalJackpotPool - finalWin; // El sobrante que no se ha ganado
+
+        // 3. Devolvemos el sobrante a su Jackpot correspondiente
+        if (tier === 5) ECONOMY.jackpots[5] = remainder;
+        else if (tier === 4) ECONOMY.jackpots[4] = remainder;
+        else if (tier === 3) ECONOMY.jackpots[3] = remainder;
+
+        if (totalJackpotPool > 0) saveEconomy();
         
-        let finalWin = totalPrize + jackpotAmount;
         state.credits += finalWin; savePlayer();
         
         gameStats.totalWon += finalWin; 
         gameStats.bonusWon = (gameStats.bonusWon || 0) + finalWin; 
         saveAndUpdateStats();
 
-        let modalSubtitle = `Símbolos recolectados: ${totalLocked}<br>Premio Base: ${formatValue(totalPrize)}`;
-        if (jackpotAmount > 0) {
-            modalSubtitle += `<br><span>¡🏆 ${jackpotName} +${formatValue(jackpotAmount)}!</span>`;
-        } else {
-            modalSubtitle += `<br><span>GANANCIA TOTAL: ${formatValue(finalWin)}</span>`;
-        }
+        // 4. Actualizamos el subtítulo del modal final
+        let modalSubtitle = `Símbolos recolectados: ${totalLocked}<br>Valor unidad: ${formatValue(valuePerSymbol)}`;
+        modalSubtitle += `<br><span>🏆 ${jackpotName}: ${formatValue(finalWin)}</span>`;
 
         setTimeout(() => {
             showLevelUpModal('FIN DEL HOLD & WIN', modalSubtitle, 5000).then(() => {
                 state.isHoldWinMode = false;
+                state.hwActiveJackpotTier = null; 
                 state.hwLockedCells = Array.from({ length: 5 }, () => Array(5).fill(false));
                 updateUI(); 
                 resetIdleState(); 
                 
-                // Si veníamos de tiradas gratis, las retomamos
                 if (state.isFreeSpinMode && state.freeSpinsLeft > 0) {
                     setTimeout(triggerSpin, 1000);
                 } else {
@@ -1237,236 +1386,357 @@
         }, 1500);
 
       } else {
-        // Continuar modo Hold & Win automáticamente
         setTimeout(triggerSpin, 1800);
       }
     }
 
+
     function evaluateWins() {
-      state.isSpinning = false;
-      const lines = LINE_OPTIONS[state.selectedLinesIdx];
-      const bet = BET_OPTIONS[state.selectedBetIdx];
-      
-      // 1. Detectar si activamos Hold & Win
-      let hwCount = 0;
-      let hwPositions = [];
-      for (let col = 0; col < 5; col++) {
-        for (let row = 0; row < 5; row++) {
-          if (state.grid[col][row] === HOLD_WIN_CONFIG.symbol) {
-            hwCount++;
-            hwPositions.push({ col, row });
-          }
-        }
-      }
+  state.isSpinning = false;
 
-      let totalSpinWin = 0; 
-      let winningLines = []; 
-      let maxMatchCount = 0;
+  const lines = LINE_OPTIONS[state.selectedLinesIdx];
+  const bet = BET_OPTIONS[state.selectedBetIdx];
 
-      let scatterCount = 0;
-      let scatterPositions = [];
-      for (let col = 0; col < 5; col++) {
-        for (let row = 0; row < 5; row++) {
-          if (state.grid[col][row] === BONUS_CONFIG.scatterSymbol) {
-            scatterCount++;
-            scatterPositions.push({ col, row });
-          }
-        }
-      }
+  // Requisitos configurables del panel de desarrollador
+  const reqMini = Math.max(
+    1,
+    parseInt(HOLD_WIN_CONFIG.reqMini, 10) ||
+    DEFAULT_HOLD_WIN_CONFIG.reqMini
+  );
 
-      for (let i = 0; i < lines; i++) {
-        const line = PAYLINES[i];
-        let symbol = state.grid[0][line[0]];
-        let matchCount = 1;
+  const reqGrand = Math.max(
+    reqMini,
+    parseInt(HOLD_WIN_CONFIG.reqGrand, 10) ||
+    DEFAULT_HOLD_WIN_CONFIG.reqGrand
+  );
 
-        for (let col = 1; col < 5; col++) {
-          if (state.grid[col][line[col]] === symbol) matchCount++;
-          else break;
-        }
+  const reqSuper = Math.max(
+    reqGrand,
+    parseInt(HOLD_WIN_CONFIG.reqSuper, 10) ||
+    DEFAULT_HOLD_WIN_CONFIG.reqSuper
+  );
 
-        if (matchCount >= 3) {
-          const config = EMOJI_CONFIG.find(c => c.symbol === symbol);
-          if (config) {
-            let winMultiplier = matchCount === 5 ? config.pay5 : (matchCount === 4 ? config.pay4 : config.pay3);
-            let winAmount = winMultiplier * bet;
+  // Contar símbolos Hold & Win
+  let hwCount = 0;
+  const hwPositions = [];
 
-            if (state.isFreeSpinMode) {
-              winAmount *= BONUS_CONFIG.multiplierOnBonus;
-            }
-
-            totalSpinWin += winAmount;
-            winningLines.push({ lineIdx: i, matchCount, symbol, winAmount });
-            if (matchCount > maxMatchCount) maxMatchCount = matchCount;
-          }
-        }
-      }
-
-      state.currentWinningLines = winningLines;
-
-      let bonusTriggered = false;
-      if (scatterCount >= BONUS_CONFIG.minRequired) {
-        state.retriggerCount = state.retriggerCount || 0;
-
-        if (!state.isFreeSpinMode) {
-          bonusTriggered = true;
-          state.isFreeSpinMode = true;
-          state.freeSpinsLeft = BONUS_CONFIG.spinsGranted;
-          state.freeSpinTotalWon = 0;
-          state.retriggerCount = 0;
-        } else if (state.retriggerCount < BONUS_CONFIG.maxRetriggers) {
-          bonusTriggered = true;
-          state.retriggerCount++;
-          state.freeSpinsLeft += BONUS_CONFIG.spinsGranted;
-        }
-      }
-
-      if (bonusTriggered) {
-        const slotContainer = $('slot-grid') || document.body;
-        slotContainer.classList.add('screen-shake');
-        setTimeout(() => slotContainer.classList.remove('screen-shake'), 500);
-      }
-
-      if (totalSpinWin > 0 || bonusTriggered) {
-        state.lastWinCredits = totalSpinWin; 
-        state.lastWinMatchCount = maxMatchCount; 
-        state.hasActiveWin = totalSpinWin > 0;
-
-        if (state.isFreeSpinMode) {
-          state.freeSpinTotalWon += totalSpinWin;
-          if (bonusTriggered) {
-            setStatusText(`🌀 ¡BONUS! +${BONUS_CONFIG.spinsGranted} TIRADAS<br><span class="sub-text-free">(Acumulado: ${formatValue(state.freeSpinTotalWon)})</span>`, true);
-          } else {
-            setStatusText(`🔥 ¡GANAS ${formatValue(totalSpinWin)}!<br><span class="sub-text-free">(Acumulado: ${formatValue(state.freeSpinTotalWon)})</span>`, true);
-          }
-        } else {
-          state.credits += totalSpinWin; 
-          savePlayer();
-          setStatusText(`🎉 ¡PREMIO! ${formatValue(totalSpinWin)}`, true);
-          
-          gameStats.prizesGiven++; 
-          gameStats.basePrizesGiven = (gameStats.basePrizesGiven || 0) + 1;
-          gameStats.totalWon += totalSpinWin; 
-          gameStats.baseWon = (gameStats.baseWon || 0) + totalSpinWin;
-          
-          gameStats.currentNoPrizeStreak = 0; 
-          saveAndUpdateStats();
-        }
-
-        document.querySelectorAll('.symbol-cell').forEach(cell => cell.classList.add('dimmed'));
-        
-        winningLines.forEach(win => {
-          for (let col = 0; col < win.matchCount; col++) {
-            const row = PAYLINES[win.lineIdx][col];
-            const cell = gridContainer.querySelector(`.symbol-cell[data-reel="${col}"][data-row="${row}"]`);
-            if (cell) { cell.classList.remove('dimmed'); cell.classList.add('winning'); }
-          }
-          const badge = document.querySelector(`.badge-line[data-line="${win.lineIdx + 1}"]`);
-          if (badge) badge.classList.add('badge-winning-pulse');
-        });
-
-        if (scatterCount >= BONUS_CONFIG.minRequired) {
-          scatterPositions.forEach(pos => {
-            const cell = gridContainer.querySelector(`.symbol-cell[data-reel="${pos.col}"][data-row="${pos.row}"]`);
-            if (cell) { cell.classList.remove('dimmed'); cell.classList.add('winning'); }
-          });
-        }
-
-        drawPaylinesSVG(winningLines);
-      } else {
-        if (state.isFreeSpinMode) setStatusText(`Tirada sin premio...`, false);
-        else setStatusText('Suerte en la próxima', false);
-      }
-
-      updateUI();
-      resetIdleState(); 
-
-      // 2. Interceptar flujo normal e iniciar Hold & Win si se cumplen condiciones (mínimo 6 por defecto)
-      if (hwCount >= 6) {
-        setTimeout(() => {
-          state.isHoldWinMode = true;
-          state.hwSpinsLeft = HOLD_WIN_CONFIG.initialSpins;
-          
-          // Bloqueamos celdas visualmente antes del siguiente spin
-          hwPositions.forEach(p => state.hwLockedCells[p.col][p.row] = true);
-          
-          showLevelUpModal(
-            '🔮 ¡HOLD & WIN ACTIVADO!',
-            `¡Conseguiste ${hwCount} símbolos!<br><span>¡${state.hwSpinsLeft} RESPINS INICIALES!</span>`,
-            4000
-          ).then(() => {
-             triggerSpin();
-          });
-        }, (totalSpinWin > 0 || bonusTriggered) ? 2000 : 500); 
-        
-        // Salimos de la función para no decrementar tiradas gratis ni lanzar auto spin
-        return; 
-      }
-
-      // 3. Flujo normal de fin de tirada
-      if (state.isFreeSpinMode) {
-        state.freeSpinsLeft--;
-
-        if (state.freeSpinsLeft > 0) {
-          if (bonusTriggered && !state.bonusModalShown) {
-            state.bonusModalShown = true; 
-            showLevelUpModal(
-              '🎉 ¡BONUS ACTIVADO!',
-              `¡Encontraste ${scatterCount} símbolos!<br>
-               <span>¡${BONUS_CONFIG.spinsGranted} TIRADAS GRATIS!</span>`,
-              3500
-            ).then(() => {
-              setTimeout(triggerSpin, 300);
-            });
-          } else {
-            setTimeout(triggerSpin, 1600);
-          }
-        } else {
-          setTimeout(() => {
-            state.isFreeSpinMode = false;
-            state.retriggerCount = 0;
-            state.bonusModalShown = false; 
-
-            if (state.freeSpinTotalWon > 0) {
-              state.credits += state.freeSpinTotalWon;
-              savePlayer();
-
-              gameStats.totalWon += state.freeSpinTotalWon;
-              gameStats.bonusWon = (gameStats.bonusWon || 0) + state.freeSpinTotalWon;
-              gameStats.bonusPrizesGiven = (gameStats.bonusPrizesGiven || 0) + 1;
-              saveAndUpdateStats();
-
-              showLevelUpModal(
-                'FIN DEL BONUS',
-                `GANANCIA TOTAL:<br>
-                 <span>${formatValue(state.freeSpinTotalWon)}</span>`,
-                4000
-              );
-            } else {
-              setStatusText('Fin de tiradas gratis', false);
-            }
-
-            state.freeSpinTotalWon = 0;
-            updateUI();
-            resetIdleState();
-            checkAutoSpin();
-          }, 2000);
-        }
-      } else {
-        if (state.hasActiveWin && state.autoSpin) {
-          setTimeout(() => {
-            if (state.hasActiveWin && !document.querySelector('#modal-gamble').classList.contains('active')) {
-              state.lastWinCredits = 0;
-              state.hasActiveWin = false;
-              updateUI();
-              resetIdleState();
-              checkAutoSpin();
-            }
-          }, 2000);
-        } else {
-          checkAutoSpin();
-        }
+  for (let col = 0; col < 5; col++) {
+    for (let row = 0; row < 5; row++) {
+      if (state.grid[col][row] === HOLD_WIN_CONFIG.symbol) {
+        hwCount++;
+        hwPositions.push({ col, row });
       }
     }
+  }
+
+  let totalSpinWin = 0;
+  const winningLines = [];
+  let maxMatchCount = 0;
+
+  // Contar símbolos Scatter
+  let scatterCount = 0;
+  const scatterPositions = [];
+
+  for (let col = 0; col < 5; col++) {
+    for (let row = 0; row < 5; row++) {
+      if (state.grid[col][row] === BONUS_CONFIG.scatterSymbol) {
+        scatterCount++;
+        scatterPositions.push({ col, row });
+      }
+    }
+  }
+
+  // Evaluar líneas ganadoras
+  for (let i = 0; i < lines; i++) {
+    const line = PAYLINES[i];
+    const symbol = state.grid[0][line[0]];
+    let matchCount = 1;
+
+    for (let col = 1; col < 5; col++) {
+      if (state.grid[col][line[col]] === symbol) {
+        matchCount++;
+      } else {
+        break;
+      }
+    }
+
+    if (matchCount >= 3) {
+      const config = EMOJI_CONFIG.find(item => item.symbol === symbol);
+
+      if (config) {
+        const winMultiplier =
+          matchCount === 5
+            ? config.pay5
+            : matchCount === 4
+              ? config.pay4
+              : config.pay3;
+
+        let winAmount = winMultiplier * bet;
+
+        if (state.isFreeSpinMode) {
+          winAmount *= BONUS_CONFIG.multiplierOnBonus;
+        }
+
+        totalSpinWin += winAmount;
+
+        winningLines.push({
+          lineIdx: i,
+          matchCount,
+          symbol,
+          winAmount
+        });
+
+        maxMatchCount = Math.max(maxMatchCount, matchCount);
+      }
+    }
+  }
+
+  state.currentWinningLines = winningLines;
+
+  // Evaluar bonus de Scatter
+  let bonusTriggered = false;
+
+  if (scatterCount >= BONUS_CONFIG.minRequired) {
+    state.retriggerCount = state.retriggerCount || 0;
+
+    if (!state.isFreeSpinMode) {
+      bonusTriggered = true;
+      state.isFreeSpinMode = true;
+      state.freeSpinsLeft = BONUS_CONFIG.spinsGranted;
+      state.freeSpinTotalWon = 0;
+      state.retriggerCount = 0;
+    } else if (state.retriggerCount < BONUS_CONFIG.maxRetriggers) {
+      bonusTriggered = true;
+      state.retriggerCount++;
+      state.freeSpinsLeft += BONUS_CONFIG.spinsGranted;
+    }
+  }
+
+  if (bonusTriggered) {
+    const slotContainer = $('slot-grid') || document.body;
+    slotContainer.classList.add('screen-shake');
+
+    setTimeout(() => {
+      slotContainer.classList.remove('screen-shake');
+    }, 500);
+  }
+
+  // Procesar premios normales
+  if (totalSpinWin > 0 || bonusTriggered) {
+    state.lastWinCredits = totalSpinWin;
+    state.lastWinMatchCount = maxMatchCount;
+    state.hasActiveWin = totalSpinWin > 0;
+
+        if (state.isFreeSpinMode) {
+      state.freeSpinTotalWon += totalSpinWin;
+
+      if (bonusTriggered) {
+        // TEXTO CORREGIDO: Dividido y simplificado para evitar desbordamiento
+        setStatusText(
+          `🌀 ¡+${BONUS_CONFIG.spinsGranted} TIRADAS! 🌀<br>
+          <span class="sub-text-free">
+          Acumulado: ${formatValue(state.freeSpinTotalWon)}
+          </span>`,
+          true
+        );
+      } else {
+        setStatusText(
+          `🔥 ¡GANAS ${formatValue(totalSpinWin)}!<br>
+          <span class="sub-text-free">
+          Acumulado: ${formatValue(state.freeSpinTotalWon)}
+          </span>`,
+          true
+        );
+      }
+
+    } else {
+      state.credits += totalSpinWin;
+      savePlayer();
+
+      setStatusText(`🎉 ¡PREMIO! ${formatValue(totalSpinWin)}`, true);
+
+      gameStats.prizesGiven++;
+      gameStats.basePrizesGiven =
+        (gameStats.basePrizesGiven || 0) + 1;
+
+      gameStats.totalWon += totalSpinWin;
+      gameStats.baseWon =
+        (gameStats.baseWon || 0) + totalSpinWin;
+
+      gameStats.currentNoPrizeStreak = 0;
+      saveAndUpdateStats();
+    }
+
+    // Atenuar todas las celdas
+    document
+      .querySelectorAll('.symbol-cell')
+      .forEach(cell => cell.classList.add('dimmed'));
+
+    // Resaltar líneas ganadoras
+    winningLines.forEach(win => {
+      for (let col = 0; col < win.matchCount; col++) {
+        const row = PAYLINES[win.lineIdx][col];
+
+        const cell = gridContainer.querySelector(
+          `.symbol-cell[data-reel="${col}"][data-row="${row}"]`
+        );
+
+        if (cell) {
+          cell.classList.remove('dimmed');
+          cell.classList.add('winning');
+        }
+      }
+
+      const badge = document.querySelector(
+        `.badge-line[data-line="${win.lineIdx + 1}"]`
+      );
+
+      if (badge) {
+        badge.classList.add('badge-winning-pulse');
+      }
+    });
+
+    // Resaltar Scatters
+    if (scatterCount >= BONUS_CONFIG.minRequired) {
+      scatterPositions.forEach(({ col, row }) => {
+        const cell = gridContainer.querySelector(
+          `.symbol-cell[data-reel="${col}"][data-row="${row}"]`
+        );
+
+        if (cell) {
+          cell.classList.remove('dimmed');
+          cell.classList.add('winning');
+        }
+      });
+    }
+
+    drawPaylinesSVG(winningLines);
+  } else {
+    if (state.isFreeSpinMode) {
+      setStatusText('Tirada sin premio...', false);
+    } else {
+      setStatusText('Suerte en la próxima', false);
+    }
+  }
+
+  updateUI();
+  resetIdleState();
+
+  // Activar Hold & Win usando los valores actuales del panel
+  if (hwCount >= reqMini) {
+    let jackpotType = 'MINI JACKPOT';
+    state.hwActiveJackpotTier = 3; // Guardamos el nivel Mini
+
+    if (hwCount >= reqSuper) {
+      jackpotType = 'SÚPER JACKPOT';
+      state.hwActiveJackpotTier = 5; // Guardamos el nivel Súper
+    } else if (hwCount >= reqGrand) {
+      jackpotType = 'GRAND JACKPOT';
+      state.hwActiveJackpotTier = 4; // Guardamos el nivel Grand
+    }
+
+    setTimeout(() => {
+      state.isHoldWinMode = true;
+      state.hwSpinsLeft = Math.max(
+        1,
+        parseInt(HOLD_WIN_CONFIG.initialSpins, 10) ||
+        DEFAULT_HOLD_WIN_CONFIG.initialSpins
+      );
+
+      // Bloquear los símbolos obtenidos en la tirada inicial
+      hwPositions.forEach(({ col, row }) => {
+        state.hwLockedCells[col][row] = true;
+        state.grid[col][row] = HOLD_WIN_CONFIG.symbol;
+      });
+
+      showLevelUpModal(
+        `🔮 ¡${jackpotType} ACTIVADO!`,
+        `¡Conseguiste ${hwCount} símbolos!<br>
+        <span>¡${state.hwSpinsLeft} RESPINS INICIALES!</span>`,
+        4000
+      ).then(() => {
+        triggerSpin();
+      });
+    }, (totalSpinWin > 0 || bonusTriggered) ? 2000 : 500);
+
+    // Evitar continuar con el flujo normal
+    return;
+  }
+
+  // Continuar flujo normal de tiradas gratis
+  if (state.isFreeSpinMode) {
+    state.freeSpinsLeft--;
+
+    if (state.freeSpinsLeft > 0) {
+      if (bonusTriggered && !state.bonusModalShown) {
+        state.bonusModalShown = true;
+
+        showLevelUpModal(
+          '🎉 ¡BONUS ACTIVADO!',
+          `¡Encontraste ${scatterCount} símbolos!<br>
+          <span>¡${BONUS_CONFIG.spinsGranted} TIRADAS GRATIS!</span>`,
+          3500
+        ).then(() => {
+          setTimeout(triggerSpin, 300);
+        });
+      } else {
+        setTimeout(triggerSpin, 1600);
+      }
+    } else {
+      setTimeout(() => {
+        state.isFreeSpinMode = false;
+        state.retriggerCount = 0;
+        state.bonusModalShown = false;
+
+        if (state.freeSpinTotalWon > 0) {
+          state.credits += state.freeSpinTotalWon;
+          savePlayer();
+
+          gameStats.totalWon += state.freeSpinTotalWon;
+          gameStats.bonusWon =
+            (gameStats.bonusWon || 0) + state.freeSpinTotalWon;
+          gameStats.bonusPrizesGiven =
+            (gameStats.bonusPrizesGiven || 0) + 1;
+
+          saveAndUpdateStats();
+
+          showLevelUpModal(
+            'FIN DEL BONUS',
+            `GANANCIA TOTAL:<br>
+            <span>${formatValue(state.freeSpinTotalWon)}</span>`,
+            4000
+          );
+        } else {
+          setStatusText('Fin de tiradas gratis', false);
+        }
+
+        state.freeSpinTotalWon = 0;
+        updateUI();
+        resetIdleState();
+        checkAutoSpin();
+      }, 2000);
+    }
+  } else {
+    if (state.hasActiveWin && state.autoSpin) {
+      setTimeout(() => {
+        if (
+          state.hasActiveWin &&
+          !document
+            .querySelector('#modal-gamble')
+            .classList.contains('active')
+        ) {
+          state.lastWinCredits = 0;
+          state.hasActiveWin = false;
+          updateUI();
+          resetIdleState();
+          checkAutoSpin();
+        }
+      }, 2000);
+    } else {
+      checkAutoSpin();
+    }
+  }
+}
 
     function checkAutoSpin() {
       if (state.autoSpin && !state.isFreeSpinMode && !state.hasActiveWin && !state.isHoldWinMode) {
@@ -1481,6 +1751,7 @@
       }
     }
 </script>
+
 
 
 </body>
