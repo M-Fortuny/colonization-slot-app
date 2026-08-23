@@ -64,55 +64,15 @@
     .reel-strip.spinning { animation: reelScroll .12s linear infinite; filter: blur(3px); }
     .reel-strip.bounce { animation: reelBounceStop .25s ease-out forwards; }
 
+    /* Animación visible para las celdas libres durante Hold & Win */
+    .symbol-cell.hold-spinning { overflow: hidden; filter: blur(3px); }
+    .symbol-cell.hold-spinning .emoji-wrapper { animation: holdSymbolSpin .18s linear infinite; will-change: transform, opacity; }
 
+    @keyframes holdSymbolSpin { 0% { transform: translateY(-120%); opacity: .35; } 50% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(120%); opacity: .35; } }
 
-
-/* Animación visible para las celdas libres durante Hold & Win */
-.symbol-cell.hold-spinning {
-  overflow: hidden;
-  filter: blur(3px);
-}
-
-.symbol-cell.hold-spinning .emoji-wrapper {
-  animation: holdSymbolSpin .18s linear infinite;
-  will-change: transform, opacity;
-
-}
-
-@keyframes holdSymbolSpin {
-  0% {
-    transform: translateY(-120%);
-    opacity: .35;
-  }
-
-  50% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-
-  100% {
-    transform: translateY(120%);
-    opacity: .35;
-  }
-}
-
-
-
-/* En Hold & Win solo giran las celdas libres */
-.symbol-cell.hold-spinning {
-  animation: holdCellSpin .12s linear infinite;
-  filter: blur(3px);
-}
-
-@keyframes holdCellSpin {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-  100% { transform: translateY(0); }
-}
-
-
-
-
+    /* En Hold & Win solo giran las celdas libres */
+    .symbol-cell.hold-spinning { animation: holdCellSpin .12s linear infinite; filter: blur(3px); }
+    @keyframes holdCellSpin { 0% { transform: translateY(0); } 50% { transform: translateY(-8px); } 100% { transform: translateY(0); } }
 
     @keyframes reelScroll { from { transform: translateY(0); } to { transform: translateY(-20%); } }
     @keyframes reelBounceStop { 0% { transform: translateY(-15px); } 70% { transform: translateY(8px); } 100% { transform: translateY(0); } }
@@ -124,13 +84,47 @@
     .symbol-cell.winning .emoji-wrapper { animation: pulseEmoji .6s infinite alternate; }
     @keyframes pulseEmoji { from { transform: scale(1); } to { transform: scale(1.25); } }
 
-    .control-panel { display: grid; grid-template-columns: 1fr 1.1fr 1fr 1.5fr 1fr; gap: 12px; align-items: center; padding: 12px 16px; background: var(--panel-bg); border: 2px solid var(--purple); border-radius: 16px; }
+    /* --- Modificación en el Grid del Panel de Control --- */
+    .control-panel { display: grid; grid-template-columns: 1fr 1fr 1.6fr 1.6fr 1fr; gap: 12px; align-items: center; padding: 12px 16px; background: var(--panel-bg); border: 2px solid var(--purple); border-radius: 16px; }
+    /* ---------------------------------------------------- */
+
     .control-label { display: block; margin-bottom: 2px; color: var(--light-purple); }
     .btn-action { width: 100%; height: 55px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(180deg, #4a148c 0%, #311b92 100%); border: 0; border-radius: 10px; box-shadow: 0 4px 0 #1a0033; }
     .btn-action:active { transform: translateY(3px); box-shadow: 0 1px 0 #1a0033; }
     .btn-spin { height: 65px; color: #fff; font-size: 20px; font-weight: 900; background: linear-gradient(180deg, #ff9800 0%, #e65100 100%); box-shadow: 0 5px 0 #b23c00; }
     .btn-spin:active { box-shadow: 0 2px 0 #b23c00; }
     .btn-gamble { background: linear-gradient(180deg, #e91e63 0%, #880e4f 100%); box-shadow: 0 4px 0 #4a0072; }
+
+    /* --- Novedades para el Botón Doble o Nada --- */
+    #btn-gamble { 
+      flex-direction: row; 
+      gap: 8px; 
+    }
+    .gamble-icon { 
+      font-size: 26px; 
+      line-height: 1;
+      display: flex;
+      align-items: center;
+    }
+    .gamble-text { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center;
+    }
+    .gamble-title { 
+      font-size: 15px; 
+      font-weight: 900; 
+      line-height: 1.1; 
+      letter-spacing: 0.5px;
+    }
+    .gamble-subtitle { 
+      font-size: 15px; 
+      font-weight: 900; 
+      line-height: 1.1; 
+      letter-spacing: 0.5px;
+    }
+
     .btn-action.disabled, .btn-spin.disabled { opacity: .35; pointer-events: none; }
 
     .modal-overlay, .fullscreen-dev-panel { position: fixed; inset: 0; z-index: 100; }
@@ -250,7 +244,34 @@
   100% { transform: translate(0, 0) rotate(0deg); }
 }
 .screen-shake { animation: screenShakeAnim 0.5s ease-in-out; }
-  </style>
+
+/* --- EFECTO LLUVIA DE PREMIOS (MEGA WIN) --- */
+.coin-shower-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+}
+.falling-coin {
+    position: absolute;
+    font-size: 35px;
+    animation: fallDown linear forwards;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+    will-change: transform, opacity;
+}
+@keyframes fallDown {
+    0% { transform: translateY(-50px) rotate(0deg) scale(1); opacity: 1; }
+    80% { opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg) scale(1.5); opacity: 0; }
+}
+
+
+</style>
+
 </head>
 
 <body>
@@ -294,6 +315,8 @@
       <div class="reel-column" data-reel="4"></div>
     </div>
 
+
+
     <div class="badges-column" id="badges-right"></div>
   </div>
 
@@ -308,10 +331,16 @@
       <span id="val-bet">x1</span>
     </button>
 
-    <button class="btn-action btn-gamble disabled" id="btn-gamble">
-      <span>🎲 DOBLAR</span>
-      <small>RIESGO 2X</small>
+
+
+        <button class="btn-action btn-gamble disabled" id="btn-gamble">
+      <div class="gamble-icon">🎲</div>
+      <div class="gamble-text">
+        <span class="gamble-title">DOBLE</span>
+        <span class="gamble-subtitle">NADA</span>
+      </div>
     </button>
+
 
     <button class="btn-action btn-spin" id="btn-spin">GIRAR</button>
 
@@ -544,19 +573,21 @@
   </div>
 
   <script>
+
     // ==========================================
     // 1. CONFIGURACIONES Y DATOS POR DEFECTO
     // ==========================================
     const DEFAULT_CONFIG = [
-      { symbol: '🌀', weight: 32, pay3: 4,   pay4: 10,  pay5: 25 },
-      { symbol: '🍒', weight: 31, pay3: 5,   pay4: 15,  pay5: 35 },
-      { symbol: '⚡', weight: 30, pay3: 8,   pay4: 25,  pay5: 60 },
-      { symbol: '🧠', weight: 29, pay3: 15,  pay4: 40,  pay5: 100 },
-      { symbol: '🔮', weight: 28, pay3: 25,  pay4: 60,  pay5: 150 },
-      { symbol: '💎', weight: 27, pay3: 50,  pay4: 120, pay5: 300 },
-      { symbol: '👑', weight: 26, pay3: 100, pay4: 250, pay5: 800 },
-      { symbol: '🎰', weight: 25, pay3: 250, pay4: 750, pay5: 2500 }
+      { symbol: '🌀', weight: 250, pay3: 5,   pay4: 20,   pay5: 100 },
+      { symbol: '🍒', weight: 200, pay3: 8,   pay4: 30,   pay5: 200 },
+      { symbol: '⚡', weight: 150, pay3: 15,  pay4: 60,   pay5: 400 },
+      { symbol: '🧠', weight: 120, pay3: 25,  pay4: 120,  pay5: 800 },
+      { symbol: '🔮', weight: 100, pay3: 40,  pay4: 200,  pay5: 1500 },
+      { symbol: '💎', weight: 80,  pay3: 75,  pay4: 400,  pay5: 3000 },
+      { symbol: '👑', weight: 60,  pay3: 150, pay4: 1000, pay5: 10000 },
+      { symbol: '🎰', weight: 40,  pay3: 300, pay4: 2500, pay5: 30000 }
     ];
+
 
     function loadSafeData(key, defaultData) {
       try {
@@ -591,7 +622,7 @@
       spinsGranted: 20,
       maxRetriggers: 5,
       multiplierOnBonus: 1.5,
-      bonusSymbolWeight: 1.25
+      bonusSymbolWeight: 0,
     };
     let savedBonus = loadSafeData('slot_bonus_config', {});
     let BONUS_CONFIG = { ...DEFAULT_BONUS_CONFIG, ...savedBonus };
@@ -601,9 +632,9 @@
       weight: 1.0,
       initialSpins: 3,
       spinsAddedOnHit: 3,
-      reqMini: 9,
-      reqGrand: 10,
-      reqSuper: 11,
+      reqMini: 8,
+      reqGrand: 9,
+      reqSuper: 10,
       resetSpinsOnHit: true
     };
     let savedHW = loadSafeData('slot_hw_config', {});
@@ -685,19 +716,20 @@
     });
 
     function registerEvents() {
-      $('btn-lines').addEventListener('click', () => {
+      $('btn-lines').addEventListener('click', () => { playClickSound();
         if (state.isSpinning || state.isFreeSpinMode || state.isHoldWinMode) return;
         state.selectedLinesIdx = (state.selectedLinesIdx + 1) % LINE_OPTIONS.length; updateUI(); resetIdleState();
       });
 
-      $('btn-bet').addEventListener('click', () => {
+      $('btn-bet').addEventListener('click', () => { playClickSound();
         if (state.isSpinning || state.isFreeSpinMode || state.isHoldWinMode) return;
         state.selectedBetIdx = (state.selectedBetIdx + 1) % BET_OPTIONS.length; updateUI(); resetIdleState();
       });
 
-      btnSpin.addEventListener('click', () => { triggerSpin(); resetIdleState(); });
+		btnSpin.addEventListener('click', () => { playClickSound(); triggerSpin(); resetIdleState(); });
 
-      btnAuto.addEventListener('click', () => {
+
+      btnAuto.addEventListener('click', () => { playClickSound(); playSpinStartSound();
         if (state.isFreeSpinMode || state.isHoldWinMode) return;
         state.autoSpin = !state.autoSpin;
         $('val-auto').textContent = state.autoSpin ? 'AUTO: ON' : 'AUTO: OFF';
@@ -1045,18 +1077,28 @@
     // ==========================================
     // 7. MECÁNICAS DE JUEGO (GAMBLE, SPIN, WINS, HOLD&WIN)
     // ==========================================
-    function processGambleLoss(lostAmount) {
+        function processGambleLoss(lostAmount) {
       const jpPercentage = ECONOMY.jackpotPercent / 100;
       const jackpotCut = lostAmount * jpPercentage; 
       const extraSuperCut = lostAmount - jackpotCut; 
 
-      let match = Math.max(3, Math.min(5, state.lastWinMatchCount));
-      ECONOMY.jackpots[match] += jackpotCut;
+      // Comprobamos si hay MÁS de una línea ganadora en la jugada actual
+      if (state.currentWinningLines && state.currentWinningLines.length > 1) {
+          // Si hay varias líneas, el porcentaje configurado va directo al Súper Jackpot
+          ECONOMY.jackpots[5] += jackpotCut;
+      } else {
+          // Si solo hay una línea, usamos el comportamiento normal
+          let match = Math.max(3, Math.min(5, state.lastWinMatchCount));
+          ECONOMY.jackpots[match] += jackpotCut;
+      }
+
+      // El resto del corte va al Súper y al beneficio del banco, como ya tenías
       ECONOMY.jackpots[5] += extraSuperCut;
       ECONOMY.bankProfit += extraSuperCut; 
       
       saveEconomy();
     }
+
 
     function playGamble() {
       if (state.lastWinCredits <= 0 || state.isFreeSpinMode || state.isHoldWinMode) return;
@@ -1098,7 +1140,7 @@
         
         $('gamble-card').textContent = '💥 0X'; 
         $('gamble-win-val').textContent = formatValue(0);
-        setStatusText('❌ Has perdido todo el premio.');
+        setStatusText('☠️ Has perdido todo el premio.');
         
         resetIdleState(); 
         
@@ -1114,6 +1156,7 @@
 
 
     function triggerSpin() {
+		playSpinStartSound();
       if (state.isHoldWinMode) {
         executeSpinVisuals();
         return;
@@ -1197,9 +1240,9 @@
       if (state.isHoldWinMode) {
         setStatusText(`🔮 RESPINS RESTANTES: ${state.hwSpinsLeft}`);
       } else if (state.isFreeSpinMode) {
-        setStatusText(`🎁 TIRADAS GRATIS<br><span class="sub-text-free">(${state.freeSpinsLeft} restantes)</span>`);
+        setStatusText(`🎁 TIRADAS GRATIS<br><span class="sub-text-free">${state.freeSpinsLeft} RESTANTES</span>`);
       } else {
-        setStatusText('🌀 Buena Suerte !!!');
+        setStatusText('🍀 Buena Suerte !!!');
       }
 
       updateUI();
@@ -1233,11 +1276,14 @@
         }
       }
 
-      reels.forEach((strip, index) => {
+            reels.forEach((strip, index) => {
         setTimeout(() => {
           if (!state.isHoldWinMode) {
             strip.classList.remove('spinning');
             strip.classList.add('bounce');
+            
+          // 🛑 AQUÍ ES DONDE SE DETIENE CADA RODILLO INDIVIDUALMENTE
+          playReelStopSound(); 
           }
 
           const cells = gridContainer.querySelectorAll(`.symbol-cell[data-reel="${index}"]`);
@@ -1264,9 +1310,18 @@
               }
             }, 350);
           }
-        }, 900 + index * 350);
+        }, 1000 + index * 150);
       });
-    }
+}
+
+
+
+
+
+
+
+
+
 
     function evaluateHoldWin() {
       state.isSpinning = false;
@@ -1302,7 +1357,7 @@
         setStatusText(`✨ ¡+${newSymbolsFound} SÍMBOLOS! ✨<br><span class="sub-text-free">Respíns a ${state.hwSpinsLeft}</span>`, true);
       } else {
         state.hwSpinsLeft--;
-        setStatusText(`🔮 HOLD & WIN <br><span class="sub-text-free">(${state.hwSpinsLeft} respins restantes)</span>`, false);
+        setStatusText(`🔮 HOLD & WIN <br><span class="sub-text-free">(${state.hwSpinsLeft} RESPINS RESTANTES)</span>`, false);
       }
 
       if (state.hwSpinsLeft <= 0 || totalLocked >= 25) {
@@ -1353,6 +1408,11 @@
         setTimeout(triggerSpin, 1800);
       }
     }
+
+
+	triggerMegaWinEffect()
+
+
 
     function evaluateWins() {
       state.isSpinning = false;
@@ -1430,8 +1490,14 @@
         }
       }
 
+      
       state.currentWinningLines = winningLines;
 
+      // ¡NUEVO!: Disparar efecto especial si hay una línea de 5
+      if (maxMatchCount === 5) {
+          triggerMegaWinEffect();
+      }
+      
       let bonusTriggered = false;
 
       if (scatterCount >= BONUS_CONFIG.minRequired) {
@@ -1515,7 +1581,7 @@
         if (state.isFreeSpinMode) {
           setStatusText('Tirada sin premio...', false);
         } else {
-          setStatusText('Suerte en la próxima', false);
+          setStatusText('🤡 Sigue Jugando ', false);
         }
       }
 
@@ -1632,10 +1698,88 @@
         }
       }
     }
+
+
+
+
+// Sonido al pulsar cualquier botón común
+function playClickSound() {
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(300, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.05);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.05);
+        
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.05);
+    } catch (e) {
+        // Ignorar si el navegador bloquea el audio
+    }
+}
+
+// Sonido sordo y rápido al arrancar los rodillos (efecto motor/impulso)
+function playSpinStartSound() {
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(120, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(240, ctx.currentTime + 0.15);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        gain.gain.setValueAtTime(0.05, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.15);
+        
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.15);
+    } catch (e) {}
+}
+
+// Sonido "clack" seco y satisfactorio al detenerse un rodillo
+function playReelStopSound() {
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(180, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.08);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.08);
+        
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.08);
+    } catch (e) {}
+}
+
+
 </script>
-
-
-
-
 </body>
 </html>
