@@ -30,9 +30,21 @@
     
     .balance-value { margin-top: 4px; margin-bottom: 6px; color: var(--green); }
     .player-name-display { font-size: 18px; font-weight: 900; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; line-height: 1.1; text-align: center; }
-    .player-level-display { font-size: 13px; font-weight: bold; color: var(--light-purple); margin-bottom: 2px; text-align: center; }
-    .level-progress-container { width: 100%; height: 8px; background: rgba(0, 0, 0, 0.6); border-radius: 4px; overflow: hidden; margin-top: 2px; border: 1px solid var(--purple); }
-    .level-progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--light-purple), var(--green)); transition: width 0.4s ease-out; box-shadow: 0 0 10px rgba(0, 230, 118, 0.5); }
+
+
+  .player-level-display { 
+  font-size: 13px; 
+  font-weight: bold; 
+  color: #5ea2ff; /* Azul claro muy visible y legible */
+  margin-bottom: 2px; 
+  text-align: center; 
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); /* Opcional: mejora el contraste sobre fondoss oscuros */
+}
+
+.level-progress-container { width: 100%; height: 8px; background: rgba(0, 0, 0, 0.6); border-radius: 4px; overflow: hidden; margin-top: 2px; border: 1px solid var(--purple); }
+.level-progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--light-purple), var(--green)); transition: width 0.4s ease-out; box-shadow: 0 0 10px rgba(0, 230, 118, 0.5); }
+
+    
 
     .dynamic-center-area { flex: 1; min-width: 350px; display: flex; align-items: center; justify-content: center; text-align: center; }
     .dynamic-text-display { color: #fff; font-size: 25px; font-weight: 900; text-align: center; white-space: nowrap; text-shadow: 0 0 10px rgba(255, 215, 0, .7); transition: opacity .35s ease, transform .35s ease; line-height: 1.1; }
@@ -64,15 +76,47 @@
     .reel-strip.spinning { animation: reelScroll .12s linear infinite; filter: blur(3px); }
     .reel-strip.bounce { animation: reelBounceStop .25s ease-out forwards; }
 
-    /* Animación visible para las celdas libres durante Hold & Win */
-    .symbol-cell.hold-spinning { overflow: hidden; filter: blur(3px); }
-    .symbol-cell.hold-spinning .emoji-wrapper { animation: holdSymbolSpin .18s linear infinite; will-change: transform, opacity; }
+        /* Estilo de la celda libre en Hold & Win: opacidad del 80% y buena visibilidad */
+    .symbol-cell.hold-spinning { 
+      overflow: hidden; 
+      filter: blur(0.5px); 
+      opacity: 0.8 !important; /* Mantiene la celda visible al 80% */
+      animation: holdCellSpin 0.15s linear infinite; 
+    }
 
-    @keyframes holdSymbolSpin { 0% { transform: translateY(-120%); opacity: .35; } 50% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(120%); opacity: .35; } }
+    @keyframes holdCellSpin { 
+      0% { transform: translateY(0); } 
+      50% { transform: translateY(4px); } 
+      100% { transform: translateY(0); } 
+    }
 
-    /* En Hold & Win solo giran las celdas libres */
-    .symbol-cell.hold-spinning { animation: holdCellSpin .12s linear infinite; filter: blur(3px); }
-    @keyframes holdCellSpin { 0% { transform: translateY(0); } 50% { transform: translateY(-8px); } 100% { transform: translateY(0); } }
+    /* Símbolos en movimiento con brillo constante */
+    .symbol-cell.hold-spinning .emoji-wrapper { 
+      animation: holdSymbolSpin 0.15s linear infinite; 
+      will-change: transform; 
+    }
+
+    @keyframes holdSymbolSpin { 
+      0% { transform: translateY(-100%); opacity: 0.8; } 
+      50% { transform: translateY(0); opacity: 1; } 
+      100% { transform: translateY(100%); opacity: 0.8; } 
+    }
+
+    /* Modificador para celdas atenuadas (no bloqueadas) cuando paran: 75%-80% de brillo */
+    .symbol-cell.dimmed {
+      opacity: 0.75 !important;
+      filter: grayscale(20%);
+    }
+
+    /* Celdas bloqueadas (resaltadas al 100%) */
+    .symbol-cell.winning {
+      opacity: 1 !important;
+      filter: none !important;
+      transform: scale(1.05);
+      z-index: 2;
+    }
+
+
 
     @keyframes reelScroll { from { transform: translateY(0); } to { transform: translateY(-20%); } }
     @keyframes reelBounceStop { 0% { transform: translateY(-15px); } 70% { transform: translateY(8px); } 100% { transform: translateY(0); } }
@@ -1275,22 +1319,26 @@
         }
       }
 
-            reels.forEach((strip, index) => {
+                  reels.forEach((strip, index) => {
         setTimeout(() => {
+          
+          // 1. Animación del modo normal
           if (!state.isHoldWinMode) {
             strip.classList.remove('spinning');
             strip.classList.add('bounce');
-            
-          // 🛑 AQUÍ ES DONDE SE DETIENE CADA RODILLO INDIVIDUALMENTE
-          playReelStopSound(); 
           }
+          
+          // 2. SONIDO DE FRENADO (AQUÍ AFUERA PARA QUE SUENE SIEMPRE)
+          playReelStopSound();
 
+          // 3. Limpieza de las celdas en Hold & Win
           const cells = gridContainer.querySelectorAll(`.symbol-cell[data-reel="${index}"]`);
 
           cells.forEach(cell => {
             const row = Number(cell.dataset.row);
             const locked = state.isHoldWinMode && state.hwLockedCells[index][row];
 
+            // Quita la animación individual
             cell.classList.remove('hold-spinning');
 
             if (locked) {
@@ -1299,6 +1347,7 @@
               cell.innerHTML = `<span class="emoji-wrapper">${state.grid[index][row]}</span>`;
             }
           });
+          
 
           if (index === 4) {
             setTimeout(() => {
@@ -1312,7 +1361,6 @@
         }, 1000 + index * 150);
       });
 }
-
 
 
 
@@ -1336,16 +1384,18 @@
       }
 
       document.querySelectorAll('.symbol-cell').forEach(cell => {
-         const c = cell.dataset.reel;
-         const r = cell.dataset.row;
-         if (state.hwLockedCells[c][r]) {
-             cell.classList.remove('dimmed');
-             cell.classList.add('winning');
-         } else {
-             cell.classList.remove('winning');
-             cell.classList.add('dimmed');
-         }
-      });
+  const c = cell.dataset.reel;
+  const r = cell.dataset.row;
+
+  if (state.hwLockedCells[c][r]) {
+    cell.classList.remove('dimmed', 'hold-spinning');
+    cell.classList.add('winning');
+  } else {
+    cell.classList.remove('winning');
+    cell.classList.add('dimmed');
+  }
+});
+
 
       if (newSymbolsFound > 0 && HOLD_WIN_CONFIG.resetSpinsOnHit) {
         state.hwSpinsLeft = HOLD_WIN_CONFIG.initialSpins;
@@ -1412,6 +1462,15 @@
     function evaluateWins() {
       state.isSpinning = false;
 
+      // 📈 SUMAR EXPERIENCIA (XP): Funciona en giros normales y jugadas gratis
+      // Calculamos XP basada en la apuesta/multiplicador actual del giro
+      const currentXP = 10 * (state.freeSpinBaseMultiplier || state.currentMultiplier || 1);
+      if (typeof addXP === 'function') {
+          addXP(currentXP);
+      } else if (typeof updateLevelProgress === 'function') {
+          updateLevelProgress(currentXP);
+      }
+
       const lines = LINE_OPTIONS[state.selectedLinesIdx];
       const bet = BET_OPTIONS[state.selectedBetIdx];
 
@@ -1421,6 +1480,7 @@
 
       let hwCount = 0;
       const hwPositions = [];
+
 
       for (let col = 0; col < 5; col++) {
         for (let row = 0; row < 5; row++) {
@@ -1784,14 +1844,14 @@ function playReelStopSound() {
         osc.frequency.setValueAtTime(180, audioCtx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.08);
         osc.connect(gain); gain.connect(audioCtx.destination);
-        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        
+        // 🔊 VOLUMEN AL 75% (Bajado de 0.08 a 0.06)
+        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
         gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.08);
+        
         osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.08);
     } catch (e) {}
 }
-
-
-
 
 
 
