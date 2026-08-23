@@ -574,19 +574,18 @@
 
   <script>
 
-    // ==========================================
-    // 1. CONFIGURACIONES Y DATOS POR DEFECTO
-    // ==========================================
-    const DEFAULT_CONFIG = [
-      { symbol: '🌀', weight: 250, pay3: 5,   pay4: 20,   pay5: 100 },
-      { symbol: '🍒', weight: 200, pay3: 8,   pay4: 30,   pay5: 200 },
-      { symbol: '⚡', weight: 150, pay3: 15,  pay4: 60,   pay5: 400 },
+        const DEFAULT_CONFIG = [
+      { symbol: '🌀', weight: 180, pay3: 5,   pay4: 20,   pay5: 100 },
+      { symbol: '🍒', weight: 160, pay3: 8,   pay4: 30,   pay5: 200 },
+      { symbol: '⚡', weight: 140, pay3: 15,  pay4: 60,   pay5: 400 },
       { symbol: '🧠', weight: 120, pay3: 25,  pay4: 120,  pay5: 800 },
       { symbol: '🔮', weight: 100, pay3: 40,  pay4: 200,  pay5: 1500 },
-      { symbol: '💎', weight: 80,  pay3: 75,  pay4: 400,  pay5: 3000 },
-      { symbol: '👑', weight: 60,  pay3: 150, pay4: 1000, pay5: 10000 },
-      { symbol: '🎰', weight: 40,  pay3: 300, pay4: 2500, pay5: 30000 }
+		// El símbolo de Jackpot sale más
+      { symbol: '💎', weight: 90,  pay3: 75,  pay4: 400,  pay5: 3000 },
+      { symbol: '👑', weight: 70,  pay3: 150, pay4: 1000, pay5: 10000 },
+      { symbol: '🎰', weight: 50,  pay3: 300, pay4: 2500, pay5: 30000 }
     ];
+
 
 
     function loadSafeData(key, defaultData) {
@@ -716,20 +715,20 @@
     });
 
     function registerEvents() {
-      $('btn-lines').addEventListener('click', () => { playClickSound();
+      $('btn-lines').addEventListener('click', () => { unlockAudio(); playClickSound();
         if (state.isSpinning || state.isFreeSpinMode || state.isHoldWinMode) return;
         state.selectedLinesIdx = (state.selectedLinesIdx + 1) % LINE_OPTIONS.length; updateUI(); resetIdleState();
       });
 
-      $('btn-bet').addEventListener('click', () => { playClickSound();
+      $('btn-bet').addEventListener('click', () => { unlockAudio(); playClickSound();
         if (state.isSpinning || state.isFreeSpinMode || state.isHoldWinMode) return;
         state.selectedBetIdx = (state.selectedBetIdx + 1) % BET_OPTIONS.length; updateUI(); resetIdleState();
       });
 
-		btnSpin.addEventListener('click', () => { playClickSound(); triggerSpin(); resetIdleState(); });
+		btnSpin.addEventListener('click', () => { unlockAudio(); playClickSound(); triggerSpin(); resetIdleState(); });
 
 
-      btnAuto.addEventListener('click', () => { playClickSound(); playSpinStartSound();
+      btnAuto.addEventListener('click', () => { unlockAudio(); playClickSound(); playSpinStartSound();
         if (state.isFreeSpinMode || state.isHoldWinMode) return;
         state.autoSpin = !state.autoSpin;
         $('val-auto').textContent = state.autoSpin ? 'AUTO: ON' : 'AUTO: OFF';
@@ -1701,6 +1700,24 @@
 
 
 
+let audioCtx = null;
+
+function unlockAudio() {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    
+    if (!audioCtx) {
+        audioCtx = new AudioContext();
+    }
+    // Forzamos el despertar del audio
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+}
+
+
+
+
 
 // Sonido al pulsar cualquier botón común
 function playClickSound() {
@@ -1778,6 +1795,26 @@ function playReelStopSound() {
         osc.stop(ctx.currentTime + 0.08);
     } catch (e) {}
 }
+
+
+
+
+
+function triggerMegaWinEffect() {
+    // Hace un destello dorado en el contenedor principal
+    const slotContainer = document.getElementById('slot-grid');
+    if (slotContainer) {
+        slotContainer.style.transition = 'box-shadow 0.3s, transform 0.3s';
+        slotContainer.style.transform = 'scale(1.05)';
+        slotContainer.style.boxShadow = '0 0 50px 20px rgba(255, 215, 0, 0.8)';
+        
+        setTimeout(() => {
+            slotContainer.style.transform = 'scale(1)';
+            slotContainer.style.boxShadow = 'none';
+        }, 1000);
+    }
+}
+
 
 
 </script>
