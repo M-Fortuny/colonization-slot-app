@@ -715,20 +715,20 @@
     });
 
     function registerEvents() {
-      $('btn-lines').addEventListener('click', () => { unlockAudio(); playClickSound();
+      $('btn-lines').addEventListener('click', () => { playClickSound();
         if (state.isSpinning || state.isFreeSpinMode || state.isHoldWinMode) return;
         state.selectedLinesIdx = (state.selectedLinesIdx + 1) % LINE_OPTIONS.length; updateUI(); resetIdleState();
       });
 
-      $('btn-bet').addEventListener('click', () => { unlockAudio(); playClickSound();
+      $('btn-bet').addEventListener('click', () => { playClickSound();
         if (state.isSpinning || state.isFreeSpinMode || state.isHoldWinMode) return;
         state.selectedBetIdx = (state.selectedBetIdx + 1) % BET_OPTIONS.length; updateUI(); resetIdleState();
       });
 
-		btnSpin.addEventListener('click', () => { unlockAudio(); playClickSound(); triggerSpin(); resetIdleState(); });
+		btnSpin.addEventListener('click', () => { playClickSound(); triggerSpin(); resetIdleState(); });
 
 
-      btnAuto.addEventListener('click', () => { unlockAudio(); playClickSound(); playSpinStartSound();
+      btnAuto.addEventListener('click', () => { playClickSound(); playSpinStartSound();
         if (state.isFreeSpinMode || state.isHoldWinMode) return;
         state.autoSpin = !state.autoSpin;
         $('val-auto').textContent = state.autoSpin ? 'AUTO: ON' : 'AUTO: OFF';
@@ -1318,10 +1318,6 @@
 
 
 
-
-
-
-
     function evaluateHoldWin() {
       state.isSpinning = false;
       let newSymbolsFound = 0;
@@ -1699,102 +1695,101 @@
     }
 
 
-
+// ==========================================
+// SISTEMA DE AUDIO GLOBAL ANTI-BLOQUEO MÓVIL
+// ==========================================
 let audioCtx = null;
+let audioUnlocked = false;
 
-function unlockAudio() {
+// Esta función despierta el audio reproduciendo un sonido mudo
+function initAudio() {
+    if (audioUnlocked) return;
+    
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return;
     
-    if (!audioCtx) {
-        audioCtx = new AudioContext();
-    }
-    // Forzamos el despertar del audio
+    audioCtx = new AudioContext();
+    
+    // TRUCO MÓVIL: Crear un buffer vacío (sonido mudo) y reproducirlo
+    const buffer = audioCtx.createBuffer(1, 1, 22050);
+    const source = audioCtx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audioCtx.destination);
+    source.start(0);
+    
     if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    
+    audioUnlocked = true;
+    
+    // Una vez desbloqueado, quitamos los "escuchadores" para no sobrecargar el móvil
+    document.removeEventListener('click', initAudio);
+    document.removeEventListener('touchstart', initAudio);
+}
+
+// Escuchamos el PRIMER toque o clic en cualquier parte de la pantalla para desbloquear
+document.addEventListener('click', initAudio);
+document.addEventListener('touchstart', initAudio);
+
+// Función auxiliar para mantener el motor despierto
+function wakeUpAudio() {
+    if (audioCtx && audioCtx.state === 'suspended') {
         audioCtx.resume();
     }
 }
 
-
-
-
-
-// Sonido al pulsar cualquier botón común
+// 1. Sonido Clic
 function playClickSound() {
+    if (!audioUnlocked || !audioCtx) return;
+    wakeUpAudio();
     try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
-        const ctx = new AudioContext();
-        
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(300, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.05);
-        
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        
-        gain.gain.setValueAtTime(0.08, ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.05);
-        
-        osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + 0.05);
-    } catch (e) {
-        // Ignorar si el navegador bloquea el audio
-    }
+        osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.05);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.05);
+        osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.05);
+    } catch (e) {}
 }
 
-// Sonido sordo y rápido al arrancar los rodillos (efecto motor/impulso)
+// 2. Sonido Motor de Rodillos
 function playSpinStartSound() {
+    if (!audioUnlocked || !audioCtx) return;
+    wakeUpAudio();
     try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
-        const ctx = new AudioContext();
-        
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(120, ctx.currentTime);
-        osc.frequency.linearRampToValueAtTime(240, ctx.currentTime + 0.15);
-        
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        
-        gain.gain.setValueAtTime(0.05, ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.15);
-        
-        osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + 0.15);
+        osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(240, audioCtx.currentTime + 0.15);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
+        osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.15);
     } catch (e) {}
 }
 
-// Sonido "clack" seco y satisfactorio al detenerse un rodillo
+// 3. Sonido Frenado de Rodillos
 function playReelStopSound() {
+    if (!audioUnlocked || !audioCtx) return;
+    wakeUpAudio();
     try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
-        const ctx = new AudioContext();
-        
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
         osc.type = 'square';
-        osc.frequency.setValueAtTime(180, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.08);
-        
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        
-        gain.gain.setValueAtTime(0.08, ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.08);
-        
-        osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + 0.08);
+        osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.08);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.08);
+        osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.08);
     } catch (e) {}
 }
+
 
 
 
