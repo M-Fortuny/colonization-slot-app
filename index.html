@@ -977,21 +977,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
       $('btn-dev-close').addEventListener('click', () => { $('fullscreen-dev').classList.remove('active'); initGridUI(); resetIdleState(); });
 
-      $('btn-dev-reset').addEventListener('click', () => {
-        if(confirm('¿Restaurar economía, emojis y borrar datos del jugador?')) {
-          EMOJI_CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
-          ECONOMY = JSON.parse(JSON.stringify(DEFAULT_ECONOMY));
-          BONUS_CONFIG = JSON.parse(JSON.stringify(DEFAULT_BONUS_CONFIG));
-          HOLD_WIN_CONFIG = JSON.parse(JSON.stringify(DEFAULT_HOLD_WIN_CONFIG));
-          playerProfile = { ...DEFAULT_PROFILE };
-          localStorage.removeItem('slot_player'); localStorage.removeItem('slot_player_profile');
-          localStorage.removeItem('slot_bonus_config'); localStorage.removeItem('slot_hw_config');
-          state.credits = ECONOMY.startingCredits;
-          saveConfig(); saveEconomy(); savePlayer(); saveBonusConfig(); saveHoldWinConfig();
-          requestPlayerName(); renderDevPanel(); updateUI(); resetIdleState();
-        }
-      });
-    }
+      
+		$('btn-dev-reset').addEventListener('click', () => {
+  // He añadido "doble o nada" al mensaje de confirmación para que quede más claro
+  if(confirm('¿Restaurar economía, emojis, doble o nada y borrar datos del jugador?')) {
+    
+    // 1. Restaurar objetos principales
+    EMOJI_CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+    ECONOMY = JSON.parse(JSON.stringify(DEFAULT_ECONOMY));
+    BONUS_CONFIG = JSON.parse(JSON.stringify(DEFAULT_BONUS_CONFIG));
+    HOLD_WIN_CONFIG = JSON.parse(JSON.stringify(DEFAULT_HOLD_WIN_CONFIG));
+    
+    // ---> AÑADIDO: Restaurar Doble o Nada <---
+    GAMBLE_CONFIG = { ...DEFAULT_GAMBLE_CONFIG };
+
+    playerProfile = { ...DEFAULT_PROFILE };
+    
+    // 2. Limpiar Storage
+    localStorage.removeItem('slot_player'); 
+    localStorage.removeItem('slot_player_profile');
+    localStorage.removeItem('slot_bonus_config'); 
+    localStorage.removeItem('slot_hw_config');
+    // Si guardas la config del gamble en el futuro, añade aquí: localStorage.removeItem('slot_gamble_config');
+    
+    // 3. Restaurar estado
+    state.credits = ECONOMY.startingCredits;
+    
+    // 4. Guardar y actualizar
+    saveConfig(); 
+    saveEconomy(); 
+    savePlayer(); 
+    saveBonusConfig(); 
+    saveHoldWinConfig();
+    
+    requestPlayerName(); 
+    
+    // Como ya tienes un renderDevPanel(), esta función se encargará de poner
+    // visualmente los valores de GAMBLE_CONFIG en sus inputs correspondientes.
+    renderDevPanel(); 
+    updateUI(); 
+    resetIdleState();
+  }
+ });
+}
+
+
 
     // ==========================================
     // 5. INTERFAZ DE USUARIO (UI) Y PANELES
@@ -1016,98 +1046,105 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function renderDevPanel() {
-      const tbody = $('dev-emoji-tbody');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-      
-      EMOJI_CONFIG.forEach((config, idx) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><input type="text" class="dev-input dev-emoji-input" data-idx="${idx}" data-key="symbol" value="${config.symbol}"></td>
-          <td><input type="number" class="dev-input" data-idx="${idx}" data-key="weight" value="${config.weight}"></td>
-          <td><input type="number" class="dev-input" data-idx="${idx}" data-key="pay3" value="${config.pay3}"></td>
-          <td><input type="number" class="dev-input" data-idx="${idx}" data-key="pay4" value="${config.pay4}"></td>
-          <td><input type="number" class="dev-input" data-idx="${idx}" data-key="pay5" value="${config.pay5}"></td>
-        `;
-        tbody.appendChild(tr);
-      });
+  const tbody = $('dev-emoji-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  
+  EMOJI_CONFIG.forEach((config, idx) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" class="dev-input dev-emoji-input" data-idx="${idx}" data-key="symbol" value="${config.symbol}"></td>
+      <td><input type="number" class="dev-input" data-idx="${idx}" data-key="weight" value="${config.weight}"></td>
+      <td><input type="number" class="dev-input" data-idx="${idx}" data-key="pay3" value="${config.pay3}"></td>
+      <td><input type="number" class="dev-input" data-idx="${idx}" data-key="pay4" value="${config.pay4}"></td>
+      <td><input type="number" class="dev-input" data-idx="${idx}" data-key="pay5" value="${config.pay5}"></td>
+    `;
+    tbody.appendChild(tr);
+  });
 
-      tbody.querySelectorAll('.dev-input').forEach(input => {
-        input.addEventListener('change', (e) => {
-          const idx = e.target.dataset.idx; const key = e.target.dataset.key;
-          if (key === 'symbol') EMOJI_CONFIG[idx][key] = e.target.value || '❓';
-          else EMOJI_CONFIG[idx][key] = parseInt(e.target.value) || 0;
-          saveConfig();
-        });
-      });
+  tbody.querySelectorAll('.dev-input').forEach(input => {
+    input.addEventListener('change', (e) => {
+      const idx = e.target.dataset.idx; const key = e.target.dataset.key;
+      if (key === 'symbol') EMOJI_CONFIG[idx][key] = e.target.value || '❓';
+      else EMOJI_CONFIG[idx][key] = parseInt(e.target.value) || 0;
+      saveConfig();
+    });
+  });
 
-      if ($('dev-starting-credits')) $('dev-starting-credits').value = ECONOMY.startingCredits;
-      if ($('dev-bank-profit')) $('dev-bank-profit').value = Math.floor(ECONOMY.bankProfit);
-      if ($('dev-jp-percent')) $('dev-jp-percent').value = ECONOMY.jackpotPercent;
-      if ($('dev-jp-3')) $('dev-jp-3').value = Math.floor(ECONOMY.jackpots[3]);
-      if ($('dev-jp-4')) $('dev-jp-4').value = Math.floor(ECONOMY.jackpots[4]);
-      if ($('dev-jp-5')) $('dev-jp-5').value = Math.floor(ECONOMY.jackpots[5]);
-      if ($('dev-spins-req')) $('dev-spins-req').value = ECONOMY.spinsToLevelUp;
-      if ($('dev-spins-reward')) $('dev-spins-reward').value = ECONOMY.freeSpinsReward;
+  if ($('dev-starting-credits')) $('dev-starting-credits').value = ECONOMY.startingCredits;
+  if ($('dev-bank-profit')) $('dev-bank-profit').value = Math.floor(ECONOMY.bankProfit);
+  if ($('dev-jp-percent')) $('dev-jp-percent').value = ECONOMY.jackpotPercent;
+  if ($('dev-jp-3')) $('dev-jp-3').value = Math.floor(ECONOMY.jackpots[3]);
+  if ($('dev-jp-4')) $('dev-jp-4').value = Math.floor(ECONOMY.jackpots[4]);
+  if ($('dev-jp-5')) $('dev-jp-5').value = Math.floor(ECONOMY.jackpots[5]);
+  if ($('dev-spins-req')) $('dev-spins-req').value = ECONOMY.spinsToLevelUp;
+  if ($('dev-spins-reward')) $('dev-spins-reward').value = ECONOMY.freeSpinsReward;
 
-      if ($('dev-bonus-symbol')) $('dev-bonus-symbol').value = BONUS_CONFIG.scatterSymbol;
-      if ($('dev-bonus-min-req')) $('dev-bonus-min-req').value = BONUS_CONFIG.minRequired;
-      if ($('dev-bonus-spins-granted')) $('dev-bonus-spins-granted').value = BONUS_CONFIG.spinsGranted;
-      if ($('dev-bonus-max-retrigger')) $('dev-bonus-max-retrigger').value = BONUS_CONFIG.maxRetriggers;
-      if ($('dev-bonus-multiplier')) $('dev-bonus-multiplier').value = BONUS_CONFIG.multiplierOnBonus;
-      if ($('dev-bonus-weight-mult')) $('dev-bonus-weight-mult').value = BONUS_CONFIG.bonusSymbolWeight;
+  if ($('dev-bonus-symbol')) $('dev-bonus-symbol').value = BONUS_CONFIG.scatterSymbol;
+  if ($('dev-bonus-min-req')) $('dev-bonus-min-req').value = BONUS_CONFIG.minRequired;
+  if ($('dev-bonus-spins-granted')) $('dev-bonus-spins-granted').value = BONUS_CONFIG.spinsGranted;
+  if ($('dev-bonus-max-retrigger')) $('dev-bonus-max-retrigger').value = BONUS_CONFIG.maxRetriggers;
+  if ($('dev-bonus-multiplier')) $('dev-bonus-multiplier').value = BONUS_CONFIG.multiplierOnBonus;
+  if ($('dev-bonus-weight-mult')) $('dev-bonus-weight-mult').value = BONUS_CONFIG.bonusSymbolWeight;
 
-      if ($('dev-jp-symbol')) $('dev-jp-symbol').value = HOLD_WIN_CONFIG.symbol;
-      if ($('dev-jp-weight')) $('dev-jp-weight').value = HOLD_WIN_CONFIG.weight;
-      if ($('dev-bonus-reset-spins')) $('dev-bonus-reset-spins').checked = HOLD_WIN_CONFIG.resetSpinsOnHit;
-      if ($('dev-jp-spins-init')) $('dev-jp-spins-init').value = HOLD_WIN_CONFIG.initialSpins;
-      if ($('dev-jp-spins-add')) $('dev-jp-spins-add').value = HOLD_WIN_CONFIG.spinsAddedOnHit;
-      if ($('dev-jp-req-mini')) $('dev-jp-req-mini').value = HOLD_WIN_CONFIG.reqMini;
-      if ($('dev-jp-req-grand')) $('dev-jp-req-grand').value = HOLD_WIN_CONFIG.reqGrand;
-      if ($('dev-jp-req-super')) $('dev-jp-req-super').value = HOLD_WIN_CONFIG.reqSuper;
+  if ($('dev-jp-symbol')) $('dev-jp-symbol').value = HOLD_WIN_CONFIG.symbol;
+  if ($('dev-jp-weight')) $('dev-jp-weight').value = HOLD_WIN_CONFIG.weight;
+  if ($('dev-bonus-reset-spins')) $('dev-bonus-reset-spins').checked = HOLD_WIN_CONFIG.resetSpinsOnHit;
+  if ($('dev-jp-spins-init')) $('dev-jp-spins-init').value = HOLD_WIN_CONFIG.initialSpins;
+  if ($('dev-jp-spins-add')) $('dev-jp-spins-add').value = HOLD_WIN_CONFIG.spinsAddedOnHit;
+  if ($('dev-jp-req-mini')) $('dev-jp-req-mini').value = HOLD_WIN_CONFIG.reqMini;
+  if ($('dev-jp-req-grand')) $('dev-jp-req-grand').value = HOLD_WIN_CONFIG.reqGrand;
+  if ($('dev-jp-req-super')) $('dev-jp-req-super').value = HOLD_WIN_CONFIG.reqSuper;
 
-      const saveEcoFields = () => {
-        ECONOMY.startingCredits = parseFloat($('dev-starting-credits')?.value) || 5000;
-        ECONOMY.bankProfit = parseFloat($('dev-bank-profit')?.value) || 0;
-        ECONOMY.jackpotPercent = parseFloat($('dev-jp-percent')?.value) || 0;
-        ECONOMY.jackpots[3] = parseFloat($('dev-jp-3')?.value) || 0;
-        ECONOMY.jackpots[4] = parseFloat($('dev-jp-4')?.value) || 0;
-        ECONOMY.jackpots[5] = parseFloat($('dev-jp-5')?.value) || 0;
-        ECONOMY.spinsToLevelUp = parseInt($('dev-spins-req')?.value) || 100;
-        ECONOMY.freeSpinsReward = parseInt($('dev-spins-reward')?.value) || 20;
-        
-        BONUS_CONFIG.scatterSymbol = $('dev-bonus-symbol')?.value || '🌀';
-        BONUS_CONFIG.minRequired = parseInt($('dev-bonus-min-req')?.value) || 8;
-        BONUS_CONFIG.spinsGranted = parseInt($('dev-bonus-spins-granted')?.value) || 20;
-        BONUS_CONFIG.maxRetriggers = parseInt($('dev-bonus-max-retrigger')?.value) || 5;
-        BONUS_CONFIG.multiplierOnBonus = parseFloat($('dev-bonus-multiplier')?.value) || 1.5;
-        BONUS_CONFIG.bonusSymbolWeight = parseFloat($('dev-bonus-weight-mult')?.value) || 1.25;
+  // 1. CARGA VISUAL DE VALORES DOBLE O NADA
+  if ($('dev-gamble-mode')) $('dev-gamble-mode').value = GAMBLE_CONFIG.mode;
+  if ($('dev-gamble-base-speed')) $('dev-gamble-base-speed').value = GAMBLE_CONFIG.baseSpeed;
+  if ($('dev-gamble-threshold')) $('dev-gamble-threshold').value = GAMBLE_CONFIG.threshold;
+  if ($('dev-gamble-step')) $('dev-gamble-step').value = GAMBLE_CONFIG.step;
+  if ($('dev-gamble-min-speed')) $('dev-gamble-min-speed').value = GAMBLE_CONFIG.minSpeed;
 
-        HOLD_WIN_CONFIG.symbol = $('dev-jp-symbol')?.value || '🔮';
-        HOLD_WIN_CONFIG.weight = parseFloat($('dev-jp-weight')?.value) || 1.0;
-        HOLD_WIN_CONFIG.resetSpinsOnHit = $('dev-bonus-reset-spins')?.checked ?? true;
-        HOLD_WIN_CONFIG.initialSpins = parseInt($('dev-jp-spins-init')?.value) || 3;
-        HOLD_WIN_CONFIG.spinsAddedOnHit = parseInt($('dev-jp-spins-add')?.value) || 3;
-        HOLD_WIN_CONFIG.reqMini = parseInt($('dev-jp-req-mini')?.value) || 8;
-        HOLD_WIN_CONFIG.reqGrand = parseInt($('dev-jp-req-grand')?.value) || 9;
-        HOLD_WIN_CONFIG.reqSuper = parseInt($('dev-jp-req-super')?.value) || 10;
+  const saveEcoFields = () => {
+    ECONOMY.startingCredits = parseFloat($('dev-starting-credits')?.value) || 5000;
+    ECONOMY.bankProfit = parseFloat($('dev-bank-profit')?.value) || 0;
+    ECONOMY.jackpotPercent = parseFloat($('dev-jp-percent')?.value) || 0;
+    ECONOMY.jackpots[3] = parseFloat($('dev-jp-3')?.value) || 0;
+    ECONOMY.jackpots[4] = parseFloat($('dev-jp-4')?.value) || 0;
+    ECONOMY.jackpots[5] = parseFloat($('dev-jp-5')?.value) || 0;
+    ECONOMY.spinsToLevelUp = parseInt($('dev-spins-req')?.value) || 100;
+    ECONOMY.freeSpinsReward = parseInt($('dev-spins-reward')?.value) || 20;
+    
+    BONUS_CONFIG.scatterSymbol = $('dev-bonus-symbol')?.value || '🌀';
+    BONUS_CONFIG.minRequired = parseInt($('dev-bonus-min-req')?.value) || 8;
+    BONUS_CONFIG.spinsGranted = parseInt($('dev-bonus-spins-granted')?.value) || 20;
+    BONUS_CONFIG.maxRetriggers = parseInt($('dev-bonus-max-retrigger')?.value) || 5;
+    BONUS_CONFIG.multiplierOnBonus = parseFloat($('dev-bonus-multiplier')?.value) || 1.5;
+    BONUS_CONFIG.bonusSymbolWeight = parseFloat($('dev-bonus-weight-mult')?.value) || 1.25;
 
-        saveEconomy(); saveBonusConfig(); saveHoldWinConfig(); updateUI();
-      };
+    HOLD_WIN_CONFIG.symbol = $('dev-jp-symbol')?.value || '🔮';
+    HOLD_WIN_CONFIG.weight = parseFloat($('dev-jp-weight')?.value) || 1.0;
+    HOLD_WIN_CONFIG.resetSpinsOnHit = $('dev-bonus-reset-spins')?.checked ?? true;
+    HOLD_WIN_CONFIG.initialSpins = parseInt($('dev-jp-spins-init')?.value) || 3;
+    HOLD_WIN_CONFIG.spinsAddedOnHit = parseInt($('dev-jp-spins-add')?.value) || 3;
+    HOLD_WIN_CONFIG.reqMini = parseInt($('dev-jp-req-mini')?.value) || 8;
+    HOLD_WIN_CONFIG.reqGrand = parseInt($('dev-jp-req-grand')?.value) || 9;
+    HOLD_WIN_CONFIG.reqSuper = parseInt($('dev-jp-req-super')?.value) || 10;
 
-        ['dev-starting-credits', 'dev-bank-profit', 'dev-jp-percent', 'dev-jp-3', 'dev-jp-4', 'dev-jp-5', 'dev-spins-req', 'dev-spins-reward', 
+    saveEconomy(); saveBonusConfig(); saveHoldWinConfig(); updateUI();
+  };
+
+  ['dev-starting-credits', 'dev-bank-profit', 'dev-jp-percent', 'dev-jp-3', 'dev-jp-4', 'dev-jp-5', 'dev-spins-req', 'dev-spins-reward', 
    'dev-bonus-symbol', 'dev-bonus-min-req', 'dev-bonus-spins-granted', 'dev-bonus-max-retrigger', 'dev-bonus-multiplier', 'dev-bonus-weight-mult',
    'dev-jp-symbol', 'dev-jp-weight', 'dev-bonus-reset-spins', 'dev-jp-spins-init', 'dev-jp-spins-add', 'dev-jp-req-mini', 'dev-jp-req-grand', 'dev-jp-req-super'
   ].forEach(id => {
     if ($(id)) $(id).addEventListener('change', saveEcoFields);
   });
 
-  // 👇 AÑADE ESTO PARA EL DOBLE O NADA 👇
-  ['dev-gamble-mode', 'dev-gamble-speed'].forEach(id => {
+  // 2. ESCUCHADORES ACTUALIZADOS PARA TODOS LOS CAMPOS DE DOBLE O NADA
+  ['dev-gamble-mode', 'dev-gamble-base-speed', 'dev-gamble-threshold', 'dev-gamble-step', 'dev-gamble-min-speed'].forEach(id => {
     if ($(id)) $(id).addEventListener('change', updateGambleConfig);
   });
+}
 
-    }
 
     function renderStats() {
       if (!$('stat-plays')) return;
@@ -1380,13 +1417,18 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================
 // SISTEMA DOBLE O NADA (ACTUALIZADO)
 // ==========================================
-let GAMBLE_CONFIG = { 
-  mode: 'skill',     // 'skill' (Habilidad) o '5050' (Azar)
-  baseSpeed: 200,    // Velocidad base inicial (ms)
-  threshold: 2,      // Cada cuántos aciertos acelera
-  step: 20,          // Ms que reduce por tramo
-  minSpeed: 80       // Suelo de seguridad (ms)
+
+// 1. Creamos una constante intocable con tus valores base
+const DEFAULT_GAMBLE_CONFIG = {
+  mode: 'skill',
+  baseSpeed: 200,    // Velocidad base que elegiste (200ms)
+  threshold: 2,      // Cada 2 aciertos
+  step: 20,          // Resta 20ms
+  minSpeed: 80       // Suelo de 80ms
 };
+
+// 2. Inicializamos la configuración copiando los valores por defecto
+let GAMBLE_CONFIG = { ...DEFAULT_GAMBLE_CONFIG };
 
 let gambleState = { 
   active: false, 
@@ -1394,11 +1436,11 @@ let gambleState = {
   activeOption: 'win', 
   timer: null, 
   isBlinking: false,
-  streak: 0          // Racha de aciertos en la sesión actual
+  streak: 0          
 };
 
-// Lee todos los campos del Panel Dev y actualiza la configuración global
-function updateGambleConfig() {
+// 3. Leemos los campos del Panel Dev (Usamos la constante como respaldo)
+window.updateGambleConfig = function() {
   const modeSelect = $('dev-gamble-mode');
   const speedInput = $('dev-gamble-base-speed');
   const thresholdInput = $('dev-gamble-threshold');
@@ -1406,13 +1448,13 @@ function updateGambleConfig() {
   const minInput = $('dev-gamble-min-speed');
 
   if (modeSelect) GAMBLE_CONFIG.mode = modeSelect.value;
-  if (speedInput) GAMBLE_CONFIG.baseSpeed = parseInt(speedInput.value, 10) || 180;
-  if (thresholdInput) GAMBLE_CONFIG.threshold = parseInt(thresholdInput.value, 10) || 2;
-  if (stepInput) GAMBLE_CONFIG.step = parseInt(stepInput.value, 10) || 15;
-  if (minInput) GAMBLE_CONFIG.minSpeed = parseInt(minInput.value, 10) || 80;
-}
+  if (speedInput) GAMBLE_CONFIG.baseSpeed = parseInt(speedInput.value, 10) || DEFAULT_GAMBLE_CONFIG.baseSpeed;
+  if (thresholdInput) GAMBLE_CONFIG.threshold = parseInt(thresholdInput.value, 10) || DEFAULT_GAMBLE_CONFIG.threshold;
+  if (stepInput) GAMBLE_CONFIG.step = parseInt(stepInput.value, 10) || DEFAULT_GAMBLE_CONFIG.step;
+  if (minInput) GAMBLE_CONFIG.minSpeed = parseInt(minInput.value, 10) || DEFAULT_GAMBLE_CONFIG.minSpeed;
+};
 
-// Devuelve la velocidad actual teniendo en cuenta la racha acumulada
+// 4. Cálculo de velocidad según la racha
 function getCurrentGambleSpeed() {
   if (GAMBLE_CONFIG.mode !== 'skill') return GAMBLE_CONFIG.baseSpeed;
 
@@ -1421,6 +1463,7 @@ function getCurrentGambleSpeed() {
 
   return Math.max(GAMBLE_CONFIG.minSpeed, targetSpeed);
 }
+
 
 
 
