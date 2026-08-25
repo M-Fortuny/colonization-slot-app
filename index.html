@@ -314,9 +314,6 @@
 }
 
 
-
-
-
 /* Oscurecimiento de fondo y foco en la ventana */
 .modal-overlay {
   position: fixed;
@@ -385,7 +382,18 @@
 .win-effect { animation: winGlow 0.6s infinite alternate; }
 
 
+.tension-glow {
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 0 25px 5px rgba(255, 60, 0, 0.8), inset 0 0 15px rgba(255, 60, 0, 0.5) !important;
+  border-radius: 10px;
+  animation: tension-pulse 0.4s infinite alternate;
+}
 
+@keyframes tension-pulse {
+  from { filter: brightness(1); transform: scale(1); }
+  to { filter: brightness(1.3); transform: scale(1.02); }
+}
 
 
 
@@ -743,6 +751,13 @@
 
   <script>
 
+window.onerror = function(message, source, lineno, colno, error) {
+  alert("🚨 ERROR DETECTADO 🚨\n\nMensaje: " + message + "\nLínea: " + lineno);
+  return true; 
+};
+
+
+
         const DEFAULT_CONFIG = [
       { symbol: '🌀', weight: 180, pay3: 5,   pay4: 20,   pay5: 100 },
       { symbol: '🍒', weight: 160, pay3: 8,   pay4: 30,   pay5: 200 },
@@ -922,15 +937,6 @@ document.addEventListener('DOMContentLoaded', () => {
         resetIdleState();
         if (state.autoSpin && !state.isSpinning) triggerSpin();
       });
-
-
-
-
-
-
-
-
-
       
 	  btnGamble.addEventListener('click', () => {
     if (state.lastWinCredits <= 0 || state.isFreeSpinMode || state.isHoldWinMode) return;
@@ -950,8 +956,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof playClickSound === 'function') playClickSound();
     closeGambleGame(gambleState.currentRisk);
   });
-
-
 
 
       $('btn-dev-close').addEventListener('click', () => { $('fullscreen-dev').classList.remove('active'); initGridUI(); resetIdleState(); });
@@ -1116,30 +1120,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateUI() {
-      const lines = LINE_OPTIONS[state.selectedLinesIdx];
-      const bet = BET_OPTIONS[state.selectedBetIdx];
-      
-      $('display-player-name').textContent = playerProfile.name || 'MeteOritO';
-      $('display-player-level').textContent = `NIVEL ${playerProfile.level}`;
-      $('display-balance-val').textContent = formatValue(state.credits);
-      
-      const totalBet = (lines + 1) * bet;
-      $('val-total-bet').textContent = `${totalBet} C`;
-      
-      $('val-lines').textContent = lines;
-      $('val-bet').textContent = `x${bet}`;
-      
-      const targetSpins = ECONOMY.spinsToLevelUp * (playerProfile.level + 1);
-      let progressPercent = (playerProfile.spinsToNextLevel / targetSpins) * 100;
-      $('level-progress-fill').style.width = `${Math.min(100, progressPercent)}%`;
+  const lines = LINE_OPTIONS[state.selectedLinesIdx];
+  const bet = BET_OPTIONS[state.selectedBetIdx];
+  
+  $('display-player-name').textContent = playerProfile.name || 'MeteOritO';
+  $('display-player-level').textContent = `NIVEL ${playerProfile.level}`;
+  $('display-balance-val').textContent = formatValue(state.credits);
+  
+  const totalBet = (lines + 1) * bet;
+  $('val-total-bet').textContent = `${totalBet} C`;
+  
+  $('val-lines').textContent = lines;
+  $('val-bet').textContent = `x${bet}`;
+  
+  const targetSpins = ECONOMY.spinsToLevelUp * (playerProfile.level + 1);
+  let progressPercent = (playerProfile.spinsToNextLevel / targetSpins) * 100;
+  $('level-progress-fill').style.width = `${Math.min(100, progressPercent)}%`;
 
-      document.querySelectorAll('.badge-line').forEach(badge => {
-        badge.classList.toggle('active', Number(badge.dataset.line) <= lines);
-      });
+  document.querySelectorAll('.badge-line').forEach(badge => {
+    badge.classList.toggle('active', Number(badge.dataset.line) <= lines);
+  });
 
-      btnGamble.classList.toggle('disabled', state.lastWinCredits <= 0 || state.isSpinning || state.isFreeSpinMode || state.isHoldWinMode);
-      [$('btn-spin'), $('btn-lines'), $('btn-bet')].forEach(button => button.classList.toggle('disabled', state.isSpinning || state.isFreeSpinMode || state.isHoldWinMode));
-    }
+  // Agrupamos el estado de bloqueo incluyendo la comprobación de state.autoSpin
+  const isControlDisabled = state.isSpinning || state.isFreeSpinMode || state.isHoldWinMode || state.autoSpin;
+
+  btnGamble.classList.toggle('disabled', state.lastWinCredits <= 0 || isControlDisabled);
+
+  [$('btn-spin'), $('btn-lines'), $('btn-bet')].forEach(button => {
+    if (!button) return;
+    button.classList.toggle('disabled', isControlDisabled);
+    button.style.pointerEvents = isControlDisabled ? 'none' : 'auto';
+  });
+}
+
 
 
     function showLevelUpModal(title, sub, duration = 4000) {
@@ -1210,6 +1223,46 @@ document.addEventListener('DOMContentLoaded', () => {
         reel.appendChild(strip);
       });
     }
+
+
+	function checkAnticipation() {
+  if (state.isHoldWinMode || state.isFreeSpinMode) return false; 
+
+  let isTension = false;
+  let spirals = 0;
+  let crystals = 0;
+
+  // 1. Contar Espirales y Bolas en las primeras 4 columnas
+  for (let col = 0; col < 4; col++) {
+    for (let row = 0; row < 5; row++) {
+      if (state.grid[col][row] === BONUS_CONFIG.scatterSymbol) spirals++;
+      if (state.grid[col][row] === HOLD_WIN_CONFIG.symbol) crystals++;
+    }
+  }
+  
+  // Si falta 1 para el bonus o para el Hold&Win
+  if (spirals === (BONUS_CONFIG.minRequired - 1)) isTension = true;
+  if (crystals === (HOLD_WIN_CONFIG.reqMini - 1)) isTension = true;
+
+  // 2. Comprobar si estamos a punto de un premio de 5 emojis
+  const lines = LINE_OPTIONS[state.selectedLinesIdx];
+  for (let i = 0; i < lines; i++) {
+    const line = PAYLINES[i];
+    let firstSym = state.grid[0][line[0]];
+    let matchCount = 1;
+    
+    // Revisar si los 4 primeros símbolos de la línea coinciden
+    for (let col = 1; col < 4; col++) {
+      if (state.grid[col][line[col]] === firstSym) matchCount++;
+      else break; 
+    }
+    
+    if (matchCount === 4) isTension = true; 
+  }
+
+  return isTension;
+}
+
 
     function resetIdleState() {
       isIdle = false;
@@ -1403,8 +1456,6 @@ function closeGambleGame(finalAmount) {
 }
 
 
-
-
 	function triggerLevelUpBonus() {
   // 1. Apuesta que el jugador tiene seleccionada en pantalla ahora mismo
   const currentBet = BET_OPTIONS[state.selectedBetIdx];
@@ -1442,9 +1493,6 @@ function closeGambleGame(finalAmount) {
   // Actualizamos los botones de la pantalla
   updateUI();
 }
-
-
-
 
 
     function triggerSpin() {
@@ -1524,110 +1572,160 @@ function closeGambleGame(finalAmount) {
 
 
     function executeSpinVisuals() {
-      state.isSpinning = true;
-      isIdle = false;
-      clearTimeout(idleTimer);
+  state.isSpinning = true;
+  isIdle = false;
+  clearTimeout(idleTimer);
 
-      state.lastWinCredits = 0;
-      state.hasActiveWin = false;
-      state.gambleFailCount = 0;
-      state.totalSpins++;
+  state.lastWinCredits = 0;
+  state.hasActiveWin = false;
+  state.gambleFailCount = 0;
+  state.totalSpins++;
 
-      clearPaylinesSVG();
+  clearPaylinesSVG();
 
-      if (!state.isHoldWinMode) {
-        document.querySelectorAll('.symbol-cell').forEach(cell => {
-          cell.classList.remove('winning', 'dimmed', 'hold-spinning');
-        });
+  if (!state.isHoldWinMode) {
+    document.querySelectorAll('.symbol-cell').forEach(cell => {
+      cell.classList.remove('winning', 'dimmed', 'hold-spinning', 'locked-cell-static');
+    });
 
-        document.querySelectorAll('.badge-line').forEach(badge => {
-          badge.classList.remove('badge-winning-pulse');
-        });
-      }
+    document.querySelectorAll('.badge-line').forEach(badge => {
+      badge.classList.remove('badge-winning-pulse');
+    });
+  }
 
-      if (state.isHoldWinMode) {
-        setStatusText(`🔮 RESPINS RESTANTES: ${state.hwSpinsLeft}`);
-      } else if (state.isFreeSpinMode) {
-        setStatusText(`🎁 TIRADAS GRATIS<br><span class="sub-text-free">${state.freeSpinsLeft} RESTANTES</span>`);
+  if (state.isHoldWinMode) {
+    setStatusText(`🔮 RESPINS RESTANTES: ${state.hwSpinsLeft}`);
+  } else if (state.isFreeSpinMode) {
+    setStatusText(
+      `🎁 TIRADAS GRATIS<br><span class="sub-text-free">${state.freeSpinsLeft} RESTANTES</span>`
+    );
+  } else {
+    setStatusText('🍀 Buena Suerte !!!');
+  }
+
+  updateUI();
+
+  const reels = gridContainer.querySelectorAll('.reel-strip');
+
+  // Activar animación únicamente en las celdas libres durante Hold & Win
+  if (state.isHoldWinMode) {
+    document.querySelectorAll('.symbol-cell').forEach(cell => {
+      const col = Number(cell.dataset.reel);
+      const row = Number(cell.dataset.row);
+
+      if (state.hwLockedCells[col][row]) {
+        cell.classList.remove('hold-spinning');
+        cell.classList.add('locked-cell-static');
       } else {
-        setStatusText('🍀 Buena Suerte !!!');
+        cell.classList.remove('locked-cell-static');
+        cell.classList.add('hold-spinning');
+      }
+    });
+  }
+
+  // Generar símbolos nuevos solo para las celdas libres
+  for (let col = 0; col < 5; col++) {
+    for (let row = 0; row < 5; row++) {
+      if (state.isHoldWinMode && state.hwLockedCells[col][row]) {
+        continue;
       }
 
-      updateUI();
+      state.grid[col][row] = getRandomSymbol();
+    }
+  }
 
-      const reels = gridContainer.querySelectorAll('.reel-strip');
+  const anticipationMode =
+    typeof checkAnticipation === 'function'
+      ? checkAnticipation()
+      : false;
 
-      if (state.isHoldWinMode) {
-        document.querySelectorAll('.symbol-cell').forEach(cell => {
-          const col = Number(cell.dataset.reel);
-          const row = Number(cell.dataset.row);
+    reels.forEach((strip, index) => {
+    strip.classList.remove('bounce', 'hold-spinning', 'tension-glow');
 
-          if (state.hwLockedCells[col][row]) {
-            cell.classList.remove('hold-spinning');
-          } else {
-            cell.classList.add('hold-spinning');
-          }
-        });
+    // En Hold & Win no se mueve el rodillo completo
+    if (!state.isHoldWinMode) {
+      strip.classList.add('spinning');
+    }
+
+    // 1. Definimos el tiempo base
+    let stopDelay = 1000 + index * 150;
+
+    // 2. Si hay tensión en el último rodillo (y no estamos en Hold & Win), sumamos tiempo y activamos el brillo
+    if (anticipationMode && index === 4 && !state.isHoldWinMode) {
+      stopDelay += 2000; // Aquí está el retraso dramático de 2 segundos extra
+      strip.classList.add('tension-glow');
+    }
+
+    setTimeout(() => {
+  // Hold & Win: detener las celdas de esta columna en secuencia
+  if (state.isHoldWinMode) {
+    strip.classList.remove('hold-spinning', 'tension-glow', 'spinning', 'bounce');
+
+    if (typeof playReelStopSound === 'function') {
+      playReelStopSound();
+    }
+
+    for (let row = 0; row < 5; row++) {
+      const cell = document.querySelector(
+        `.symbol-cell[data-reel="${index}"][data-row="${row}"]`
+      );
+
+      if (!cell) continue;
+
+      const isLocked = state.hwLockedCells[index][row];
+
+      cell.classList.remove('hold-spinning');
+
+      if (isLocked) {
+        cell.classList.add('locked-cell-static', 'winning');
       } else {
-        reels.forEach(strip => {
-          strip.classList.add('spinning');
-          strip.classList.remove('bounce');
-        });
+        cell.classList.remove('locked-cell-static');
+        cell.innerHTML = `
+          <span class="emoji-wrapper">${state.grid[index][row]}</span>
+        `;
       }
+    }
 
-      for (let col = 0; col < 5; col++) {
-        for (let row = 0; row < 5; row++) {
-          if (state.isHoldWinMode && state.hwLockedCells[col][row]) {
-            continue;
-          }
-          state.grid[col][row] = getRandomSymbol();
-        }
-      }
+    // Solo se evalúa después de detener la quinta columna
+    if (index === 4) {
+      setTimeout(() => {
+        evaluateHoldWin();
+      }, 300);
+    }
 
-                  reels.forEach((strip, index) => {
-        setTimeout(() => {
-          
-          // 1. Animación del modo normal
-          if (!state.isHoldWinMode) {
-            strip.classList.remove('spinning');
-            strip.classList.add('bounce');
-          }
-          
-          // 2. SONIDO DE FRENADO (AQUÍ AFUERA PARA QUE SUENE SIEMPRE)
-          playReelStopSound();
+    return;
+  }
 
-          // 3. Limpieza de las celdas en Hold & Win
-          const cells = gridContainer.querySelectorAll(`.symbol-cell[data-reel="${index}"]`);
+  // Juego normal
+  strip.classList.remove('spinning', 'tension-glow');
+  strip.classList.add('bounce');
 
-          cells.forEach(cell => {
-            const row = Number(cell.dataset.row);
-            const locked = state.isHoldWinMode && state.hwLockedCells[index][row];
+  if (typeof playReelStopSound === 'function') {
+    playReelStopSound();
+  }
 
-            // Quita la animación individual
-            cell.classList.remove('hold-spinning');
+  for (let row = 0; row < 5; row++) {
+    const cell = document.querySelector(
+      `.symbol-cell[data-reel="${index}"][data-row="${row}"]`
+    );
 
-            if (locked) {
-              cell.innerHTML = `<span class="emoji-wrapper">${HOLD_WIN_CONFIG.symbol}</span>`;
-            } else {
-              cell.innerHTML = `<span class="emoji-wrapper">${state.grid[index][row]}</span>`;
-            }
-          });
-          
+    if (cell) {
+      cell.innerHTML = `
+        <span class="emoji-wrapper">${state.grid[index][row]}</span>
+      `;
+    }
+  }
 
-          if (index === 4) {
-            setTimeout(() => {
-              if (state.isHoldWinMode) {
-                evaluateHoldWin();
-              } else {
-                evaluateWins();
-              }
-            }, 350);
-          }
-        }, 1000 + index * 150);
-      });
+  if (index === 4) {
+    setTimeout(() => {
+      evaluateWins();
+      state.isSpinning = false;
+    }, 300);
+  }
+}, stopDelay);
+
+    });
 }
-
-
 
 
 
@@ -1728,9 +1826,7 @@ function closeGambleGame(finalAmount) {
 }
 
 
-
 	triggerMegaWinEffect()
-
 
 
     function evaluateWins() {
@@ -2141,8 +2237,6 @@ function triggerConfettiEffect() {
     });
   }
 }
-
-
 
 
 // ==========================================
