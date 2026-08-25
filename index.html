@@ -397,8 +397,6 @@
 
 
 
-
-
 </style>
 
 </head>
@@ -560,19 +558,38 @@
   Ajusta el modo de arriesgar (Azar 50/50 o Habilidad manual) y la velocidad en milisegundos del parpadeo de luz.
 </p>
 
-
-<div class="dev-economy-grid" style="margin-bottom: 30px;">
-  <div class="dev-economy-box">
-    <label for="dev-gamble-mode" title="Modo de resolución del minijuego">Modo de Juego</label>
-    <select id="dev-gamble-mode" onchange="updateGambleConfig()" style="background: rgba(0, 0, 0, 0.4); color: #fff; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 6px; padding: 6px 8px; width: 100%; font-size: 13px; cursor: pointer; outline: none;">
-      <option value="5050" style="background: #191428; color: #fff;">RNG / Suerte 50/50</option>
-      <option value="skill" style="background: #191428; color: #fff;">Habilidad (Paro Manual)</option>
+<div class="dev-group" style="display: flex; gap: 10px; flex-wrap: wrap; max-width: 700px; margin-bottom: 15px;">
+  <div style="flex: 1; min-width: 130px;">
+    <label style="font-size: 12px; color: #ccc; display: block; margin-bottom: 4px;">Modo de Juego</label>
+    <select id="dev-gamble-mode" class="dev-input" onchange="updateGambleConfig()"
+>
+      <option value="skill" selected>Habilidad (Manual)</option>
+      <option value="chance">Azar (50/50)</option>
     </select>
   </div>
 
-  <div class="dev-economy-box">
-    <label for="dev-gamble-speed" title="Tiempo de refresco de luz en milisegundos">Velocidad Parpadeo (ms)</label>
-    <input type="number" id="dev-gamble-speed" value="120" min="30" max="1000" step="10" onchange="updateGambleConfig()">
+  <div style="flex: 1; min-width: 110px;">
+    <label style="font-size: 12px; color: #ccc; display: block; margin-bottom: 4px;">Vel. Base (ms)</label>
+    <input type="number" id="dev-gamble-base-speed" class="dev-input" value="180" min="50" step="10" onchange="updateGambleConfig()"
+>
+  </div>
+
+  <div style="flex: 1; min-width: 110px;">
+    <label style="font-size: 12px; color: #ccc; display: block; margin-bottom: 4px;">Cada X Aciertos</label>
+    <input type="number" id="dev-gamble-threshold" class="dev-input" value="2" min="1" step="1" onchange="updateGambleConfig()"
+>
+  </div>
+
+  <div style="flex: 1; min-width: 110px;">
+    <label style="font-size: 12px; color: #ccc; display: block; margin-bottom: 4px;">Resta (ms)</label>
+    <input type="number" id="dev-gamble-step" class="dev-input" value="15" min="5" step="5" onchange="updateGambleConfig()"
+>
+  </div>
+
+  <div style="flex: 1; min-width: 110px;">
+    <label style="font-size: 12px; color: #ccc; display: block; margin-bottom: 4px;">Límite Mín (ms)</label>
+    <input type="number" id="dev-gamble-min-speed" class="dev-input" value="80" min="30" step="5" onchange="updateGambleConfig()"
+>
   </div>
 </div>
 
@@ -1360,20 +1377,52 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ==========================================
-// NUEVO SISTEMA DOBLE O NADA (RIESGO)
 // ==========================================
-let GAMBLE_CONFIG = { mode: '5050', speed: 120 };
-let gambleState = { active: false, currentRisk: 0, activeOption: 'win', timer: null, isBlinking: false };
+// SISTEMA DOBLE O NADA (ACTUALIZADO)
+// ==========================================
+let GAMBLE_CONFIG = { 
+  mode: 'skill',     // 'skill' (Habilidad) o '5050' (Azar)
+  baseSpeed: 200,    // Velocidad base inicial (ms)
+  threshold: 2,      // Cada cuántos aciertos acelera
+  step: 20,          // Ms que reduce por tramo
+  minSpeed: 80       // Suelo de seguridad (ms)
+};
 
+let gambleState = { 
+  active: false, 
+  currentRisk: 0, 
+  activeOption: 'win', 
+  timer: null, 
+  isBlinking: false,
+  streak: 0          // Racha de aciertos en la sesión actual
+};
+
+// Lee todos los campos del Panel Dev y actualiza la configuración global
 function updateGambleConfig() {
   const modeSelect = $('dev-gamble-mode');
-  const speedInput = $('dev-gamble-speed');
-  if (modeSelect && speedInput) {
-    GAMBLE_CONFIG.mode = modeSelect.value;
-    GAMBLE_CONFIG.speed = parseInt(speedInput.value, 10) || 120;
-  }
+  const speedInput = $('dev-gamble-base-speed');
+  const thresholdInput = $('dev-gamble-threshold');
+  const stepInput = $('dev-gamble-step');
+  const minInput = $('dev-gamble-min-speed');
+
+  if (modeSelect) GAMBLE_CONFIG.mode = modeSelect.value;
+  if (speedInput) GAMBLE_CONFIG.baseSpeed = parseInt(speedInput.value, 10) || 180;
+  if (thresholdInput) GAMBLE_CONFIG.threshold = parseInt(thresholdInput.value, 10) || 2;
+  if (stepInput) GAMBLE_CONFIG.step = parseInt(stepInput.value, 10) || 15;
+  if (minInput) GAMBLE_CONFIG.minSpeed = parseInt(minInput.value, 10) || 80;
 }
+
+// Devuelve la velocidad actual teniendo en cuenta la racha acumulada
+function getCurrentGambleSpeed() {
+  if (GAMBLE_CONFIG.mode !== 'skill') return GAMBLE_CONFIG.baseSpeed;
+
+  const multiplier = Math.floor((gambleState.streak || 0) / GAMBLE_CONFIG.threshold);
+  const targetSpeed = GAMBLE_CONFIG.baseSpeed - (multiplier * GAMBLE_CONFIG.step);
+
+  return Math.max(GAMBLE_CONFIG.minSpeed, targetSpeed);
+}
+
+
 
 function openGambleModal() {
   $('modal-gamble').classList.add('active');
@@ -1424,7 +1473,7 @@ function playGamble() {
     // Reactiva el parpadeo tras 1.2s para seguir jugando
     setTimeout(() => { if (gambleState.active) startBlinking(); }, 1200);
   } else {
-    card.textContent = '☠️ NADA ☠️'; card.style.color = '#ff3366';
+    card.textContent = '🧟‍♀️ NADA 🧟‍♂️'; card.style.color = '#ff3366';
     if (typeof processGambleLoss === 'function') processGambleLoss(gambleState.currentRisk);
     
     gameStats.currentDoubleStreak = 0; 
