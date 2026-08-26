@@ -926,15 +926,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		
 		btnSpin.addEventListener('click', () => {
-    // Solo reproducir la principal si no estamos en un modo especial
-    if (!state.isFreeSpinMode && !state.isHoldWinMode) {
-         BGMController.playTrack('principal');
+    // Si aún no hay música sonando, arrancar la principal por primera vez
+    if (!BGMController.currentTrack) {
+        BGMController.playTrack('principal');
     }
+
     playClickSound();      //[span_2](start_span)[span_2](end_span)
     playSpinStartSound();  //[span_3](start_span)[span_3](end_span)
     triggerSpin();         //[span_4](start_span)[span_4](end_span)
     resetIdleState();      //[span_5](start_span)[span_5](end_span)
 });
+
 
 
 
@@ -2473,16 +2475,14 @@ function playReelStopSound() {
     init() {
         if (this.isInitialized) return;
         
-        // Configurar loops y volumen para las pistas principales
         this.tracks.principal.forEach(audio => {
             audio.loop = true;
             audio.volume = 0.4;
         });
 
-        // Configurar el resto de efectos/modos
         ['freespins', 'esferas', 'doblenada'].forEach(key => {
             this.tracks[key].loop = true;
-            this.tracks[key].volume = 0.3;
+            this.tracks[key].volume = 0.4;
         });
 
         this.isInitialized = true;
@@ -2493,10 +2493,13 @@ function playReelStopSound() {
         let nextTrack = null;
 
         if (trackName === 'principal') {
-            // Seleccionar la pista principal actual de la lista
-            nextTrack = this.tracks.principal[this.currentPrincipalIndex];
+            // 🛑 SI YA HAY UNA PISTA PRINCIPAL REPRODUCIÉNDOSE, NO CAMBIARLA
+            if (this.currentTrack && this.tracks.principal.includes(this.currentTrack)) {
+                return;
+            }
 
-            // Avanzar al siguiente índice para la próxima vez que se active la música base
+            // Seleccionar la pista actual y preparar el índice para el PRÓXIMO cambio
+            nextTrack = this.tracks.principal[this.currentPrincipalIndex];
             this.currentPrincipalIndex = (this.currentPrincipalIndex + 1) % this.tracks.principal.length;
         } else {
             nextTrack = this.tracks[trackName];
@@ -2517,12 +2520,14 @@ function playReelStopSound() {
             console.warn(`No se pudo reproducir la pista ${trackName}:`, err);
         });
     }
-};
+}; // 👈 Verifica que este Cierre del objeto exista en tu archivo.
 
 // Desbloquear audio con el primer clic interactivo del usuario
 document.addEventListener('click', () => {
     BGMController.init();
 }, { once: true });
+
+
 
 
 
