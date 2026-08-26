@@ -2446,11 +2446,11 @@ function playReelStopSound() {
 
 	const BGMController = {
     tracks: {
-        principal: new Audio('audio/principal1.mp3'), // Puedes alternar con principal2.mp3 si lo deseas
-        freespins: new Audio('audio/freespins.mp3'),
-        esferas: new Audio('audio/esferas.mp3'),
-        doblenada: new Audio('audio/doblenada.mp3')
-    },
+    principal: new Audio('./audio/principal1.mp3'),
+    freespins: new Audio('./audio/freespins.mp3'),
+    esferas: new Audio('./audio/esferas.mp3'),
+    doblenada: new Audio('./audio/doblenada.mp3')
+}
     currentTrack: null,
 
     init() {
