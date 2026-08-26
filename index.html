@@ -497,7 +497,6 @@
 
 
 
-
   <div class="level-up-modal" id="modal-level-up">
     <div class="level-up-card">
       <div class="level-up-title" id="lvl-modal-title">ENHORABUENA</div>
@@ -925,7 +924,18 @@ document.addEventListener('DOMContentLoaded', () => {
         state.selectedBetIdx = (state.selectedBetIdx + 1) % BET_OPTIONS.length; updateUI(); resetIdleState();
       });
 
-		btnSpin.addEventListener('click', () => { playClickSound(); triggerSpin(); resetIdleState(); });
+		
+		btnSpin.addEventListener('click', () => {
+    // Solo reproducir la principal si no estamos en un modo especial
+    if (!state.isFreeSpinMode && !state.isHoldWinMode) {
+         BGMController.playTrack('principal');
+    }
+    playClickSound();      //[span_2](start_span)[span_2](end_span)
+    playSpinStartSound();  //[span_3](start_span)[span_3](end_span)
+    triggerSpin();         //[span_4](start_span)[span_4](end_span)
+    resetIdleState();      //[span_5](start_span)[span_5](end_span)
+});
+
 
 
       btnAuto.addEventListener('click', () => { playClickSound(); playSpinStartSound();
@@ -1002,7 +1012,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
  });
 }
-
 
 
     // ==========================================
@@ -1448,8 +1457,8 @@ function getCurrentGambleSpeed() {
 
 
 
-
 function openGambleModal() {
+  BGMController.playTrack('doblenada');
   $('modal-gamble').classList.add('active');
   $('gamble-win-val').textContent = formatValue(gambleState.currentRisk);
   startBlinking();
@@ -1634,6 +1643,8 @@ function closeGambleGame(finalAmount) {
       saveProfile(); 
       state.isSpinning = true; 
       updateUI();
+		BGMController.playTrack('freespins');
+
       
       showLevelUpModal('ENHORABUENA', `SUBISTE A NIVEL ${playerProfile.level}<br><span>¡${state.freeSpinsLeft} TIRADAS GRATIS!</span>`, 3500).then(() => {
         executeSpinVisuals();
@@ -1892,6 +1903,8 @@ function closeGambleGame(finalAmount) {
             state.hwLockedCells = Array.from({ length: 5 }, () => Array(5).fill(false));
             updateUI(); 
             resetIdleState(); 
+				BGMController.playTrack('principal');
+
             
             if (state.isFreeSpinMode && state.freeSpinsLeft > 0) {
                 setTimeout(triggerSpin, 1000);
@@ -2018,6 +2031,9 @@ function closeGambleGame(finalAmount) {
       state.freeSpinsLeft = BONUS_CONFIG.spinsGranted;
       state.freeSpinTotalWon = 0;
       state.retriggerCount = 0;
+		BGMController.playTrack('freespins');
+
+
       
       // Bloqueamos la apuesta con la que activó el bonus de espirales
       state.freeSpinBaseMultiplier = bet; 
@@ -2102,18 +2118,21 @@ function closeGambleGame(finalAmount) {
     }
   }
 
-  updateUI();
+    updateUI();
   resetIdleState();
 
-    if (hwCount >= reqMini) {
-    let jackpotType = 'MINI JACKPOT';
-    state.hwActiveJackpotTier = 3; 
-    
-    // 🔊 Sonido de entrada a las Esferas y Vibración
-    SoundFX.playHoldWinTrigger();
-    triggerVibration([200, 100, 200]);
- 
+  if (hwCount >= reqMini) {
+    let jackpotType = 'MINI JACKPOT'; 
+    state.hwActiveJackpotTier = 3;    
 
+    // 🔊 Sonido de entrada a las Esferas y Vibración
+    SoundFX.playHoldWinTrigger();     
+    triggerVibration([200, 100, 200]);
+
+    // 🎵 INICIAR MÚSICA DE ESFERAS
+    BGMController.playTrack('esferas');
+ 
+    // Comprobaciones de Jackpots superiores (ahora dentro del bloque correcto)
     if (hwCount >= reqSuper) {
       jackpotType = 'SÚPER JACKPOT';
       state.hwActiveJackpotTier = 5; 
@@ -2140,9 +2159,10 @@ function closeGambleGame(finalAmount) {
       });
     }, (totalSpinWin > 0 || bonusTriggered) ? 2000 : 500);
 
-    return;
+    return; // <--- Aquí es donde realmente termina toda la lógica de activar las esferas
   }
 
+  
   if (state.isFreeSpinMode) {
     state.freeSpinsLeft--;
 
@@ -2422,6 +2442,46 @@ function playReelStopSound() {
         osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.08);
     } catch (e) {}
 }
+
+
+	const BGMController = {
+    tracks: {
+        principal: new Audio('audio/principal1.mp3'), // Puedes alternar con principal2.mp3 si lo deseas
+        freespins: new Audio('audio/freespins.mp3'),
+        esferas: new Audio('audio/esferas.mp3'),
+        doblenada: new Audio('audio/doblenada.mp3')
+    },
+    currentTrack: null,
+
+    init() {
+        // Configurar el bucle y el volumen para que no tape los efectos de sonido
+        Object.values(this.tracks).forEach(audio => {
+            audio.loop = true;
+            audio.volume = 0.4; // Ajusta este valor (0.0 a 1.0) según lo fuerte que sea tu MP3
+        });
+    },
+
+    playTrack(trackName) {
+        // Si ya está sonando esta pista, no hacemos nada
+        if (this.currentTrack === this.tracks[trackName]) return;
+
+        // Pausar y reiniciar la pista anterior si existe
+        if (this.currentTrack) {
+            this.currentTrack.pause();
+            this.currentTrack.currentTime = 0;
+        }
+
+        // Asignar y reproducir la nueva pista
+        this.currentTrack = this.tracks[trackName];
+        if (this.currentTrack) {
+            // El catch evita errores en la consola si el navegador bloquea el autoplay antes de hacer clic
+            this.currentTrack.play().catch(err => console.warn("Esperando interacción del usuario para reproducir audio.", err));
+        }
+    }
+};
+
+// Inicializar las pistas cuando cargue el juego
+BGMController.init();
 
 
 
