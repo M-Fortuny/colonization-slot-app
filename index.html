@@ -2457,46 +2457,73 @@ function playReelStopSound() {
 
 	const BGMController = {
     tracks: {
-        principal: new Audio('./audio/principal1.mp3'),
+        principal: [
+            new Audio('./audio/principal1.mp3'),
+            new Audio('./audio/principal2.mp3'),
+            new Audio('./audio/principal3.mp3')
+        ],
         freespins: new Audio('./audio/freespins.mp3'),
         esferas: new Audio('./audio/esferas.mp3'),
         doblenada: new Audio('./audio/doblenada.mp3')
     },
     currentTrack: null,
+    currentPrincipalIndex: 0,
     isInitialized: false,
 
     init() {
         if (this.isInitialized) return;
-        Object.values(this.tracks).forEach(audio => {
+        
+        // Configurar loops y volumen para las pistas principales
+        this.tracks.principal.forEach(audio => {
             audio.loop = true;
             audio.volume = 0.4;
         });
+
+        // Configurar el resto de efectos/modos
+        ['freespins', 'esferas', 'doblenada'].forEach(key => {
+            this.tracks[key].loop = true;
+            this.tracks[key].volume = 0.3;
+        });
+
         this.isInitialized = true;
     },
 
     playTrack(trackName) {
         this.init();
-        const nextTrack = this.tracks[trackName];
+        let nextTrack = null;
 
+        if (trackName === 'principal') {
+            // Seleccionar la pista principal actual de la lista
+            nextTrack = this.tracks.principal[this.currentPrincipalIndex];
+
+            // Avanzar al siguiente índice para la próxima vez que se active la música base
+            this.currentPrincipalIndex = (this.currentPrincipalIndex + 1) % this.tracks.principal.length;
+        } else {
+            nextTrack = this.tracks[trackName];
+        }
+
+        // Si la pista solicitada ya está sonando, no hacemos nada
         if (!nextTrack || this.currentTrack === nextTrack) return;
 
+        // Pausar y reiniciar la pista activa anterior
         if (this.currentTrack) {
             this.currentTrack.pause();
             this.currentTrack.currentTime = 0;
         }
 
+        // Asignar y reproducir la nueva pista
         this.currentTrack = nextTrack;
-        
         this.currentTrack.play().catch(err => {
-            console.warn(`No se pudo reproducir ${trackName}: Comprueba que la ruta './audio/${trackName}.mp3' exista en GitHub.`, err);
+            console.warn(`No se pudo reproducir la pista ${trackName}:`, err);
         });
     }
 };
 
-// Activar audio automáticamente al hacer el primer clic en cualquier parte del juego
+// Desbloquear audio con el primer clic interactivo del usuario
 document.addEventListener('click', () => {
     BGMController.init();
 }, { once: true });
+
 
 
 
