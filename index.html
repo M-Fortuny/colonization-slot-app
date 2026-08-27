@@ -13,50 +13,109 @@
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
-    :root { --purple: #7b2cbf; --light-purple: #ab47bc; --dark-bg: #08020f; --panel-bg: rgba(15, 5, 25, .95); --gold: #ffd700; --green: #00e676; }
-    html { width: 100%; height: 100%; height: -webkit-fill-available; background-color: #08020f; overflow: hidden; }
-    body { position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; min-height: 100vh; min-height: -webkit-fill-available; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left)); color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: radial-gradient(circle at center, #1b092b 0%, #08020f 100%); overflow: hidden; }
-    button { font-family: inherit; }
-    .layout-match { width: 100%; max-width: 980px; margin-inline: auto; }
-    .top-bar { min-height: 85px; display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 10px 20px; background: rgba(20, 10, 35, .85); border: 2px solid var(--purple); border-radius: 14px; box-shadow: 0 4px 15px rgba(0, 0, 0, .5); }
-    .total-bet-box, .balance-box { min-width: 160px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 6px 14px; background: rgba(0, 0, 0, .55); border-radius: 10px; }
-    .total-bet-box { border: 1px solid var(--light-purple); }
-    .balance-box { border: 1px solid var(--green); }
-    .total-bet-label, .balance-label, .control-label { font-size: 11px; font-weight: bold; text-transform: uppercase; text-align: center; }
-    .total-bet-label { color: #e0b0ff; }
-    .balance-label { color: #b9f6ca; }
-    .total-bet-value, .balance-value { margin-top: 2px; font-size: 22px; font-weight: 900; white-space: nowrap; text-align: center; }
-    .total-bet-value { color: var(--gold); }
-    
-    .balance-value { margin-top: 4px; margin-bottom: 6px; color: var(--green); }
-    .player-name-display { font-size: 18px; font-weight: 900; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; line-height: 1.1; text-align: center; }
+:root { --purple: #7b2cbf; --light-purple: #ab47bc; --dark-bg: #08020f; --panel-bg: rgba(15, 5, 25, .95); --gold: #ffd700; --green: #00e676; }
+html { width: 100%; height: 100%; height: -webkit-fill-available; background-color: #08020f; overflow: hidden; }
+body { position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; padding: max(20px, env(safe-area-inset-top)); color: #fff; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: radial-gradient(circle at center, #1b092b 0%, #08020f 100%); overflow: hidden; }
+button { font-family: inherit; }
+.layout-match { width: 100%; max-width: 980px; margin-inline: auto; }
 
-
-  .player-level-display { 
-  font-size: 13px; 
-  font-weight: bold; 
-  color: #5ea2ff; /* Azul claro muy visible y legible */
-  margin-bottom: 2px; 
-  text-align: center; 
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); /* Opcional: mejora el contraste sobre fondoss oscuros */
+/* --- CONTENEDOR PRINCIPAL DEL MODAL --- */
+.top-bar { 
+  height: 110px; 
+  box-sizing: border-box; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: flex-start; 
+  /* Fíjate en la siguiente línea: 10px arriba, 20px derecha, 10px abajo, 20px izquierda */
+  padding: 8px 20px 10px 20px; 
+  gap: 14px; /* Si al separarlo de arriba ves que se pega mucho a los iconos, reduce este gap a 10px o 12px */
+  background: rgba(20, 10, 35, .85); 
+  border: 2px solid var(--purple); 
+  border-radius: 14px; 
+  box-shadow: 0 4px 15px rgba(0, 0, 0, .5); 
 }
 
-.level-progress-container { width: 100%; height: 8px; background: rgba(0, 0, 0, 0.6); border-radius: 4px; overflow: hidden; margin-top: 2px; border: 1px solid var(--purple); }
-.level-progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--light-purple), var(--green)); transition: width 0.4s ease-out; box-shadow: 0 0 10px rgba(0, 230, 118, 0.5); }
 
-    
 
-    .dynamic-center-area { flex: 1; min-width: 350px; display: flex; align-items: center; justify-content: center; text-align: center; }
-    .dynamic-text-display { color: #fff; font-size: 25px; font-weight: 900; text-align: center; white-space: nowrap; text-shadow: 0 0 10px rgba(255, 215, 0, .7); transition: opacity .35s ease, transform .35s ease; line-height: 1.1; }
-    .dynamic-text-display.win-text { color: #00ff88; font-size: 28px; text-shadow: 0 0 15px #00ff88, 0 0 25px #00ff88; animation: pulseWinText .8s infinite alternate ease-in-out; }
-    .dynamic-text-display.jackpot-text { color: var(--gold); font-size: 26px; text-shadow: 0 0 12px #ff9800, 0 0 22px var(--gold); }
-    .jackpot-name, .jackpot-value { display: block; }
-    .jackpot-value { color: #fff; }
-    
-    .sub-text-free { font-size: 0.75em; color: var(--gold); display: inline-block; margin-top: 3px; font-weight: normal; }
-    .dynamic-text-display.win-text .sub-text-free { color: #fff; text-shadow: none; font-size: 0.65em; font-weight: bold; }
 
-    @keyframes pulseWinText { from { transform: scale(.98); } to { transform: scale(1.06); } }
+
+/* --- FILA SUPERIOR (INFO JUGADOR) --- */
+.top-info-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+.info-group { display: flex; align-items: center; gap: 10px; }
+
+/* Corta el espacio invisible (aire) por encima y por debajo de los textos superiores */
+.info-group span {
+  line-height: 1;
+  margin: 1;
+  display: block;
+}
+
+.level-group { display: flex; align-items: center; gap: 6px; }
+
+/* Tipografías de la fila superior */
+.player-name-display { font-size: 16px; font-weight: 900; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+.balance-value { font-size: 16px; font-weight: 900; color: var(--green); }
+.player-level-display { font-size: 14px; font-weight: bold; color: #5ea2ff; text-transform: uppercase; }
+.bonus-display { font-size: 15px; font-weight: 900; color: #ff4081; text-shadow: 0 0 8px rgba(255, 64, 129, 0.6); }
+.total-bet-label { font-size: 14px; font-weight: bold; color: #e0b0ff; text-transform: uppercase; }
+.total-bet-value { font-size: 16px; font-weight: 900; color: var(--green); }
+
+/* Barra de nivel adaptada a la línea */
+.level-progress-container { width: 80px; height: 8px; background: rgba(0, 0, 0, 0.6); border-radius: 4px; overflow: hidden; border: 1px solid var(--purple); display: inline-block; }
+.level-progress-fill { width: 50%; height: 100%; background: linear-gradient(90deg, var(--light-purple), var(--green)); transition: width 0.4s ease-out; box-shadow: 0 0 10px rgba(0, 230, 118, 0.5); }
+
+/* --- FILA INFERIOR (TEXTOS DINÁMICOS E ICONOS) --- */
+.dynamic-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+
+/* --- AJUSTE EN ICONOS Y TEXTO DINÁMICO --- */
+.left-icons { width: 50px; display: flex; align-items: center; justify-content: flex-start; }
+.right-spacer { width: 50px; display: flex; align-items: center; justify-content: flex-end; }
+.icon-placeholder { font-size: 24px; cursor: pointer; opacity: 0.85; transition: opacity 0.2s, transform 0.1s; padding: 2px; }
+.icon-placeholder:active { transform: scale(0.9); }
+
+/* --- ÁREA CENTRAL Y TEXTOS --- */
+.dynamic-center-area { 
+  flex: 1; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  text-align: center; 
+}
+
+.dynamic-text-display { 
+  color: #fff; 
+  font-size: 26px; 
+  font-weight: 900; 
+  text-align: center; 
+  text-shadow: 0 0 10px rgba(255, 215, 0, .7); 
+  line-height: 1.1; 
+  margin: 0; 
+  letter-spacing: 1px; 
+  display: flex;
+  flex-direction: column; 
+  justify-content: center;
+}
+
+/* Animaciones Textos */
+.dynamic-text-display.win-text { color: #00ff88; font-size: 28px; text-shadow: 0 0 15px #00ff88, 0 0 25px #00ff88; animation: pulseWinText .8s infinite alternate ease-in-out; }
+
+/* --- Modificación en el CSS general para Jackpot --- */
+.dynamic-text-display.jackpot-text { 
+  color: var(--gold); 
+  font-size: 28px; 
+  text-shadow: 0 0 12px #ff9800, 0 0 22px var(--gold); 
+  display: flex;             
+  flex-direction: row; 
+  align-items: center;
+  justify-content: center;
+  gap: 10px;  
+  margin: 0; 
+}
+.dynamic-text-display.jackpot-text .jackpot-value { margin-left: 8px; }
+
+
+
+
 
     .lockers-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 8px 10px; background: rgba(15, 5, 25, .85); border: 2px solid var(--purple); border-radius: 14px; box-shadow: 0 4px 15px rgba(0, 0, 0, .4); }
     .locker-box { height: 42px; display: flex; align-items: center; justify-content: center; overflow: hidden; color: #777; font-size: 13px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; background: rgba(0, 0, 0, .55); border: 1px dashed var(--light-purple); border-radius: 10px; }
@@ -398,29 +457,56 @@
 
 
 </style>
-
 </head>
-
 <body>
+
+
   <div class="top-bar layout-match">
-    <div class="total-bet-box">
-      <div class="total-bet-label">Apuesta Total</div>
-      <div class="total-bet-value" id="val-total-bet">9 C</div>
+  <!-- Fila 1: Información superior unificada -->
+  <div class="top-info-row">
+    <div class="info-group">
+      <span class="player-name-display" id="display-player-name">JUGADOR</span>
+      <span class="balance-value" id="display-balance-val">5.000c</span>
     </div>
 
-    <div class="dynamic-center-area">
-      <div class="dynamic-text-display" id="dynamic-display">✨ ¡Mucha suerte!</div>
-    </div>
-
-    <div class="balance-box" id="balance-box">
-      <div class="player-name-display" id="display-player-name">JUGADOR</div>
-      <div class="player-level-display" id="display-player-level">NIVEL 1</div>
-      <div class="balance-value" id="display-balance-val">5.000 C</div>
+    <div class="info-group level-group">
+      <span class="player-level-display" id="display-player-level">NIVEL 1</span>
       <div class="level-progress-container">
         <div class="level-progress-fill" id="level-progress-fill"></div>
       </div>
     </div>
+
+    <div class="info-group">
+      <span class="bonus-display">BONOS X5</span>
+    </div>
+
+    <div class="info-group">
+      <span class="total-bet-label">TOTAL APUESTA</span>
+      <span class="total-bet-value" id="val-total-bet">30c</span>
+    </div>
   </div>
+
+  <!-- Fila 2: Iconos y Textos Dinámicos -->
+  <div class="dynamic-row">
+    <!-- Dejamos solo el engranaje a la izquierda -->
+    <div class="left-icons">
+      <div class="icon-placeholder">⚙️</div>
+    </div>
+    
+    <div class="dynamic-center-area">
+      <div class="dynamic-text-display" id="dynamic-display">Slots Fans</div>
+    </div>
+    
+    <!-- Metemos el altavoz en el espaciador de la derecha -->
+    <div class="right-spacer">
+      <div class="icon-placeholder">🔊</div>
+    </div>
+  </div>
+</div>
+
+
+
+
 
   <div class="lockers-container layout-match">
     <div class="locker-box"><span class="locker-icon">🔒</span> Locker</div>
@@ -754,21 +840,16 @@ window.onerror = function(message, source, lineno, colno, error) {
   return true; 
 };
 
-
-
-        const DEFAULT_CONFIG = [
+    const DEFAULT_CONFIG = [
       { symbol: '🌀', weight: 180, pay3: 5,   pay4: 20,   pay5: 100 },
       { symbol: '🍒', weight: 160, pay3: 8,   pay4: 30,   pay5: 200 },
       { symbol: '⚡', weight: 140, pay3: 15,  pay4: 60,   pay5: 400 },
       { symbol: '🧠', weight: 120, pay3: 25,  pay4: 120,  pay5: 800 },
       { symbol: '🔮', weight: 100, pay3: 40,  pay4: 200,  pay5: 1500 },
-		// El símbolo de Jackpot sale más
       { symbol: '💎', weight: 90,  pay3: 75,  pay4: 400,  pay5: 3000 },
       { symbol: '👑', weight: 70,  pay3: 150, pay4: 1000, pay5: 10000 },
       { symbol: '🎰', weight: 50,  pay3: 300, pay4: 2500, pay5: 30000 }
     ];
-
-
 
     function loadSafeData(key, defaultData) {
       try {
@@ -847,31 +928,30 @@ window.onerror = function(message, source, lineno, colno, error) {
     const BET_OPTIONS = [1, 2, 3, 5, 10];
     
     const state = {
-  credits: savedPlayer.credits !== undefined ? savedPlayer.credits : ECONOMY.startingCredits,
-  selectedLinesIdx: 4, 
-  selectedBetIdx: 0,
-  isSpinning: false, 
-  autoSpin: false,
-  lastWinCredits: 0, 
-  lastWinMatchCount: 3, 
-  hasActiveWin: false, 
-  gambleFailCount: 0,
-  grid: Array.from({ length: 5 }, () => Array(5).fill('')),
-  totalSpins: 0, 
-  totalPayout: 0, 
-  currentWinningLines: [],
-  levelMultiplierHistory: [], // Historial para el cálculo justo
-  freeSpinsLeft: 0, 
-  freeSpinTotalWon: 0, 
-  isFreeSpinMode: false,
-  bonusModalShown: false,
-  
-  isHoldWinMode: false,
-  hwSpinsLeft: 0,
-  hwLockedCells: Array.from({ length: 5 }, () => Array(5).fill(false)),
-  hwActiveJackpotTier: null 
-};
-
+      credits: savedPlayer.credits !== undefined ? savedPlayer.credits : ECONOMY.startingCredits,
+      selectedLinesIdx: 4, 
+      selectedBetIdx: 0,
+      isSpinning: false, 
+      autoSpin: false,
+      lastWinCredits: 0, 
+      lastWinMatchCount: 3, 
+      hasActiveWin: false, 
+      gambleFailCount: 0,
+      grid: Array.from({ length: 5 }, () => Array(5).fill('')),
+      totalSpins: 0, 
+      totalPayout: 0, 
+      currentWinningLines: [],
+      levelMultiplierHistory: [],
+      freeSpinsLeft: 0, 
+      freeSpinTotalWon: 0, 
+      isFreeSpinMode: false,
+      bonusModalShown: false,
+      
+      isHoldWinMode: false,
+      hwSpinsLeft: 0,
+      hwLockedCells: Array.from({ length: 5 }, () => Array(5).fill(false)),
+      hwActiveJackpotTier: null 
+    };
 
     let jackpotIndex = 0; let secretBuffer = ''; let secretTimeout = null;
     let idleTimer = null; let isIdle = true;
@@ -895,23 +975,20 @@ window.onerror = function(message, source, lineno, colno, error) {
     function saveAndUpdateStats() { localStorage.setItem('machine_stats', JSON.stringify(gameStats)); renderStats(); }
 
     // ==========================================
-// 4. INICIALIZACIÓN Y EVENTOS PRINCIPALES
-// ==========================================
-document.addEventListener('DOMContentLoaded', () => {
-  if (!playerProfile.name) requestPlayerName();
-  initBadges(); 
-  initGridUI(); 
-  registerEvents(); 
-  updateUI();
-  startJackpotRotation(); 
-  renderDevPanel(); 
-  renderStats(); 
-  resetIdleState();
-  
-  // Sincronizar el estado inicial del panel Dev de Riesgo
-  updateGambleConfig();
-});
-
+    // 4. INICIALIZACIÓN Y EVENTOS PRINCIPALES
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!playerProfile.name) requestPlayerName();
+      initBadges(); 
+      initGridUI(); 
+      registerEvents(); 
+      updateUI();
+      startJackpotRotation(); 
+      renderDevPanel(); 
+      renderStats(); 
+      resetIdleState();
+      updateGambleConfig();
+    });
 
     function registerEvents() {
       $('btn-lines').addEventListener('click', () => { playClickSound();
@@ -924,21 +1001,15 @@ document.addEventListener('DOMContentLoaded', () => {
         state.selectedBetIdx = (state.selectedBetIdx + 1) % BET_OPTIONS.length; updateUI(); resetIdleState();
       });
 
-		
-		btnSpin.addEventListener('click', () => {
-    // Si aún no hay música sonando, arrancar la principal por primera vez
-    if (!BGMController.currentTrack) {
-        BGMController.playTrack('principal');
-    }
-
-    playClickSound();      //[span_2](start_span)[span_2](end_span)
-    playSpinStartSound();  //[span_3](start_span)[span_3](end_span)
-    triggerSpin();         //[span_4](start_span)[span_4](end_span)
-    resetIdleState();      //[span_5](start_span)[span_5](end_span)
-});
-
-
-
+      btnSpin.addEventListener('click', () => {
+        if (!BGMController.currentTrack) {
+            BGMController.playTrack('principal');
+        }
+        playClickSound();
+        playSpinStartSound();
+        triggerSpin();
+        resetIdleState();
+      });
 
       btnAuto.addEventListener('click', () => { playClickSound(); playSpinStartSound();
         if (state.isFreeSpinMode || state.isHoldWinMode) return;
@@ -949,77 +1020,65 @@ document.addEventListener('DOMContentLoaded', () => {
         if (state.autoSpin && !state.isSpinning) triggerSpin();
       });
       
-	  btnGamble.addEventListener('click', () => {
-    if (state.lastWinCredits <= 0 || state.isFreeSpinMode || state.isHoldWinMode) return;
-    if (typeof playClickSound === 'function') playClickSound();
-    gambleState.active = true;
-    gambleState.currentRisk = state.lastWinCredits;
-    gameStats.currentDoubleStreak = 0; 
-    openGambleModal();
-  });
+      btnGamble.addEventListener('click', () => {
+        if (state.lastWinCredits <= 0 || state.isFreeSpinMode || state.isHoldWinMode) return;
+        if (typeof playClickSound === 'function') playClickSound();
+        gambleState.active = true;
+        gambleState.currentRisk = state.lastWinCredits;
+        gameStats.currentDoubleStreak = 0; 
+        openGambleModal();
+      });
 
-  $('btn-gamble-play').addEventListener('click', () => {
-    if (typeof playClickSound === 'function') playClickSound();
-    playGamble();
-  });
+      $('btn-gamble-play').addEventListener('click', () => {
+        if (typeof playClickSound === 'function') playClickSound();
+        playGamble();
+      });
 
-  $('btn-gamble-collect').addEventListener('click', () => {
-    if (typeof playClickSound === 'function') playClickSound();
-    closeGambleGame(gambleState.currentRisk);
-  });
-
+      $('btn-gamble-collect').addEventListener('click', () => {
+        if (typeof playClickSound === 'function') playClickSound();
+        closeGambleGame(gambleState.currentRisk);
+      });
 
       $('btn-dev-close').addEventListener('click', () => { $('fullscreen-dev').classList.remove('active'); initGridUI(); resetIdleState(); });
 
-      
-		$('btn-dev-reset').addEventListener('click', () => {
-  // He añadido "doble o nada" al mensaje de confirmación para que quede más claro
-  if(confirm('¿Restaurar economía, emojis, doble o nada y borrar datos del jugador?')) {
-    
-    // 1. Restaurar objetos principales
-    EMOJI_CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
-    ECONOMY = JSON.parse(JSON.stringify(DEFAULT_ECONOMY));
-    BONUS_CONFIG = JSON.parse(JSON.stringify(DEFAULT_BONUS_CONFIG));
-    HOLD_WIN_CONFIG = JSON.parse(JSON.stringify(DEFAULT_HOLD_WIN_CONFIG));
-    
-    // ---> AÑADIDO: Restaurar Doble o Nada <---
-    GAMBLE_CONFIG = { ...DEFAULT_GAMBLE_CONFIG };
-
-    playerProfile = { ...DEFAULT_PROFILE };
-    
-    // 2. Limpiar Storage
-    localStorage.removeItem('slot_player'); 
-    localStorage.removeItem('slot_player_profile');
-    localStorage.removeItem('slot_bonus_config'); 
-    localStorage.removeItem('slot_hw_config');
-    // Si guardas la config del gamble en el futuro, añade aquí: localStorage.removeItem('slot_gamble_config');
-    
-    // 3. Restaurar estado
-    state.credits = ECONOMY.startingCredits;
-    
-    // 4. Guardar y actualizar
-    saveConfig(); 
-    saveEconomy(); 
-    savePlayer(); 
-    saveBonusConfig(); 
-    saveHoldWinConfig();
-    
-    requestPlayerName(); 
-    
-    // Como ya tienes un renderDevPanel(), esta función se encargará de poner
-    // visualmente los valores de GAMBLE_CONFIG en sus inputs correspondientes.
-    renderDevPanel(); 
-    updateUI(); 
-    resetIdleState();
-  }
- });
-}
-
+      $('btn-dev-reset').addEventListener('click', () => {
+        if(confirm('¿Restaurar economía, emojis, doble o nada y borrar datos del jugador?')) {
+          EMOJI_CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+          ECONOMY = JSON.parse(JSON.stringify(DEFAULT_ECONOMY));
+          BONUS_CONFIG = JSON.parse(JSON.stringify(DEFAULT_BONUS_CONFIG));
+          HOLD_WIN_CONFIG = JSON.parse(JSON.stringify(DEFAULT_HOLD_WIN_CONFIG));
+          GAMBLE_CONFIG = { ...DEFAULT_GAMBLE_CONFIG };
+          playerProfile = { ...DEFAULT_PROFILE };
+          
+          localStorage.removeItem('slot_player'); 
+          localStorage.removeItem('slot_player_profile');
+          localStorage.removeItem('slot_bonus_config'); 
+          localStorage.removeItem('slot_hw_config');
+          
+          state.credits = ECONOMY.startingCredits;
+          
+          saveConfig(); 
+          saveEconomy(); 
+          savePlayer(); 
+          saveBonusConfig(); 
+          saveHoldWinConfig();
+          
+          requestPlayerName(); 
+          renderDevPanel(); 
+          updateUI(); 
+          resetIdleState();
+        }
+      });
+    }
 
     // ==========================================
     // 5. INTERFAZ DE USUARIO (UI) Y PANELES
     // ==========================================
     function formatValue(credits) { return `${Math.floor(credits).toLocaleString('es-ES')} C`; }
+
+    function formatCredits(val) {
+      return formatValue(val);
+    }
 
     function requestPlayerName() {
       let name = prompt('Ingresa el Nombre del Jugador (Máximo 10 caracteres):', playerProfile.name || 'MeteOritO');
@@ -1039,112 +1098,109 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function renderDevPanel() {
-  const tbody = $('dev-emoji-tbody');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-  
-  EMOJI_CONFIG.forEach((config, idx) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><input type="text" class="dev-input dev-emoji-input" data-idx="${idx}" data-key="symbol" value="${config.symbol}"></td>
-      <td><input type="number" class="dev-input" data-idx="${idx}" data-key="weight" value="${config.weight}"></td>
-      <td><input type="number" class="dev-input" data-idx="${idx}" data-key="pay3" value="${config.pay3}"></td>
-      <td><input type="number" class="dev-input" data-idx="${idx}" data-key="pay4" value="${config.pay4}"></td>
-      <td><input type="number" class="dev-input" data-idx="${idx}" data-key="pay5" value="${config.pay5}"></td>
-    `;
-    tbody.appendChild(tr);
-  });
+      const tbody = $('dev-emoji-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      
+      EMOJI_CONFIG.forEach((config, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><input type="text" class="dev-input dev-emoji-input" data-idx="${idx}" data-key="symbol" value="${config.symbol}"></td>
+          <td><input type="number" class="dev-input" data-idx="${idx}" data-key="weight" value="${config.weight}"></td>
+          <td><input type="number" class="dev-input" data-idx="${idx}" data-key="pay3" value="${config.pay3}"></td>
+          <td><input type="number" class="dev-input" data-idx="${idx}" data-key="pay4" value="${config.pay4}"></td>
+          <td><input type="number" class="dev-input" data-idx="${idx}" data-key="pay5" value="${config.pay5}"></td>
+        `;
+        tbody.appendChild(tr);
+      });
 
-  tbody.querySelectorAll('.dev-input').forEach(input => {
-    input.addEventListener('change', (e) => {
-      const idx = e.target.dataset.idx; const key = e.target.dataset.key;
-      if (key === 'symbol') EMOJI_CONFIG[idx][key] = e.target.value || '❓';
-      else EMOJI_CONFIG[idx][key] = parseInt(e.target.value) || 0;
-      saveConfig();
-    });
-  });
+      tbody.querySelectorAll('.dev-input').forEach(input => {
+        input.addEventListener('change', (e) => {
+          const idx = e.target.dataset.idx; const key = e.target.dataset.key;
+          if (key === 'symbol') EMOJI_CONFIG[idx][key] = e.target.value || '❓';
+          else EMOJI_CONFIG[idx][key] = parseInt(e.target.value) || 0;
+          saveConfig();
+        });
+      });
 
-  if ($('dev-starting-credits')) $('dev-starting-credits').value = ECONOMY.startingCredits;
-  if ($('dev-bank-profit')) $('dev-bank-profit').value = Math.floor(ECONOMY.bankProfit);
-  if ($('dev-jp-percent')) $('dev-jp-percent').value = ECONOMY.jackpotPercent;
-  if ($('dev-jp-3')) $('dev-jp-3').value = Math.floor(ECONOMY.jackpots[3]);
-  if ($('dev-jp-4')) $('dev-jp-4').value = Math.floor(ECONOMY.jackpots[4]);
-  if ($('dev-jp-5')) $('dev-jp-5').value = Math.floor(ECONOMY.jackpots[5]);
-  if ($('dev-spins-req')) $('dev-spins-req').value = ECONOMY.spinsToLevelUp;
-  if ($('dev-spins-reward')) $('dev-spins-reward').value = ECONOMY.freeSpinsReward;
+      if ($('dev-starting-credits')) $('dev-starting-credits').value = ECONOMY.startingCredits;
+      if ($('dev-bank-profit')) $('dev-bank-profit').value = Math.floor(ECONOMY.bankProfit);
+      if ($('dev-jp-percent')) $('dev-jp-percent').value = ECONOMY.jackpotPercent;
+      if ($('dev-jp-3')) $('dev-jp-3').value = Math.floor(ECONOMY.jackpots[3]);
+      if ($('dev-jp-4')) $('dev-jp-4').value = Math.floor(ECONOMY.jackpots[4]);
+      if ($('dev-jp-5')) $('dev-jp-5').value = Math.floor(ECONOMY.jackpots[5]);
+      if ($('dev-spins-req')) $('dev-spins-req').value = ECONOMY.spinsToLevelUp;
+      if ($('dev-spins-reward')) $('dev-spins-reward').value = ECONOMY.freeSpinsReward;
 
-  if ($('dev-bonus-symbol')) $('dev-bonus-symbol').value = BONUS_CONFIG.scatterSymbol;
-  if ($('dev-bonus-min-req')) $('dev-bonus-min-req').value = BONUS_CONFIG.minRequired;
-  if ($('dev-bonus-spins-granted')) $('dev-bonus-spins-granted').value = BONUS_CONFIG.spinsGranted;
-  if ($('dev-bonus-max-retrigger')) $('dev-bonus-max-retrigger').value = BONUS_CONFIG.maxRetriggers;
-  if ($('dev-bonus-multiplier')) $('dev-bonus-multiplier').value = BONUS_CONFIG.multiplierOnBonus;
-  if ($('dev-bonus-weight-mult')) $('dev-bonus-weight-mult').value = BONUS_CONFIG.bonusSymbolWeight;
+      if ($('dev-bonus-symbol')) $('dev-bonus-symbol').value = BONUS_CONFIG.scatterSymbol;
+      if ($('dev-bonus-min-req')) $('dev-bonus-min-req').value = BONUS_CONFIG.minRequired;
+      if ($('dev-bonus-spins-granted')) $('dev-bonus-spins-granted').value = BONUS_CONFIG.spinsGranted;
+      if ($('dev-bonus-max-retrigger')) $('dev-bonus-max-retrigger').value = BONUS_CONFIG.maxRetriggers;
+      if ($('dev-bonus-multiplier')) $('dev-bonus-multiplier').value = BONUS_CONFIG.multiplierOnBonus;
+      if ($('dev-bonus-weight-mult')) $('dev-bonus-weight-mult').value = BONUS_CONFIG.bonusSymbolWeight;
 
-  if ($('dev-jp-symbol')) $('dev-jp-symbol').value = HOLD_WIN_CONFIG.symbol;
-  if ($('dev-jp-weight')) $('dev-jp-weight').value = HOLD_WIN_CONFIG.weight;
-  if ($('dev-bonus-reset-spins')) $('dev-bonus-reset-spins').checked = HOLD_WIN_CONFIG.resetSpinsOnHit;
-  if ($('dev-jp-spins-init')) $('dev-jp-spins-init').value = HOLD_WIN_CONFIG.initialSpins;
-  if ($('dev-jp-spins-add')) $('dev-jp-spins-add').value = HOLD_WIN_CONFIG.spinsAddedOnHit;
-  if ($('dev-jp-req-mini')) $('dev-jp-req-mini').value = HOLD_WIN_CONFIG.reqMini;
-  if ($('dev-jp-req-grand')) $('dev-jp-req-grand').value = HOLD_WIN_CONFIG.reqGrand;
-  if ($('dev-jp-req-super')) $('dev-jp-req-super').value = HOLD_WIN_CONFIG.reqSuper;
+      if ($('dev-jp-symbol')) $('dev-jp-symbol').value = HOLD_WIN_CONFIG.symbol;
+      if ($('dev-jp-weight')) $('dev-jp-weight').value = HOLD_WIN_CONFIG.weight;
+      if ($('dev-bonus-reset-spins')) $('dev-bonus-reset-spins').checked = HOLD_WIN_CONFIG.resetSpinsOnHit;
+      if ($('dev-jp-spins-init')) $('dev-jp-spins-init').value = HOLD_WIN_CONFIG.initialSpins;
+      if ($('dev-jp-spins-add')) $('dev-jp-spins-add').value = HOLD_WIN_CONFIG.spinsAddedOnHit;
+      if ($('dev-jp-req-mini')) $('dev-jp-req-mini').value = HOLD_WIN_CONFIG.reqMini;
+      if ($('dev-jp-req-grand')) $('dev-jp-req-grand').value = HOLD_WIN_CONFIG.reqGrand;
+      if ($('dev-jp-req-super')) $('dev-jp-req-super').value = HOLD_WIN_CONFIG.reqSuper;
 
-  // 1. CARGA VISUAL DE VALORES DOBLE O NADA
-  if ($('dev-gamble-mode')) $('dev-gamble-mode').value = GAMBLE_CONFIG.mode;
-  if ($('dev-gamble-base-speed')) $('dev-gamble-base-speed').value = GAMBLE_CONFIG.baseSpeed;
-  if ($('dev-gamble-threshold')) $('dev-gamble-threshold').value = GAMBLE_CONFIG.threshold;
-  if ($('dev-gamble-step')) $('dev-gamble-step').value = GAMBLE_CONFIG.step;
-  if ($('dev-gamble-min-speed')) $('dev-gamble-min-speed').value = GAMBLE_CONFIG.minSpeed;
+      if ($('dev-gamble-mode')) $('dev-gamble-mode').value = GAMBLE_CONFIG.mode;
+      if ($('dev-gamble-base-speed')) $('dev-gamble-base-speed').value = GAMBLE_CONFIG.baseSpeed;
+      if ($('dev-gamble-threshold')) $('dev-gamble-threshold').value = GAMBLE_CONFIG.threshold;
+      if ($('dev-gamble-step')) $('dev-gamble-step').value = GAMBLE_CONFIG.step;
+      if ($('dev-gamble-min-speed')) $('dev-gamble-min-speed').value = GAMBLE_CONFIG.minSpeed;
 
-  const saveEcoFields = () => {
-    ECONOMY.startingCredits = parseFloat($('dev-starting-credits')?.value) || 5000;
-    ECONOMY.bankProfit = parseFloat($('dev-bank-profit')?.value) || 0;
-    ECONOMY.jackpotPercent = parseFloat($('dev-jp-percent')?.value) || 0;
-    ECONOMY.jackpots[3] = parseFloat($('dev-jp-3')?.value) || 0;
-    ECONOMY.jackpots[4] = parseFloat($('dev-jp-4')?.value) || 0;
-    ECONOMY.jackpots[5] = parseFloat($('dev-jp-5')?.value) || 0;
-    ECONOMY.spinsToLevelUp = parseInt($('dev-spins-req')?.value) || 100;
-    ECONOMY.freeSpinsReward = parseInt($('dev-spins-reward')?.value) || 20;
-    
-    BONUS_CONFIG.scatterSymbol = $('dev-bonus-symbol')?.value || '🌀';
-    BONUS_CONFIG.minRequired = parseInt($('dev-bonus-min-req')?.value) || 8;
-    BONUS_CONFIG.spinsGranted = parseInt($('dev-bonus-spins-granted')?.value) || 20;
-    BONUS_CONFIG.maxRetriggers = parseInt($('dev-bonus-max-retrigger')?.value) || 5;
-    BONUS_CONFIG.multiplierOnBonus = parseFloat($('dev-bonus-multiplier')?.value) || 1.5;
-    BONUS_CONFIG.bonusSymbolWeight = parseFloat($('dev-bonus-weight-mult')?.value) || 1.25;
+      const saveEcoFields = () => {
+        ECONOMY.startingCredits = parseFloat($('dev-starting-credits')?.value) || 5000;
+        ECONOMY.bankProfit = parseFloat($('dev-bank-profit')?.value) || 0;
+        ECONOMY.jackpotPercent = parseFloat($('dev-jp-percent')?.value) || 0;
+        ECONOMY.jackpots[3] = parseFloat($('dev-jp-3')?.value) || 0;
+        ECONOMY.jackpots[4] = parseFloat($('dev-jp-4')?.value) || 0;
+        ECONOMY.jackpots[5] = parseFloat($('dev-jp-5')?.value) || 0;
+        ECONOMY.spinsToLevelUp = parseInt($('dev-spins-req')?.value) || 100;
+        ECONOMY.freeSpinsReward = parseInt($('dev-spins-reward')?.value) || 20;
+        
+        BONUS_CONFIG.scatterSymbol = $('dev-bonus-symbol')?.value || '🌀';
+        BONUS_CONFIG.minRequired = parseInt($('dev-bonus-min-req')?.value) || 8;
+        BONUS_CONFIG.spinsGranted = parseInt($('dev-bonus-spins-granted')?.value) || 20;
+        BONUS_CONFIG.maxRetriggers = parseInt($('dev-bonus-max-retrigger')?.value) || 5;
+        BONUS_CONFIG.multiplierOnBonus = parseFloat($('dev-bonus-multiplier')?.value) || 1.5;
+        BONUS_CONFIG.bonusSymbolWeight = parseFloat($('dev-bonus-weight-mult')?.value) || 1.25;
 
-    HOLD_WIN_CONFIG.symbol = $('dev-jp-symbol')?.value || '🔮';
-    HOLD_WIN_CONFIG.weight = parseFloat($('dev-jp-weight')?.value) || 1.0;
-    HOLD_WIN_CONFIG.resetSpinsOnHit = $('dev-bonus-reset-spins')?.checked ?? true;
-    HOLD_WIN_CONFIG.initialSpins = parseInt($('dev-jp-spins-init')?.value) || 3;
-    HOLD_WIN_CONFIG.spinsAddedOnHit = parseInt($('dev-jp-spins-add')?.value) || 3;
-    HOLD_WIN_CONFIG.reqMini = parseInt($('dev-jp-req-mini')?.value) || 8;
-    HOLD_WIN_CONFIG.reqGrand = parseInt($('dev-jp-req-grand')?.value) || 9;
-    HOLD_WIN_CONFIG.reqSuper = parseInt($('dev-jp-req-super')?.value) || 10;
+        HOLD_WIN_CONFIG.symbol = $('dev-jp-symbol')?.value || '🔮';
+        HOLD_WIN_CONFIG.weight = parseFloat($('dev-jp-weight')?.value) || 1.0;
+        HOLD_WIN_CONFIG.resetSpinsOnHit = $('dev-bonus-reset-spins')?.checked ?? true;
+        HOLD_WIN_CONFIG.initialSpins = parseInt($('dev-jp-spins-init')?.value) || 3;
+        HOLD_WIN_CONFIG.spinsAddedOnHit = parseInt($('dev-jp-spins-add')?.value) || 3;
+        HOLD_WIN_CONFIG.reqMini = parseInt($('dev-jp-req-mini')?.value) || 8;
+        HOLD_WIN_CONFIG.reqGrand = parseInt($('dev-jp-req-grand')?.value) || 9;
+        HOLD_WIN_CONFIG.reqSuper = parseInt($('dev-jp-req-super')?.value) || 10;
 
-    saveEconomy(); saveBonusConfig(); saveHoldWinConfig(); updateUI();
-  };
+        saveEconomy(); saveBonusConfig(); saveHoldWinConfig(); updateUI();
+      };
 
-  ['dev-starting-credits', 'dev-bank-profit', 'dev-jp-percent', 'dev-jp-3', 'dev-jp-4', 'dev-jp-5', 'dev-spins-req', 'dev-spins-reward', 
-   'dev-bonus-symbol', 'dev-bonus-min-req', 'dev-bonus-spins-granted', 'dev-bonus-max-retrigger', 'dev-bonus-multiplier', 'dev-bonus-weight-mult',
-   'dev-jp-symbol', 'dev-jp-weight', 'dev-bonus-reset-spins', 'dev-jp-spins-init', 'dev-jp-spins-add', 'dev-jp-req-mini', 'dev-jp-req-grand', 'dev-jp-req-super'
-  ].forEach(id => {
-    if ($(id)) $(id).addEventListener('change', saveEcoFields);
-  });
+      ['dev-starting-credits', 'dev-bank-profit', 'dev-jp-percent', 'dev-jp-3', 'dev-jp-4', 'dev-jp-5', 'dev-spins-req', 'dev-spins-reward', 
+       'dev-bonus-symbol', 'dev-bonus-min-req', 'dev-bonus-spins-granted', 'dev-bonus-max-retrigger', 'dev-bonus-multiplier', 'dev-bonus-weight-mult',
+       'dev-jp-symbol', 'dev-jp-weight', 'dev-bonus-reset-spins', 'dev-jp-spins-init', 'dev-jp-spins-add', 'dev-jp-req-mini', 'dev-jp-req-grand', 'dev-jp-req-super'
+      ].forEach(id => {
+        if ($(id)) $(id).addEventListener('change', saveEcoFields);
+      });
 
-  // 2. ESCUCHADORES ACTUALIZADOS PARA TODOS LOS CAMPOS DE DOBLE O NADA
-  ['dev-gamble-mode', 'dev-gamble-base-speed', 'dev-gamble-threshold', 'dev-gamble-step', 'dev-gamble-min-speed'].forEach(id => {
-    if ($(id)) $(id).addEventListener('change', updateGambleConfig);
-  });
-}
-
+      ['dev-gamble-mode', 'dev-gamble-base-speed', 'dev-gamble-threshold', 'dev-gamble-step', 'dev-gamble-min-speed'].forEach(id => {
+        if ($(id)) $(id).addEventListener('change', updateGambleConfig);
+      });
+    }
 
     function renderStats() {
       if (!$('stat-plays')) return;
-      $('stat-plays').innerText = gameStats.totalPlays;
-      $('stat-bet').innerText = gameStats.totalBet.toFixed(2);
-      $('stat-won').innerText = gameStats.totalWon.toFixed(2);
-      $('stat-lost-risk').innerText = gameStats.totalLostRisking.toFixed(2);
+      $('stat-plays').innerText = gameStats.totalPlays.toLocaleString('es-ES');
+      $('stat-bet').innerText = formatValue(gameStats.totalBet);
+      $('stat-won').innerText = formatValue(gameStats.totalWon);
+      $('stat-lost-risk').innerText = formatValue(gameStats.totalLostRisking);
       
       let rtpTotal = gameStats.totalBet > 0 ? (gameStats.totalWon / gameStats.totalBet) * 100 : 0;
       let rtpBase = gameStats.totalBet > 0 ? ((gameStats.baseWon || 0) / gameStats.totalBet) * 100 : 0;
@@ -1167,40 +1223,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateUI() {
-  const lines = LINE_OPTIONS[state.selectedLinesIdx];
-  const bet = BET_OPTIONS[state.selectedBetIdx];
-  
-  $('display-player-name').textContent = playerProfile.name || 'MeteOritO';
-  $('display-player-level').textContent = `NIVEL ${playerProfile.level}`;
-  $('display-balance-val').textContent = formatValue(state.credits);
-  
-  const totalBet = (lines + 1) * bet;
-  $('val-total-bet').textContent = `${totalBet} C`;
-  
-  $('val-lines').textContent = lines;
-  $('val-bet').textContent = `x${bet}`;
-  
-  const targetSpins = ECONOMY.spinsToLevelUp * (playerProfile.level + 1);
-  let progressPercent = (playerProfile.spinsToNextLevel / targetSpins) * 100;
-  $('level-progress-fill').style.width = `${Math.min(100, progressPercent)}%`;
+      const lines = LINE_OPTIONS[state.selectedLinesIdx];
+      const bet = BET_OPTIONS[state.selectedBetIdx];
+      
+      $('display-player-name').textContent = playerProfile.name || 'MeteOritO';
+      $('display-player-level').textContent = `NIVEL ${playerProfile.level}`;
+      $('display-balance-val').textContent = formatValue(state.credits);
+      
+      const totalBet = (lines + 1) * bet;
+      $('val-total-bet').textContent = formatValue(totalBet);
+      
+      $('val-lines').textContent = lines;
+      $('val-bet').textContent = `x${bet}`;
+      
+      const targetSpins = ECONOMY.spinsToLevelUp * (playerProfile.level + 1);
+      let progressPercent = (playerProfile.spinsToNextLevel / targetSpins) * 100;
+      $('level-progress-fill').style.width = `${Math.min(100, progressPercent)}%`;
 
-  document.querySelectorAll('.badge-line').forEach(badge => {
-    badge.classList.toggle('active', Number(badge.dataset.line) <= lines);
-  });
+      document.querySelectorAll('.badge-line').forEach(badge => {
+        badge.classList.toggle('active', Number(badge.dataset.line) <= lines);
+      });
 
-  // Agrupamos el estado de bloqueo incluyendo la comprobación de state.autoSpin
-  const isControlDisabled = state.isSpinning || state.isFreeSpinMode || state.isHoldWinMode || state.autoSpin;
+      const isControlDisabled = state.isSpinning || state.isFreeSpinMode || state.isHoldWinMode || state.autoSpin;
 
-  btnGamble.classList.toggle('disabled', state.lastWinCredits <= 0 || isControlDisabled);
+      btnGamble.classList.toggle('disabled', state.lastWinCredits <= 0 || isControlDisabled);
 
-  [$('btn-spin'), $('btn-lines'), $('btn-bet')].forEach(button => {
-    if (!button) return;
-    button.classList.toggle('disabled', isControlDisabled);
-    button.style.pointerEvents = isControlDisabled ? 'none' : 'auto';
-  });
-}
-
-
+      [$('btn-spin'), $('btn-lines'), $('btn-bet')].forEach(button => {
+        if (!button) return;
+        button.classList.toggle('disabled', isControlDisabled);
+        button.style.pointerEvents = isControlDisabled ? 'none' : 'auto';
+      });
+    }
 
     function showLevelUpModal(title, sub, duration = 4000) {
       const modal = $('modal-level-up');
@@ -1271,45 +1324,39 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    function checkAnticipation() {
+      if (state.isHoldWinMode || state.isFreeSpinMode) return false; 
 
-	function checkAnticipation() {
-  if (state.isHoldWinMode || state.isFreeSpinMode) return false; 
+      let isTension = false;
+      let spirals = 0;
+      let crystals = 0;
 
-  let isTension = false;
-  let spirals = 0;
-  let crystals = 0;
+      for (let col = 0; col < 4; col++) {
+        for (let row = 0; row < 5; row++) {
+          if (state.grid[col][row] === BONUS_CONFIG.scatterSymbol) spirals++;
+          if (state.grid[col][row] === HOLD_WIN_CONFIG.symbol) crystals++;
+        }
+      }
+      
+      if (spirals === (BONUS_CONFIG.minRequired - 1)) isTension = true;
+      if (crystals === (HOLD_WIN_CONFIG.reqMini - 1)) isTension = true;
 
-  // 1. Contar Espirales y Bolas en las primeras 4 columnas
-  for (let col = 0; col < 4; col++) {
-    for (let row = 0; row < 5; row++) {
-      if (state.grid[col][row] === BONUS_CONFIG.scatterSymbol) spirals++;
-      if (state.grid[col][row] === HOLD_WIN_CONFIG.symbol) crystals++;
+      const lines = LINE_OPTIONS[state.selectedLinesIdx];
+      for (let i = 0; i < lines; i++) {
+        const line = PAYLINES[i];
+        let firstSym = state.grid[0][line[0]];
+        let matchCount = 1;
+        
+        for (let col = 1; col < 4; col++) {
+          if (state.grid[col][line[col]] === firstSym) matchCount++;
+          else break; 
+        }
+        
+        if (matchCount === 4) isTension = true; 
+      }
+
+      return isTension;
     }
-  }
-  
-  // Si falta 1 para el bonus o para el Hold&Win
-  if (spirals === (BONUS_CONFIG.minRequired - 1)) isTension = true;
-  if (crystals === (HOLD_WIN_CONFIG.reqMini - 1)) isTension = true;
-
-  // 2. Comprobar si estamos a punto de un premio de 5 emojis
-  const lines = LINE_OPTIONS[state.selectedLinesIdx];
-  for (let i = 0; i < lines; i++) {
-    const line = PAYLINES[i];
-    let firstSym = state.grid[0][line[0]];
-    let matchCount = 1;
-    
-    // Revisar si los 4 primeros símbolos de la línea coinciden
-    for (let col = 1; col < 4; col++) {
-      if (state.grid[col][line[col]] === firstSym) matchCount++;
-      else break; 
-    }
-    
-    if (matchCount === 4) isTension = true; 
-  }
-
-  return isTension;
-}
-
 
     function resetIdleState() {
       isIdle = false;
@@ -1384,862 +1431,765 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // 7. MECÁNICAS DE JUEGO (GAMBLE, SPIN, WINS, HOLD&WIN)
     // ==========================================
-        function processGambleLoss(lostAmount) {
+    function processGambleLoss(lostAmount) {
       const jpPercentage = ECONOMY.jackpotPercent / 100;
       const jackpotCut = lostAmount * jpPercentage; 
       const extraSuperCut = lostAmount - jackpotCut; 
 
-      // Comprobamos si hay MÁS de una línea ganadora en la jugada actual
       if (state.currentWinningLines && state.currentWinningLines.length > 1) {
-          // Si hay varias líneas, el porcentaje configurado va directo al Súper Jackpot
           ECONOMY.jackpots[5] += jackpotCut;
       } else {
-          // Si solo hay una línea, usamos el comportamiento normal
           let match = Math.max(3, Math.min(5, state.lastWinMatchCount));
           ECONOMY.jackpots[match] += jackpotCut;
       }
 
-      // El resto del corte va al Súper y al beneficio del banco, como ya tenías
       ECONOMY.jackpots[5] += extraSuperCut;
       ECONOMY.bankProfit += extraSuperCut; 
       
       saveEconomy();
     }
 
+    const DEFAULT_GAMBLE_CONFIG = {
+      mode: 'skill',
+      baseSpeed: 200,    
+      threshold: 2,      
+      step: 20,          
+      minSpeed: 80       
+    };
 
-// ==========================================
-// SISTEMA DOBLE O NADA (ACTUALIZADO)
-// ==========================================
+    let GAMBLE_CONFIG = { ...DEFAULT_GAMBLE_CONFIG };
 
-// 1. Creamos una constante intocable con tus valores base
-const DEFAULT_GAMBLE_CONFIG = {
-  mode: 'skill',
-  baseSpeed: 200,    // Velocidad base que elegiste (200ms)
-  threshold: 2,      // Cada 2 aciertos
-  step: 20,          // Resta 20ms
-  minSpeed: 80       // Suelo de 80ms
-};
+    let gambleState = { 
+      active: false, 
+      currentRisk: 0, 
+      activeOption: 'win', 
+      timer: null, 
+      isBlinking: false,
+      streak: 0          
+    };
 
-// 2. Inicializamos la configuración copiando los valores por defecto
-let GAMBLE_CONFIG = { ...DEFAULT_GAMBLE_CONFIG };
+    window.updateGambleConfig = function() {
+      const modeSelect = $('dev-gamble-mode');
+      const speedInput = $('dev-gamble-base-speed');
+      const thresholdInput = $('dev-gamble-threshold');
+      const stepInput = $('dev-gamble-step');
+      const minInput = $('dev-gamble-min-speed');
 
-let gambleState = { 
-  active: false, 
-  currentRisk: 0, 
-  activeOption: 'win', 
-  timer: null, 
-  isBlinking: false,
-  streak: 0          
-};
+      if (modeSelect) GAMBLE_CONFIG.mode = modeSelect.value;
+      if (speedInput) GAMBLE_CONFIG.baseSpeed = parseInt(speedInput.value, 10) || DEFAULT_GAMBLE_CONFIG.baseSpeed;
+      if (thresholdInput) GAMBLE_CONFIG.threshold = parseInt(thresholdInput.value, 10) || DEFAULT_GAMBLE_CONFIG.threshold;
+      if (stepInput) GAMBLE_CONFIG.step = parseInt(stepInput.value, 10) || DEFAULT_GAMBLE_CONFIG.step;
+      if (minInput) GAMBLE_CONFIG.minSpeed = parseInt(minInput.value, 10) || DEFAULT_GAMBLE_CONFIG.minSpeed;
+    };
 
-// 3. Leemos los campos del Panel Dev (Usamos la constante como respaldo)
-window.updateGambleConfig = function() {
-  const modeSelect = $('dev-gamble-mode');
-  const speedInput = $('dev-gamble-base-speed');
-  const thresholdInput = $('dev-gamble-threshold');
-  const stepInput = $('dev-gamble-step');
-  const minInput = $('dev-gamble-min-speed');
+    function getCurrentGambleSpeed() {
+      if (GAMBLE_CONFIG.mode !== 'skill') return GAMBLE_CONFIG.baseSpeed;
 
-  if (modeSelect) GAMBLE_CONFIG.mode = modeSelect.value;
-  if (speedInput) GAMBLE_CONFIG.baseSpeed = parseInt(speedInput.value, 10) || DEFAULT_GAMBLE_CONFIG.baseSpeed;
-  if (thresholdInput) GAMBLE_CONFIG.threshold = parseInt(thresholdInput.value, 10) || DEFAULT_GAMBLE_CONFIG.threshold;
-  if (stepInput) GAMBLE_CONFIG.step = parseInt(stepInput.value, 10) || DEFAULT_GAMBLE_CONFIG.step;
-  if (minInput) GAMBLE_CONFIG.minSpeed = parseInt(minInput.value, 10) || DEFAULT_GAMBLE_CONFIG.minSpeed;
-};
+      const multiplier = Math.floor((gambleState.streak || 0) / GAMBLE_CONFIG.threshold);
+      const targetSpeed = GAMBLE_CONFIG.baseSpeed - (multiplier * GAMBLE_CONFIG.step);
 
-// 4. Cálculo de velocidad según la racha
-function getCurrentGambleSpeed() {
-  if (GAMBLE_CONFIG.mode !== 'skill') return GAMBLE_CONFIG.baseSpeed;
-
-  const multiplier = Math.floor((gambleState.streak || 0) / GAMBLE_CONFIG.threshold);
-  const targetSpeed = GAMBLE_CONFIG.baseSpeed - (multiplier * GAMBLE_CONFIG.step);
-
-  return Math.max(GAMBLE_CONFIG.minSpeed, targetSpeed);
-}
-
-
-
-function openGambleModal() {
-  BGMController.playTrack('doblenada');
-  $('modal-gamble').classList.add('active');
-  $('gamble-win-val').textContent = formatValue(gambleState.currentRisk);
-  startBlinking();
-}
-
-function startBlinking() {
-  gambleState.isBlinking = true;
-  const card = $('gamble-card');
-  card.classList.remove('win-effect');
-  
-  // Obtenemos la velocidad dinámica en tiempo real según la racha y el panel Dev
-  const currentSpeed = getCurrentGambleSpeed();
-  
-  gambleState.timer = setInterval(() => {
-    gambleState.activeOption = gambleState.activeOption === 'win' ? 'lose' : 'win';
-    if (gambleState.activeOption === 'win') {
-        card.textContent = '✨ DOBLE ✨';
-        card.style.color = '#00ffcc';
-    } else {
-        card.textContent = '☠️ NADA ☠️';
-        card.style.color = '#ff3366';
+      return Math.max(GAMBLE_CONFIG.minSpeed, targetSpeed);
     }
-  }, currentSpeed); // <-- AQUÍ ESTÁ EL CAMBIO CLAVE
-}
 
-
-function playGamble() {
-  if (!gambleState.active || !gambleState.isBlinking) return;
-  
-  clearInterval(gambleState.timer);
-  gambleState.isBlinking = false;
-  gameStats.doubleAttempts = (gameStats.doubleAttempts || 0) + 1;
-  let isWin = (GAMBLE_CONFIG.mode === 'chance') 
-    ? (Math.random() < 0.5) 
-    : (gambleState.activeOption === 'win');
-
-  const card = $('gamble-card');
-  
-
-  if (isWin) {
-    card.textContent = '✨ 2X ✨'; card.style.color = '#00ffcc'; card.classList.add('win-effect');
-    gameStats.doubleWins = (gameStats.doubleWins || 0) + 1;
-    gameStats.currentDoubleStreak++;
-    if (gameStats.currentDoubleStreak > (gameStats.maxDoubleStreak || 0)) gameStats.maxDoubleStreak = gameStats.currentDoubleStreak;
-    gameStats.totalWon += gambleState.currentRisk;
-    saveAndUpdateStats();
-
-    gambleState.currentRisk *= 2;
-    state.lastWinCredits = gambleState.currentRisk;
-    $('gamble-win-val').textContent = formatValue(gambleState.currentRisk);
-    setStatusText(`¡DOBLAS! +${formatValue(gambleState.currentRisk)}`, true);
-    
-    // Reactiva el parpadeo tras 1.2s para seguir jugando
-    setTimeout(() => { if (gambleState.active) startBlinking(); }, 1200);
-  } else {
-    card.textContent = '🧟‍♀️ NADA 🧟‍♂️'; card.style.color = '#ff3366';
-    if (typeof processGambleLoss === 'function') processGambleLoss(gambleState.currentRisk);
-    
-    gameStats.currentDoubleStreak = 0; 
-    gameStats.totalLostRisking = (gameStats.totalLostRisking || 0) + gambleState.currentRisk; 
-    gameStats.totalWon -= gambleState.currentRisk; 
-    saveAndUpdateStats();
-    
-    state.credits -= gambleState.currentRisk; state.credits = Math.max(0, state.credits); 
-    savePlayer();
-    setStatusText('☠️ Has perdido todo.', false);
-    
-    setTimeout(() => { closeGambleGame(0); }, 1500);
-  }
-}
-
-function closeGambleGame(finalAmount) {
-  BGMController.playTrack('principal');
-  clearInterval(gambleState.timer);
-  gambleState.active = false;
-  gambleState.isBlinking = false;
-  $('modal-gamble').classList.remove('active');
-
-  if (finalAmount > 0) {
-    state.credits += finalAmount; savePlayer();
-    setStatusText(`🎉 ¡COBRAS ${formatValue(finalAmount)}!`, true);
-  }
-  
-  state.hasActiveWin = false; state.lastWinCredits = 0;
-  updateUI(); resetIdleState(); checkAutoSpin();
-}
-
-
-	function triggerLevelUpBonus() {
-  // 1. Apuesta que el jugador tiene seleccionada en pantalla ahora mismo
-  const currentBet = BET_OPTIONS[state.selectedBetIdx];
-
-  // 2. Calcular la apuesta media jugada durante este nivel
-  let averageBet = 1;
-  if (state.levelMultiplierHistory && state.levelMultiplierHistory.length > 0) {
-    const suma = state.levelMultiplierHistory.reduce((acc, val) => acc + val, 0);
-    averageBet = Math.floor(suma / state.levelMultiplierHistory.length);
-  }
-  if (averageBet < 1) averageBet = 1;
-
-  // 3. REGLA ANTI-HACK: Si la apuesta actual es mayor que la media, bajamos a la media.
-  // Si la apuesta actual es menor o igual, respetamos lo que eligió el jugador.
-  const finalBet = Math.min(currentBet, averageBet);
-
-  // 4. Buscar el índice del botón que corresponde a esa apuesta
-  let newBetIdx = 0;
-  for (let i = 0; i < BET_OPTIONS.length; i++) {
-    if (BET_OPTIONS[i] <= finalBet) {
-      newBetIdx = i;
-    } else {
-      break;
+    function openGambleModal() {
+      BGMController.playTrack('doblenada');
+      $('modal-gamble').classList.add('active');
+      $('gamble-win-val').textContent = formatValue(gambleState.currentRisk);
+      startBlinking();
     }
-  }
 
-  // 5. Aplicar el cambio de apuesta y guardar el multiplicador bloqueado
-  state.selectedBetIdx = newBetIdx;
-  state.freeSpinBaseMultiplier = BET_OPTIONS[newBetIdx];
+    function startBlinking() {
+      gambleState.isBlinking = true;
+      const card = $('gamble-card');
+      card.classList.remove('win-effect');
+      
+      const currentSpeed = getCurrentGambleSpeed();
+      
+      gambleState.timer = setInterval(() => {
+        gambleState.activeOption = gambleState.activeOption === 'win' ? 'lose' : 'win';
+        if (gambleState.activeOption === 'win') {
+            card.textContent = '✨ DOBLE ✨';
+            card.style.color = '#00ffcc';
+        } else {
+            card.textContent = '☠️ NADA ☠️';
+            card.style.color = '#ff3366';
+        }
+      }, currentSpeed);
+    }
 
-  // Vaciamos el historial para el nuevo nivel
-  state.levelMultiplierHistory = [];
-  state.freeSpinsLeft = ECONOMY.freeSpinsReward || 25;
+    function playGamble() {
+      if (!gambleState.active || !gambleState.isBlinking) return;
+      
+      clearInterval(gambleState.timer);
+      gambleState.isBlinking = false;
+      gameStats.doubleAttempts = (gameStats.doubleAttempts || 0) + 1;
+      let isWin = (GAMBLE_CONFIG.mode === 'chance') 
+        ? (Math.random() < 0.5) 
+        : (gambleState.activeOption === 'win');
 
-  // Actualizamos los botones de la pantalla
-  updateUI();
-}
+      const card = $('gamble-card');
 
+      if (isWin) {
+        card.textContent = '✨ 2X ✨'; card.style.color = '#00ffcc'; card.classList.add('win-effect');
+        gameStats.doubleWins = (gameStats.doubleWins || 0) + 1;
+        gameStats.currentDoubleStreak++;
+        if (gameStats.currentDoubleStreak > (gameStats.maxDoubleStreak || 0)) gameStats.maxDoubleStreak = gameStats.currentDoubleStreak;
+        gameStats.totalWon += gambleState.currentRisk;
+        saveAndUpdateStats();
+
+        gambleState.currentRisk *= 2;
+        state.lastWinCredits = gambleState.currentRisk;
+        $('gamble-win-val').textContent = formatValue(gambleState.currentRisk);
+        setStatusText(`¡DOBLAS! +${formatValue(gambleState.currentRisk)}`, true);
+        
+        setTimeout(() => { if (gambleState.active) startBlinking(); }, 1200);
+      } else {
+        card.textContent = '🧟‍♀️ NADA 🧟‍♂️'; card.style.color = '#ff3366';
+        if (typeof processGambleLoss === 'function') processGambleLoss(gambleState.currentRisk);
+        
+        gameStats.currentDoubleStreak = 0; 
+        gameStats.totalLostRisking = (gameStats.totalLostRisking || 0) + gambleState.currentRisk; 
+        gameStats.totalWon -= gambleState.currentRisk; 
+        saveAndUpdateStats();
+        
+        state.credits -= gambleState.currentRisk; state.credits = Math.max(0, state.credits); 
+        savePlayer();
+        setStatusText('☠️ Has perdido todo.', false);
+        
+        setTimeout(() => { closeGambleGame(0); }, 1500);
+      }
+    }
+
+    function closeGambleGame(finalAmount) {
+      BGMController.playTrack('principal');
+      clearInterval(gambleState.timer);
+      gambleState.active = false;
+      gambleState.isBlinking = false;
+      $('modal-gamble').classList.remove('active');
+
+      if (finalAmount > 0) {
+        state.credits += finalAmount; savePlayer();
+        setStatusText(`🎉 ¡COBRAS ${formatValue(finalAmount)}!`, true);
+      }
+      
+      state.hasActiveWin = false; state.lastWinCredits = 0;
+      updateUI(); resetIdleState(); checkAutoSpin();
+    }
+
+    function triggerLevelUpBonus() {
+      const currentBet = BET_OPTIONS[state.selectedBetIdx];
+      let averageBet = 1;
+      if (state.levelMultiplierHistory && state.levelMultiplierHistory.length > 0) {
+        const suma = state.levelMultiplierHistory.reduce((acc, val) => acc + val, 0);
+        averageBet = Math.floor(suma / state.levelMultiplierHistory.length);
+      }
+      if (averageBet < 1) averageBet = 1;
+
+      const finalBet = Math.min(currentBet, averageBet);
+
+      let newBetIdx = 0;
+      for (let i = 0; i < BET_OPTIONS.length; i++) {
+        if (BET_OPTIONS[i] <= finalBet) {
+          newBetIdx = i;
+        } else {
+          break;
+        }
+      }
+
+      state.selectedBetIdx = newBetIdx;
+      state.freeSpinBaseMultiplier = BET_OPTIONS[newBetIdx];
+      state.levelMultiplierHistory = [];
+      state.freeSpinsLeft = ECONOMY.freeSpinsReward || 25;
+
+      updateUI();
+    }
 
     function triggerSpin() {
-  playSpinStartSound();
-  if (state.isHoldWinMode) {
-    executeSpinVisuals();
-    return;
-  }
+      playSpinStartSound();
+      if (state.isHoldWinMode) {
+        executeSpinVisuals();
+        return;
+      }
 
-  const lines = LINE_OPTIONS[state.selectedLinesIdx];
-  const bet = BET_OPTIONS[state.selectedBetIdx];
-  
-  const totalBet = (lines + 1) * bet;
+      const lines = LINE_OPTIONS[state.selectedLinesIdx];
+      const bet = BET_OPTIONS[state.selectedBetIdx];
+      const totalBet = (lines + 1) * bet;
 
-  if (!state.isFreeSpinMode) {
-    // 1. Validar saldo suficiente
-    if (state.credits < totalBet) {
-      setStatusText('⚠️ Saldo insuficiente');
-      state.autoSpin = false; 
-      $('val-auto').textContent = 'AUTO: OFF'; 
-      btnAuto.style.background = '';
-      resetIdleState(); 
-      return;
-    }
+      if (!state.isFreeSpinMode) {
+        if (state.credits < totalBet) {
+          setStatusText('⚠️ Saldo insuficiente');
+          state.autoSpin = false; 
+          $('val-auto').textContent = 'AUTO: OFF'; 
+          btnAuto.style.background = '';
+          resetIdleState(); 
+          return;
+        }
 
-    // 2. Cobrar tirada
-    state.credits -= totalBet; 
-    savePlayer();
-    saveEconomy();
-    
-    // Guardar multiplicador para el cálculo de la media
-    if (!state.levelMultiplierHistory) state.levelMultiplierHistory = [];
-    state.levelMultiplierHistory.push(bet || 1);
+        state.credits -= totalBet; 
+        savePlayer();
+        saveEconomy();
+        
+        if (!state.levelMultiplierHistory) state.levelMultiplierHistory = [];
+        state.levelMultiplierHistory.push(bet || 1);
 
-    // 3. Actualizar estadísticas
-    gameStats.totalPlays++; 
-    gameStats.basePlays = (gameStats.basePlays || 0) + 1;
-    gameStats.totalBet += totalBet; 
-    gameStats.currentNoPrizeStreak++; 
-    saveAndUpdateStats();
-    
-    playerProfile.spinsToNextLevel += bet; 
-    saveProfile(); 
-    updateUI();
+        gameStats.totalPlays++; 
+        gameStats.basePlays = (gameStats.basePlays || 0) + 1;
+        gameStats.totalBet += totalBet; 
+        gameStats.currentNoPrizeStreak++; 
+        saveAndUpdateStats();
+        
+        playerProfile.spinsToNextLevel += bet; 
+        saveProfile(); 
+        updateUI();
 
-    // 4. Comprobar subida de nivel
-    const targetSpins = ECONOMY.spinsToLevelUp * (playerProfile.level + 1);
+        const targetSpins = ECONOMY.spinsToLevelUp * (playerProfile.level + 1);
 
         if (playerProfile.spinsToNextLevel >= targetSpins) {
-      playerProfile.level++;
-      playerProfile.spinsToNextLevel = 0; 
-      
-      // Aquí se ejecuta el cálculo de la media y se asignan los giros
-      triggerLevelUpBonus();
-      
-      state.isFreeSpinMode = true;
-      state.freeSpinTotalWon = 0;
-      saveProfile(); 
-      state.isSpinning = true; 
-      updateUI();
-		BGMController.playTrack('freespins');
+          playerProfile.level++;
+          playerProfile.spinsToNextLevel = 0; 
+          
+          triggerLevelUpBonus();
+          
+          state.isFreeSpinMode = true;
+          state.freeSpinTotalWon = 0;
+          saveProfile(); 
+          state.isSpinning = true; 
+          updateUI();
+          BGMController.playTrack('freespins');
 
-      
-      showLevelUpModal('ENHORABUENA', `SUBISTE A NIVEL ${playerProfile.level}<br><span>¡${state.freeSpinsLeft} TIRADAS GRATIS!</span>`, 3500).then(() => {
-        executeSpinVisuals();
-      });
-      return;
+          showLevelUpModal('ENHORABUENA', `SUBISTE A NIVEL ${playerProfile.level}<br><span>¡${state.freeSpinsLeft} TIRADAS GRATIS!</span>`, 3500).then(() => {
+            executeSpinVisuals();
+          });
+          return;
+        }
+      } else {
+        gameStats.totalPlays++; 
+        gameStats.bonusPlays = (gameStats.bonusPlays || 0) + 1;
+        saveAndUpdateStats();
+      }
+
+      executeSpinVisuals();
     }
-  } else {
-    // Modo Free Spin activo
-    gameStats.totalPlays++; 
-    gameStats.bonusPlays = (gameStats.bonusPlays || 0) + 1;
-    saveAndUpdateStats();
-  }
-
-  executeSpinVisuals();
-}
-
-
 
     function executeSpinVisuals() {
-  state.isSpinning = true;
-  isIdle = false;
-  clearTimeout(idleTimer);
+      state.isSpinning = true;
+      isIdle = false;
+      clearTimeout(idleTimer);
 
-  state.lastWinCredits = 0;
-  state.hasActiveWin = false;
-  state.gambleFailCount = 0;
-  state.totalSpins++;
+      state.lastWinCredits = 0;
+      state.hasActiveWin = false;
+      state.gambleFailCount = 0;
+      state.totalSpins++;
 
-  clearPaylinesSVG();
+      clearPaylinesSVG();
 
-  if (!state.isHoldWinMode) {
-    document.querySelectorAll('.symbol-cell').forEach(cell => {
-      cell.classList.remove('winning', 'dimmed', 'hold-spinning', 'locked-cell-static');
-    });
+      if (!state.isHoldWinMode) {
+        document.querySelectorAll('.symbol-cell').forEach(cell => {
+          cell.classList.remove('winning', 'dimmed', 'hold-spinning', 'locked-cell-static');
+        });
 
-    document.querySelectorAll('.badge-line').forEach(badge => {
-      badge.classList.remove('badge-winning-pulse');
-    });
-  }
+        document.querySelectorAll('.badge-line').forEach(badge => {
+          badge.classList.remove('badge-winning-pulse');
+        });
+      }
 
-  if (state.isHoldWinMode) {
-    setStatusText(`🔮 RESPINS RESTANTES: ${state.hwSpinsLeft}`);
-  } else if (state.isFreeSpinMode) {
-    setStatusText(
-      `🎁 TIRADAS GRATIS<br><span class="sub-text-free">${state.freeSpinsLeft} RESTANTES</span>`
-    );
-  } else {
-    setStatusText('🍀 Buena Suerte !!!');
-  }
-
-  updateUI();
-
-  const reels = gridContainer.querySelectorAll('.reel-strip');
-
-  // Activar animación únicamente en las celdas libres durante Hold & Win
-  if (state.isHoldWinMode) {
-    document.querySelectorAll('.symbol-cell').forEach(cell => {
-      const col = Number(cell.dataset.reel);
-      const row = Number(cell.dataset.row);
-
-      if (state.hwLockedCells[col][row]) {
-        cell.classList.remove('hold-spinning');
-        cell.classList.add('locked-cell-static');
+      if (state.isHoldWinMode) {
+        setStatusText(`🔮 RESPINS RESTANTES: ${state.hwSpinsLeft}`);
+      } else if (state.isFreeSpinMode) {
+        setStatusText(
+          `🎁 TIRADAS GRATIS 🎁<br><span class="sub-text-free">${state.freeSpinsLeft} RESTANTES</span>`
+        );
       } else {
-        cell.classList.remove('locked-cell-static');
-        cell.classList.add('hold-spinning');
-      }
-    });
-  }
-
-  // Generar símbolos nuevos solo para las celdas libres
-  for (let col = 0; col < 5; col++) {
-    for (let row = 0; row < 5; row++) {
-      if (state.isHoldWinMode && state.hwLockedCells[col][row]) {
-        continue;
+        setStatusText('🍀 Buena Suerte !!!');
       }
 
-      state.grid[col][row] = getRandomSymbol();
-    }
-  }
+      updateUI();
 
-  const anticipationMode =
-    typeof checkAnticipation === 'function'
-      ? checkAnticipation()
-      : false;
+      const reels = gridContainer.querySelectorAll('.reel-strip');
 
-    reels.forEach((strip, index) => {
-    strip.classList.remove('bounce', 'hold-spinning', 'tension-glow');
+      if (state.isHoldWinMode) {
+        document.querySelectorAll('.symbol-cell').forEach(cell => {
+          const col = Number(cell.dataset.reel);
+          const row = Number(cell.dataset.row);
 
-    // En Hold & Win no se mueve el rodillo completo
-    if (!state.isHoldWinMode) {
-      strip.classList.add('spinning');
-    }
-
-    // 1. Definimos el tiempo base
-    let stopDelay = 1000 + index * 150;
-
-    // 2. Si hay tensión en el último rodillo (y no estamos en Hold & Win), sumamos tiempo y activamos el brillo
-    if (anticipationMode && index === 4 && !state.isHoldWinMode) {
-      stopDelay += 2000; // Aquí está el retraso dramático de 2 segundos extra
-      strip.classList.add('tension-glow');
-    }
-
-    setTimeout(() => {
-  // Hold & Win: detener las celdas de esta columna en secuencia
-  if (state.isHoldWinMode) {
-    strip.classList.remove('hold-spinning', 'tension-glow', 'spinning', 'bounce');
-
-    if (typeof playReelStopSound === 'function') {
-      playReelStopSound();
-    }
-
-    for (let row = 0; row < 5; row++) {
-      const cell = document.querySelector(
-        `.symbol-cell[data-reel="${index}"][data-row="${row}"]`
-      );
-
-      if (!cell) continue;
-
-      const isLocked = state.hwLockedCells[index][row];
-
-      cell.classList.remove('hold-spinning');
-
-      if (isLocked) {
-        cell.classList.add('locked-cell-static', 'winning');
-      } else {
-        cell.classList.remove('locked-cell-static');
-        cell.innerHTML = `
-          <span class="emoji-wrapper">${state.grid[index][row]}</span>
-        `;
+          if (state.hwLockedCells[col][row]) {
+            cell.classList.remove('hold-spinning');
+            cell.classList.add('locked-cell-static');
+          } else {
+            cell.classList.remove('locked-cell-static');
+            cell.classList.add('hold-spinning');
+          }
+        });
       }
+
+      for (let col = 0; col < 5; col++) {
+        for (let row = 0; row < 5; row++) {
+          if (state.isHoldWinMode && state.hwLockedCells[col][row]) {
+            continue;
+          }
+          state.grid[col][row] = getRandomSymbol();
+        }
+      }
+
+      const anticipationMode = typeof checkAnticipation === 'function' ? checkAnticipation() : false;
+
+      reels.forEach((strip, index) => {
+        strip.classList.remove('bounce', 'hold-spinning', 'tension-glow');
+
+        if (!state.isHoldWinMode) {
+          strip.classList.add('spinning');
+        }
+
+        let stopDelay = 1000 + index * 150;
+
+        if (anticipationMode && index === 4 && !state.isHoldWinMode) {
+          stopDelay += 2000;
+          strip.classList.add('tension-glow');
+        }
+
+        setTimeout(() => {
+          if (state.isHoldWinMode) {
+            strip.classList.remove('hold-spinning', 'tension-glow', 'spinning', 'bounce');
+
+            if (typeof playReelStopSound === 'function') {
+              playReelStopSound();
+            }
+
+            for (let row = 0; row < 5; row++) {
+              const cell = document.querySelector(`.symbol-cell[data-reel="${index}"][data-row="${row}"]`);
+
+              if (!cell) continue;
+
+              const isLocked = state.hwLockedCells[index][row];
+
+              cell.classList.remove('hold-spinning');
+
+              if (isLocked) {
+                cell.classList.add('locked-cell-static', 'winning');
+              } else {
+                cell.classList.remove('locked-cell-static');
+                cell.innerHTML = `<span class="emoji-wrapper">${state.grid[index][row]}</span>`;
+              }
+            }
+
+            if (index === 4) {
+              setTimeout(() => { evaluateHoldWin(); }, 300);
+            }
+
+            return;
+          }
+
+          strip.classList.remove('spinning', 'tension-glow');
+          strip.classList.add('bounce');
+
+          if (typeof playReelStopSound === 'function') {
+            playReelStopSound();
+          }
+
+          for (let row = 0; row < 5; row++) {
+            const cell = document.querySelector(`.symbol-cell[data-reel="${index}"][data-row="${row}"]`);
+            if (cell) {
+              cell.innerHTML = `<span class="emoji-wrapper">${state.grid[index][row]}</span>`;
+            }
+          }
+
+          if (index === 4) {
+            setTimeout(() => {
+              evaluateWins();
+              state.isSpinning = false;
+            }, 300);
+          }
+        }, stopDelay);
+      });
     }
-
-    // Solo se evalúa después de detener la quinta columna
-    if (index === 4) {
-      setTimeout(() => {
-        evaluateHoldWin();
-      }, 300);
-    }
-
-    return;
-  }
-
-  // Juego normal
-  strip.classList.remove('spinning', 'tension-glow');
-  strip.classList.add('bounce');
-
-  if (typeof playReelStopSound === 'function') {
-    playReelStopSound();
-  }
-
-  for (let row = 0; row < 5; row++) {
-    const cell = document.querySelector(
-      `.symbol-cell[data-reel="${index}"][data-row="${row}"]`
-    );
-
-    if (cell) {
-      cell.innerHTML = `
-        <span class="emoji-wrapper">${state.grid[index][row]}</span>
-      `;
-    }
-  }
-
-  if (index === 4) {
-    setTimeout(() => {
-      evaluateWins();
-      state.isSpinning = false;
-    }, 300);
-  }
-}, stopDelay);
-
-    });
-}
-
-
 
     function evaluateHoldWin() {
-  state.isSpinning = false;
-  let newSymbolsFound = 0;
-  let totalLocked = 0;
+      state.isSpinning = false;
+      let newSymbolsFound = 0;
+      let totalLocked = 0;
 
-  for (let col = 0; col < 5; col++) {
-    for (let row = 0; row < 5; row++) {
-      if (state.grid[col][row] === HOLD_WIN_CONFIG.symbol) {
-        if (!state.hwLockedCells[col][row]) {
-          newSymbolsFound++;
-          state.hwLockedCells[col][row] = true;
+      for (let col = 0; col < 5; col++) {
+        for (let row = 0; row < 5; row++) {
+          if (state.grid[col][row] === HOLD_WIN_CONFIG.symbol) {
+            if (!state.hwLockedCells[col][row]) {
+              newSymbolsFound++;
+              state.hwLockedCells[col][row] = true;
+            }
+            totalLocked++;
+          }
         }
-        totalLocked++;
+      }
+
+      document.querySelectorAll('.symbol-cell').forEach(cell => {
+        const c = cell.dataset.reel;
+        const r = cell.dataset.row;
+        if (state.hwLockedCells[c][r]) {
+          cell.classList.remove('dimmed', 'hold-spinning');
+          cell.classList.add('winning');
+        } else {
+          cell.classList.remove('winning');
+          cell.classList.add('dimmed');
+        }
+      });
+
+      if (newSymbolsFound > 0 && HOLD_WIN_CONFIG.resetSpinsOnHit) {
+        state.hwSpinsLeft = HOLD_WIN_CONFIG.initialSpins;
+        setStatusText(`✨ ¡+${newSymbolsFound} SÍMBOLOS! ✨<br><span class="sub-text-free">Respíns a ${state.hwSpinsLeft}</span>`, true);
+      } else {
+        state.hwSpinsLeft--;
+        setStatusText(`🔮 HOLD & WIN <br><span class="sub-text-free">(${state.hwSpinsLeft} RESPINS RESTANTES)</span>`, false);
+      }
+
+      if (state.hwSpinsLeft <= 0 || totalLocked >= 25) {
+        if (totalLocked >= 25) {
+            SoundFX.play5InALine();
+            triggerConfettiEffect();
+            triggerMegaWinEffect(); 
+            triggerVibration([300, 100, 300, 100, 500]);
+        }
+
+        let jackpotName = ''; 
+        let totalJackpotPool = 0;
+        let tier = state.hwActiveJackpotTier;
+
+        if (tier === 5) { totalJackpotPool = ECONOMY.jackpots[5]; jackpotName = 'SÚPER'; }
+        else if (tier === 4) { totalJackpotPool = ECONOMY.jackpots[4]; jackpotName = 'GRAND'; }
+        else if (tier === 3) { totalJackpotPool = ECONOMY.jackpots[3]; jackpotName = 'MINI'; }
+
+        let valuePerSymbol = totalJackpotPool / 25; 
+        let finalWin = Math.floor(totalLocked * valuePerSymbol); 
+        let remainder = totalJackpotPool - finalWin; 
+
+        if (tier === 5) ECONOMY.jackpots[5] = remainder;
+        else if (tier === 4) ECONOMY.jackpots[4] = remainder;
+        else if (tier === 3) ECONOMY.jackpots[3] = remainder;
+
+        if (totalJackpotPool > 0) saveEconomy();
+        
+        state.credits += finalWin; 
+        savePlayer();
+        
+        gameStats.totalWon += finalWin; 
+        gameStats.bonusWon = (gameStats.bonusWon || 0) + finalWin; 
+        saveAndUpdateStats();
+
+        let modalSubtitle = `Símbolos recolectados: ${totalLocked}<br>Valor unidad: ${formatValue(valuePerSymbol)}`;
+        modalSubtitle += `<br><span>🏆 ${jackpotName}: ${formatValue(finalWin)}</span>`;
+
+        setTimeout(() => {
+            showLevelUpModal('FIN DEL HOLD & WIN', modalSubtitle, 5000).then(() => {
+                state.isHoldWinMode = false;
+                state.hwActiveJackpotTier = null; 
+                state.hwLockedCells = Array.from({ length: 5 }, () => Array(5).fill(false));
+                updateUI(); 
+                resetIdleState(); 
+                BGMController.playTrack('principal');
+
+                if (state.isFreeSpinMode && state.freeSpinsLeft > 0) {
+                    setTimeout(triggerSpin, 1000);
+                } else {
+                    checkAutoSpin();
+                }
+            });
+        }, 1500);
+
+      } else {
+        setTimeout(triggerSpin, 1800);
       }
     }
-  }
-
-  document.querySelectorAll('.symbol-cell').forEach(cell => {
-    const c = cell.dataset.reel;
-    const r = cell.dataset.row;
-    if (state.hwLockedCells[c][r]) {
-      cell.classList.remove('dimmed', 'hold-spinning');
-      cell.classList.add('winning');
-    } else {
-      cell.classList.remove('winning');
-      cell.classList.add('dimmed');
-    }
-  });
-
-  if (newSymbolsFound > 0 && HOLD_WIN_CONFIG.resetSpinsOnHit) {
-    state.hwSpinsLeft = HOLD_WIN_CONFIG.initialSpins;
-    setStatusText(`✨ ¡+${newSymbolsFound} SÍMBOLOS! ✨<br><span class="sub-text-free">Respíns a ${state.hwSpinsLeft}</span>`, true);
-  } else {
-    state.hwSpinsLeft--;
-    setStatusText(`🔮 HOLD & WIN <br><span class="sub-text-free">(${state.hwSpinsLeft} RESPINS RESTANTES)</span>`, false);
-  }
-
-  if (state.hwSpinsLeft <= 0 || totalLocked >= 25) {
-    
-    // 🔴 EFECTOS SI CONSIGUE EL PLENO (25 SÍMBOLOS)
-    if (totalLocked >= 25) {
-        SoundFX.play5InALine();
-        triggerConfettiEffect();
-        triggerMegaWinEffect(); 
-        triggerVibration([300, 100, 300, 100, 500]);
-    }
-
-    let jackpotName = ''; 
-    let totalJackpotPool = 0;
-    let tier = state.hwActiveJackpotTier;
-
-    if (tier === 5) { totalJackpotPool = ECONOMY.jackpots[5]; jackpotName = 'SÚPER'; }
-    else if (tier === 4) { totalJackpotPool = ECONOMY.jackpots[4]; jackpotName = 'GRAND'; }
-    else if (tier === 3) { totalJackpotPool = ECONOMY.jackpots[3]; jackpotName = 'MINI'; }
-
-    let valuePerSymbol = totalJackpotPool / 25; 
-    let finalWin = Math.floor(totalLocked * valuePerSymbol); 
-    let remainder = totalJackpotPool - finalWin; 
-
-    if (tier === 5) ECONOMY.jackpots[5] = remainder;
-    else if (tier === 4) ECONOMY.jackpots[4] = remainder;
-    else if (tier === 3) ECONOMY.jackpots[3] = remainder;
-
-    if (totalJackpotPool > 0) saveEconomy();
-    
-    state.credits += finalWin; 
-    savePlayer();
-    
-    gameStats.totalWon += finalWin; 
-    gameStats.bonusWon = (gameStats.bonusWon || 0) + finalWin; 
-    saveAndUpdateStats();
-
-    let modalSubtitle = `Símbolos recolectados: ${totalLocked}<br>Valor unidad: ${formatValue(valuePerSymbol)}`;
-    modalSubtitle += `<br><span>🏆 ${jackpotName}: ${formatValue(finalWin)}</span>`;
-
-    setTimeout(() => {
-        showLevelUpModal('FIN DEL HOLD & WIN', modalSubtitle, 5000).then(() => {
-            state.isHoldWinMode = false;
-            state.hwActiveJackpotTier = null; 
-            state.hwLockedCells = Array.from({ length: 5 }, () => Array(5).fill(false));
-            updateUI(); 
-            resetIdleState(); 
-				BGMController.playTrack('principal');
-
-            
-            if (state.isFreeSpinMode && state.freeSpinsLeft > 0) {
-                setTimeout(triggerSpin, 1000);
-            } else {
-                checkAutoSpin();
-            }
-        });
-    }, 1500);
-
-  } else {
-    setTimeout(triggerSpin, 1800);
-  }
-}
-
-
-	triggerMegaWinEffect()
-
 
     function evaluateWins() {
-  state.isSpinning = false;
+      state.isSpinning = false;
 
-  const lines = LINE_OPTIONS[state.selectedLinesIdx];
-  const uiBet = BET_OPTIONS[state.selectedBetIdx];
+      const lines = LINE_OPTIONS[state.selectedLinesIdx];
+      const uiBet = BET_OPTIONS[state.selectedBetIdx];
+      const bet = state.isFreeSpinMode ? (state.freeSpinBaseMultiplier || 1) : uiBet;
 
-  // 🔴 USAR EL MULTIPLICADOR BLOQUEADO EN TIRADAS GRATIS
-  const bet = state.isFreeSpinMode ? (state.freeSpinBaseMultiplier || 1) : uiBet;
-
-  // 📈 SUMAR EXPERIENCIA (XP)
-  const currentXP = 10 * bet;
-  if (typeof addXP === 'function') {
-      addXP(currentXP);
-  } else if (typeof updateLevelProgress === 'function') {
-      updateLevelProgress(currentXP);
-  }
-
-  const reqMini = Math.max(1, parseInt(HOLD_WIN_CONFIG.reqMini, 10) || DEFAULT_HOLD_WIN_CONFIG.reqMini);
-  const reqGrand = Math.max(reqMini, parseInt(HOLD_WIN_CONFIG.reqGrand, 10) || DEFAULT_HOLD_WIN_CONFIG.reqGrand);
-  const reqSuper = Math.max(reqGrand, parseInt(HOLD_WIN_CONFIG.reqSuper, 10) || DEFAULT_HOLD_WIN_CONFIG.reqSuper);
-
-  let hwCount = 0;
-  const hwPositions = [];
-
-  for (let col = 0; col < 5; col++) {
-    for (let row = 0; row < 5; row++) {
-      if (state.grid[col][row] === HOLD_WIN_CONFIG.symbol) {
-        hwCount++;
-        hwPositions.push({ col, row });
+      const currentXP = 10 * bet;
+      if (typeof addXP === 'function') {
+          addXP(currentXP);
+      } else if (typeof updateLevelProgress === 'function') {
+          updateLevelProgress(currentXP);
       }
-    }
-  }
 
-  let totalSpinWin = 0;
-  const winningLines = [];
-  let maxMatchCount = 0;
+      const reqMini = Math.max(1, parseInt(HOLD_WIN_CONFIG.reqMini, 10) || DEFAULT_HOLD_WIN_CONFIG.reqMini);
+      const reqGrand = Math.max(reqMini, parseInt(HOLD_WIN_CONFIG.reqGrand, 10) || DEFAULT_HOLD_WIN_CONFIG.reqGrand);
+      const reqSuper = Math.max(reqGrand, parseInt(HOLD_WIN_CONFIG.reqSuper, 10) || DEFAULT_HOLD_WIN_CONFIG.reqSuper);
 
-  let scatterCount = 0;
-  const scatterPositions = [];
+      let hwCount = 0;
+      const hwPositions = [];
 
-  for (let col = 0; col < 5; col++) {
-    for (let row = 0; row < 5; row++) {
-      if (state.grid[col][row] === BONUS_CONFIG.scatterSymbol) {
-        scatterCount++;
-        scatterPositions.push({ col, row });
+      for (let col = 0; col < 5; col++) {
+        for (let row = 0; row < 5; row++) {
+          if (state.grid[col][row] === HOLD_WIN_CONFIG.symbol) {
+            hwCount++;
+            hwPositions.push({ col, row });
+          }
+        }
       }
-    }
-  }
 
-  for (let i = 0; i < lines; i++) {
-    const line = PAYLINES[i];
-    const symbol = state.grid[0][line[0]];
-    let matchCount = 1;
+      let totalSpinWin = 0;
+      const winningLines = [];
+      let maxMatchCount = 0;
 
-    for (let col = 1; col < 5; col++) {
-      if (state.grid[col][line[col]] === symbol) {
-        matchCount++;
-      } else {
-        break;
+      let scatterCount = 0;
+      const scatterPositions = [];
+
+      for (let col = 0; col < 5; col++) {
+        for (let row = 0; row < 5; row++) {
+          if (state.grid[col][row] === BONUS_CONFIG.scatterSymbol) {
+            scatterCount++;
+            scatterPositions.push({ col, row });
+          }
+        }
       }
-    }
 
-    if (matchCount >= 3) {
-      const config = EMOJI_CONFIG.find(item => item.symbol === symbol);
+      for (let i = 0; i < lines; i++) {
+        const line = PAYLINES[i];
+        const symbol = state.grid[0][line[0]];
+        let matchCount = 1;
 
-      if (config) {
-        const winMultiplier = matchCount === 5 ? config.pay5 : matchCount === 4 ? config.pay4 : config.pay3;
-        let winAmount = winMultiplier * bet;
-
-        if (state.isFreeSpinMode) {
-          winAmount *= BONUS_CONFIG.multiplierOnBonus;
+        for (let col = 1; col < 5; col++) {
+          if (state.grid[col][line[col]] === symbol) {
+            matchCount++;
+          } else {
+            break;
+          }
         }
 
-        totalSpinWin += winAmount;
+        if (matchCount >= 3) {
+          const config = EMOJI_CONFIG.find(item => item.symbol === symbol);
 
-        winningLines.push({
-          lineIdx: i,
-          matchCount,
-          symbol,
-          winAmount
-        });
+          if (config) {
+            const winMultiplier = matchCount === 5 ? config.pay5 : matchCount === 4 ? config.pay4 : config.pay3;
+            let winAmount = winMultiplier * bet;
 
-        maxMatchCount = Math.max(maxMatchCount, matchCount);
+            if (state.isFreeSpinMode) {
+              winAmount *= BONUS_CONFIG.multiplierOnBonus;
+            }
+
+            totalSpinWin += winAmount;
+
+            winningLines.push({
+              lineIdx: i,
+              matchCount,
+              symbol,
+              winAmount
+            });
+
+            maxMatchCount = Math.max(maxMatchCount, matchCount);
+          }
+        }
       }
-    }
-  }
 
-  state.currentWinningLines = winningLines;
+      state.currentWinningLines = winningLines;
 
-    // Disparar cuando hay 5 emojis iguales
-  if (maxMatchCount === 5) {
-      SoundFX.play5InALine();
-      triggerVibration([150, 50, 150]);
-      triggerConfettiEffect(); // Confeti por línea de 5
-      triggerMegaWinEffect();
-  }
-  
-  let bonusTriggered = false;
-
-  if (scatterCount >= BONUS_CONFIG.minRequired) {
-    state.retriggerCount = state.retriggerCount || 0;
-
-    if (!state.isFreeSpinMode) {
-      bonusTriggered = true;
-      state.isFreeSpinMode = true;
-      state.freeSpinsLeft = BONUS_CONFIG.spinsGranted;
-      state.freeSpinTotalWon = 0;
-      state.retriggerCount = 0;
-		BGMController.playTrack('freespins');
-
-
+      if (maxMatchCount === 5) {
+          SoundFX.play5InALine();
+          triggerVibration([150, 50, 150]);
+          triggerConfettiEffect(); 
+          triggerMegaWinEffect();
+      }
       
-      // Bloqueamos la apuesta con la que activó el bonus de espirales
-      state.freeSpinBaseMultiplier = bet; 
-    } else if (state.retriggerCount < BONUS_CONFIG.maxRetriggers) {
-      bonusTriggered = true;
-      state.retriggerCount++;
-      state.freeSpinsLeft += BONUS_CONFIG.spinsGranted;
-    }
-  }
+      let bonusTriggered = false;
 
-    if (bonusTriggered) {
-    // 🔊 Sonido y Vibración de temblor
-    SoundFX.playShakeSound();
-    triggerVibration([80, 40, 80, 40, 120]);
+      if (scatterCount >= BONUS_CONFIG.minRequired) {
+        state.retriggerCount = state.retriggerCount || 0;
 
-    const slotContainer = $('slot-grid') || document.body;
-    slotContainer.classList.add('screen-shake');
-    setTimeout(() => { slotContainer.classList.remove('screen-shake'); }, 500);
-  }
-
-
-  if (totalSpinWin > 0 || bonusTriggered) {
-    state.lastWinCredits = totalSpinWin;
-    state.lastWinMatchCount = maxMatchCount;
-    state.hasActiveWin = totalSpinWin > 0;
-
-    if (state.isFreeSpinMode) {
-      state.freeSpinTotalWon += totalSpinWin;
+        if (!state.isFreeSpinMode) {
+          bonusTriggered = true;
+          state.isFreeSpinMode = true;
+          state.freeSpinsLeft = BONUS_CONFIG.spinsGranted;
+          state.freeSpinTotalWon = 0;
+          state.retriggerCount = 0;
+          BGMController.playTrack('freespins');
+          state.freeSpinBaseMultiplier = bet; 
+        } else if (state.retriggerCount < BONUS_CONFIG.maxRetriggers) {
+          bonusTriggered = true;
+          state.retriggerCount++;
+          state.freeSpinsLeft += BONUS_CONFIG.spinsGranted;
+        }
+      }
 
       if (bonusTriggered) {
-        setStatusText(`🌀 ¡+${BONUS_CONFIG.spinsGranted} TIRADAS! 🌀<br><span class="sub-text-free">Acumulado: ${formatValue(state.freeSpinTotalWon)}</span>`, true);
-      } else {
-        setStatusText(`🔥 ¡GANAS ${formatValue(totalSpinWin)}!<br><span class="sub-text-free">Acumulado: ${formatValue(state.freeSpinTotalWon)}</span>`, true);
-      }
-    } else {
-      state.credits += totalSpinWin;
-      savePlayer();
+        SoundFX.playShakeSound();
+        triggerVibration([80, 40, 80, 40, 120]);
 
-      setStatusText(`🎉 ¡PREMIO! ${formatValue(totalSpinWin)}`, true);
-
-      gameStats.prizesGiven++;
-      gameStats.basePrizesGiven = (gameStats.basePrizesGiven || 0) + 1;
-      gameStats.totalWon += totalSpinWin;
-      gameStats.baseWon = (gameStats.baseWon || 0) + totalSpinWin;
-      gameStats.currentNoPrizeStreak = 0;
-      saveAndUpdateStats();
-    }
-
-    document.querySelectorAll('.symbol-cell').forEach(cell => cell.classList.add('dimmed'));
-
-    winningLines.forEach(win => {
-      for (let col = 0; col < win.matchCount; col++) {
-        const row = PAYLINES[win.lineIdx][col];
-        const cell = gridContainer.querySelector(`.symbol-cell[data-reel="${col}"][data-row="${row}"]`);
-
-        if (cell) {
-          cell.classList.remove('dimmed');
-          cell.classList.add('winning');
-        }
+        const slotContainer = $('slot-grid') || document.body;
+        slotContainer.classList.add('screen-shake');
+        setTimeout(() => { slotContainer.classList.remove('screen-shake'); }, 500);
       }
 
-      const badge = document.querySelector(`.badge-line[data-line="${win.lineIdx + 1}"]`);
-      if (badge) badge.classList.add('badge-winning-pulse');
-    });
+      if (totalSpinWin > 0 || bonusTriggered) {
+        state.lastWinCredits = totalSpinWin;
+        state.lastWinMatchCount = maxMatchCount;
+        state.hasActiveWin = totalSpinWin > 0;
 
-    if (scatterCount >= BONUS_CONFIG.minRequired) {
-      scatterPositions.forEach(({ col, row }) => {
-        const cell = gridContainer.querySelector(`.symbol-cell[data-reel="${col}"][data-row="${row}"]`);
-        if (cell) {
-          cell.classList.remove('dimmed');
-          cell.classList.add('winning');
-        }
-      });
-    }
+        if (state.isFreeSpinMode) {
+          state.freeSpinTotalWon += totalSpinWin;
 
-    drawPaylinesSVG(winningLines);
-  } else {
-    if (state.isFreeSpinMode) {
-      setStatusText('Tirada sin premio...', false);
-    } else {
-      setStatusText('🤡 Sigue Jugando ', false);
-    }
-  }
+          if (bonusTriggered) {
+    setStatusText(`🌀 ¡+${BONUS_CONFIG.spinsGranted} TIRADAS! 🌀`, true);
+} else {
 
-    updateUI();
-  resetIdleState();
-
-  if (hwCount >= reqMini) {
-    let jackpotType = 'MINI JACKPOT'; 
-    state.hwActiveJackpotTier = 3;    
-
-    // 🔊 Sonido de entrada a las Esferas y Vibración
-    SoundFX.playHoldWinTrigger();     
-    triggerVibration([200, 100, 200]);
-
-    // 🎵 INICIAR MÚSICA DE ESFERAS
-    BGMController.playTrack('esferas');
- 
-    // Comprobaciones de Jackpots superiores (ahora dentro del bloque correcto)
-    if (hwCount >= reqSuper) {
-      jackpotType = 'SÚPER JACKPOT';
-      state.hwActiveJackpotTier = 5; 
-    } else if (hwCount >= reqGrand) {
-      jackpotType = 'GRAND JACKPOT';
-      state.hwActiveJackpotTier = 4; 
-    }
-
-    setTimeout(() => {
-      state.isHoldWinMode = true;
-      state.hwSpinsLeft = Math.max(1, parseInt(HOLD_WIN_CONFIG.initialSpins, 10) || DEFAULT_HOLD_WIN_CONFIG.initialSpins);
-
-      hwPositions.forEach(({ col, row }) => {
-        state.hwLockedCells[col][row] = true;
-        state.grid[col][row] = HOLD_WIN_CONFIG.symbol;
-      });
-
-      showLevelUpModal(
-        `🔮 ¡${jackpotType} ACTIVADO!`,
-        `¡Conseguiste ${hwCount} símbolos!<br><span>¡${state.hwSpinsLeft} RESPINS INICIALES!</span>`,
-        4000
-      ).then(() => {
-        triggerSpin();
-      });
-    }, (totalSpinWin > 0 || bonusTriggered) ? 2000 : 500);
-
-    return; // <--- Aquí es donde realmente termina toda la lógica de activar las esferas
-  }
-
-  
-    if (state.isFreeSpinMode) {
-    state.freeSpinsLeft--;
-
-    if (state.freeSpinsLeft > 0) {
-      if (bonusTriggered && !state.bonusModalShown) {
-        state.bonusModalShown = true;
-        
-        // 🎵 INICIAR MÚSICA DE TIRADAS GRATIS
-        BGMController.playTrack('freespins');
-
-        showLevelUpModal(
-          '🎉 ¡BONUS ACTIVADO!',
-          `¡Encontraste ${scatterCount} símbolos!<br><span>¡${BONUS_CONFIG.spinsGranted} TIRADAS GRATIS!</span>`,
-          3500
-        ).then(() => {
-          setTimeout(triggerSpin, 300);
-        });
-      } else {
-        setTimeout(triggerSpin, 1600);
-      }
-    } else {
-      // 🛑 FIN DE LAS TIRADAS GRATIS
-      setTimeout(() => {
-        state.isFreeSpinMode = false;
-        state.retriggerCount = 0;
-        state.bonusModalShown = false;
-
-        // 🎵 VOLVER A LA MÚSICA PRINCIPAL
-        BGMController.playTrack('principal');
-
-        if (state.freeSpinTotalWon > 0) {
-          state.credits += state.freeSpinTotalWon;
+            setStatusText(`🔥 ¡GANAS ${formatValue(totalSpinWin)}!<br><span class="sub-text-free">Acumulado: ${formatValue(state.freeSpinTotalWon)}</span>`, true);
+          }
+        } else {
+          state.credits += totalSpinWin;
           savePlayer();
 
-          gameStats.totalWon += state.freeSpinTotalWon;
-          gameStats.bonusWon = (gameStats.bonusWon || 0) + state.freeSpinTotalWon;
-          gameStats.bonusPrizesGiven = (gameStats.bonusPrizesGiven || 0) + 1;
+          setStatusText(`🪎 PREMIO ${formatValue(totalSpinWin)}`, true);
 
+          gameStats.prizesGiven++;
+          gameStats.basePrizesGiven = (gameStats.basePrizesGiven || 0) + 1;
+          gameStats.totalWon += totalSpinWin;
+          gameStats.baseWon = (gameStats.baseWon || 0) + totalSpinWin;
+          gameStats.currentNoPrizeStreak = 0;
           saveAndUpdateStats();
+        }
+
+        document.querySelectorAll('.symbol-cell').forEach(cell => cell.classList.add('dimmed'));
+
+        winningLines.forEach(win => {
+          for (let col = 0; col < win.matchCount; col++) {
+            const row = PAYLINES[win.lineIdx][col];
+            const cell = gridContainer.querySelector(`.symbol-cell[data-reel="${col}"][data-row="${row}"]`);
+
+            if (cell) {
+              cell.classList.remove('dimmed');
+              cell.classList.add('winning');
+            }
+          }
+
+          const badge = document.querySelector(`.badge-line[data-line="${win.lineIdx + 1}"]`);
+          if (badge) badge.classList.add('badge-winning-pulse');
+        });
+
+        if (scatterCount >= BONUS_CONFIG.minRequired) {
+          scatterPositions.forEach(({ col, row }) => {
+            const cell = gridContainer.querySelector(`.symbol-cell[data-reel="${col}"][data-row="${row}"]`);
+            if (cell) {
+              cell.classList.remove('dimmed');
+              cell.classList.add('winning');
+            }
+          });
+        }
+
+        drawPaylinesSVG(winningLines);
+      } else {
+        if (state.isFreeSpinMode) {
+          setStatusText('Tirada sin premio...', false);
+        } else {
+          setStatusText('🤡 Sigue Jugando ', false);
+        }
+      }
+
+      updateUI();
+      resetIdleState();
+
+      if (hwCount >= reqMini) {
+        let jackpotType = 'MINI JACKPOT'; 
+        state.hwActiveJackpotTier = 3;    
+
+        SoundFX.playHoldWinTrigger();     
+        triggerVibration([200, 100, 200]);
+        BGMController.playTrack('esferas');
+     
+        if (hwCount >= reqSuper) {
+          jackpotType = 'SÚPER JACKPOT';
+          state.hwActiveJackpotTier = 5; 
+        } else if (hwCount >= reqGrand) {
+          jackpotType = 'GRAND JACKPOT';
+          state.hwActiveJackpotTier = 4; 
+        }
+
+        setTimeout(() => {
+          state.isHoldWinMode = true;
+          state.hwSpinsLeft = Math.max(1, parseInt(HOLD_WIN_CONFIG.initialSpins, 10) || DEFAULT_HOLD_WIN_CONFIG.initialSpins);
+
+          hwPositions.forEach(({ col, row }) => {
+            state.hwLockedCells[col][row] = true;
+            state.grid[col][row] = HOLD_WIN_CONFIG.symbol;
+          });
 
           showLevelUpModal(
-            'FIN DEL BONUS',
-            `GANANCIA TOTAL:<br><span>${formatValue(state.freeSpinTotalWon)}</span>`,
+            `🔮 ¡${jackpotType} ACTIVADO!`,
+            `¡Conseguiste ${hwCount} símbolos!<br><span>¡${state.hwSpinsLeft} RESPINS INICIALES!</span>`,
             4000
-          );
+          ).then(() => {
+            triggerSpin();
+          });
+        }, (totalSpinWin > 0 || bonusTriggered) ? 2000 : 500);
+
+        return;
+      }
+
+      if (state.isFreeSpinMode) {
+        state.freeSpinsLeft--;
+
+        if (state.freeSpinsLeft > 0) {
+          if (bonusTriggered && !state.bonusModalShown) {
+            state.bonusModalShown = true;
+            BGMController.playTrack('freespins');
+
+            showLevelUpModal(
+              '🎉 ¡BONUS ACTIVADO!',
+              `¡Encontraste ${scatterCount} símbolos!<br><span>¡${BONUS_CONFIG.spinsGranted} TIRADAS GRATIS!</span>`,
+              3500
+            ).then(() => {
+              setTimeout(triggerSpin, 300);
+            });
+          } else {
+            setTimeout(triggerSpin, 1600);
+          }
         } else {
-          setStatusText('Fin de tiradas gratis', false);
+          setTimeout(() => {
+            state.isFreeSpinMode = false;
+            state.retriggerCount = 0;
+            state.bonusModalShown = false;
+            BGMController.playTrack('principal');
+
+            if (state.freeSpinTotalWon > 0) {
+              state.credits += state.freeSpinTotalWon;
+              savePlayer();
+
+              gameStats.totalWon += state.freeSpinTotalWon;
+              gameStats.bonusWon = (gameStats.bonusWon || 0) + state.freeSpinTotalWon;
+              gameStats.bonusPrizesGiven = (gameStats.bonusPrizesGiven || 0) + 1;
+
+              saveAndUpdateStats();
+
+              showLevelUpModal(
+                'FIN DEL BONUS',
+                `GANANCIA TOTAL:<br><span>${formatValue(state.freeSpinTotalWon)}</span>`,
+                4000
+              );
+            } else {
+              setStatusText('Fin de tiradas gratis', false);
+            }
+
+            state.freeSpinTotalWon = 0;
+            updateUI();
+            resetIdleState();
+            checkAutoSpin();
+          }, 2000);
         }
-
-        state.freeSpinTotalWon = 0;
-        updateUI();
-        resetIdleState();
-        checkAutoSpin();
-      }, 2000);
-    }
-
-
-  } else {
-    if (state.hasActiveWin && state.autoSpin) {
-      setTimeout(() => {
-        if (state.hasActiveWin && !document.querySelector('#modal-gamble').classList.contains('active')) {
-          state.lastWinCredits = 0;
-          state.hasActiveWin = false;
-          updateUI();
-          resetIdleState();
+      } else {
+        if (state.hasActiveWin && state.autoSpin) {
+          setTimeout(() => {
+            if (state.hasActiveWin && !document.querySelector('#modal-gamble').classList.contains('active')) {
+              state.lastWinCredits = 0;
+              state.hasActiveWin = false;
+              updateUI();
+              resetIdleState();
+              checkAutoSpin();
+            }
+          }, 2000);
+        } else {
           checkAutoSpin();
         }
-      }, 2000);
-    } else {
-      checkAutoSpin();
+      }
     }
-  }
-}
-
 
     function checkAutoSpin() {
       if (state.autoSpin && !state.isFreeSpinMode && !state.hasActiveWin && !state.isHoldWinMode) {
@@ -2255,301 +2205,265 @@ function closeGambleGame(finalAmount) {
       }
     }
 
-
-// 🔊 Generador de Sonidos Sintetizados por Web Audio API
-const SoundFX = {
-  ctx: null,
-  init() {
-    if (!this.ctx) {
-      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume();
-    }
-  },
-  
-  // 🔮 Sonido de entrada al juego de las Esferas / Hold & Win
-  playHoldWinTrigger() {
-    this.init();
-    const now = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(220, now);
-    osc.frequency.exponentialRampToValueAtTime(880, now + 0.6);
-    
-    gain.gain.setValueAtTime(0.3, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
-    
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-    
-    osc.start(now);
-    osc.stop(now + 0.6);
-  },
-
-  // 💥 Sonido de Temblor de Pantalla (Impacto Grave)
-  playShakeSound() {
-    this.init();
-    const now = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(120, now);
-    osc.frequency.exponentialRampToValueAtTime(30, now + 0.4);
-    
-    gain.gain.setValueAtTime(0.4, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-    
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-    
-    osc.start(now);
-    osc.stop(now + 0.4);
-  },
-
-
-
-  // ✨ Sonido de 5 Emojis en Línea / Gran Premio
-  play5InALine() {
-    this.init();
-    const notes = [523.25, 659.25, 783.99, 1046.50]; // Do, Mi, Sol, Do (Agudo)
-    notes.forEach((freq, idx) => {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      const now = this.ctx.currentTime + (idx * 0.1);
+    // 🔊 Generador de Sonidos Sintetizados por Web Audio API
+    const SoundFX = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      },
       
-      osc.type = 'triangle';
-      osc.frequency.value = freq;
-      
-      gain.gain.setValueAtTime(0.3, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-      
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      
-      osc.start(now);
-      osc.stop(now + 0.3);
-    });
-  }
-}
-
-
-
-
-// 📳 Función auxiliar para vibración en dispositivos móviles
-function triggerVibration(pattern = [100, 50, 100]) {
-  if ('vibrate' in navigator) {
-    navigator.vibrate(pattern);
-  }
-}
-
-// 🎉 Disparo de Confeti para Plenos / Grandes Premios
-function triggerConfettiEffect() {
-  if (typeof confetti === 'function') {
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 }
-    });
-  }
-}
-
-
-// ==========================================
-// SISTEMA DE AUDIO GLOBAL ANTI-BLOQUEO MÓVIL
-// ==========================================
-let audioCtx = null;
-let audioUnlocked = false;
-
-// Esta función despierta el audio reproduciendo un sonido mudo
-function initAudio() {
-    if (audioUnlocked) return;
-    
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return;
-    
-    audioCtx = new AudioContext();
-    
-    // TRUCO MÓVIL: Crear un buffer vacío (sonido mudo) y reproducirlo
-    const buffer = audioCtx.createBuffer(1, 1, 22050);
-    const source = audioCtx.createBufferSource();
-    source.buffer = buffer;
-    source.connect(audioCtx.destination);
-    source.start(0);
-    
-    if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-    }
-    
-    audioUnlocked = true;
-    
-    // Una vez desbloqueado, quitamos los "escuchadores" para no sobrecargar el móvil
-    document.removeEventListener('click', initAudio);
-    document.removeEventListener('touchstart', initAudio);
-}
-
-// Escuchamos el PRIMER toque o clic en cualquier parte de la pantalla para desbloquear
-document.addEventListener('click', initAudio);
-document.addEventListener('touchstart', initAudio);
-
-// Función auxiliar para mantener el motor despierto
-function wakeUpAudio() {
-    if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume();
-    }
-}
-
-// 1. Sonido Clic
-function playClickSound() {
-    if (!audioUnlocked || !audioCtx) return;
-    wakeUpAudio();
-    try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.05);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.05);
-        osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.05);
-    } catch (e) {}
-}
-
-// 2. Sonido Motor de Rodillos
-function playSpinStartSound() {
-    if (!audioUnlocked || !audioCtx) return;
-    wakeUpAudio();
-    try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(120, audioCtx.currentTime);
-        osc.frequency.linearRampToValueAtTime(240, audioCtx.currentTime + 0.15);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
-        osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.15);
-    } catch (e) {}
-}
-
-// 3. Sonido Frenado de Rodillos
-function playReelStopSound() {
-    if (!audioUnlocked || !audioCtx) return;
-    wakeUpAudio();
-    try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(180, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.08);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        
-        // 🔊 VOLUMEN AL 75% (Bajado de 0.08 a 0.06)
-        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.08);
-        
-        osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.08);
-    } catch (e) {}
-}
-
-
-	const BGMController = {
-    tracks: {
-        principal: [
-            new Audio('./audio/principal1.mp3'),
-            new Audio('./audio/principal2.mp3'),
-            new Audio('./audio/principal3.mp3')
-        ],
-        freespins: new Audio('./audio/freespins.mp3'),
-        esferas: new Audio('./audio/esferas.mp3'),
-        doblenada: new Audio('./audio/doblenada.mp3')
-    },
-    currentTrack: null,
-    currentPrincipalIndex: 0,
-    isInitialized: false,
-
-    init() {
-        if (this.isInitialized) return;
-        
-        this.tracks.principal.forEach(audio => {
-            audio.loop = true;
-            audio.volume = 0.4;
-        });
-
-        ['freespins', 'esferas', 'doblenada'].forEach(key => {
-            this.tracks[key].loop = true;
-            this.tracks[key].volume = 0.4;
-        });
-
-        this.isInitialized = true;
-    },
-
-    playTrack(trackName) {
+      playHoldWinTrigger() {
         this.init();
-        let nextTrack = null;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.6);
+        
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+        
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        
+        osc.start(now);
+        osc.stop(now + 0.6);
+      },
 
-        if (trackName === 'principal') {
-            // 🛑 SI YA HAY UNA PISTA PRINCIPAL REPRODUCIÉNDOSE, NO CAMBIARLA
-            if (this.currentTrack && this.tracks.principal.includes(this.currentTrack)) {
-                return;
+      playShakeSound() {
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(120, now);
+        osc.frequency.exponentialRampToValueAtTime(30, now + 0.4);
+        
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+        
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        
+        osc.start(now);
+        osc.stop(now + 0.4);
+      },
+
+      play5InALine() {
+        this.init();
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          const now = this.ctx.currentTime + (idx * 0.1);
+          
+          osc.type = 'triangle';
+          osc.frequency.value = freq;
+          
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+          
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          
+          osc.start(now);
+          osc.stop(now + 0.3);
+        });
+      }
+    };
+
+    function triggerVibration(pattern = [100, 50, 100]) {
+      if ('vibrate' in navigator) {
+        navigator.vibrate(pattern);
+      }
+    }
+
+    function triggerConfettiEffect() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }
+    }
+
+    let audioCtx = null;
+    let audioUnlocked = false;
+
+    function initAudio() {
+        if (audioUnlocked) return;
+        
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        
+        audioCtx = new AudioContext();
+        
+        const buffer = audioCtx.createBuffer(1, 1, 22050);
+        const source = audioCtx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(audioCtx.destination);
+        source.start(0);
+        
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        
+        audioUnlocked = true;
+        
+        document.removeEventListener('click', initAudio);
+        document.removeEventListener('touchstart', initAudio);
+    }
+
+    document.addEventListener('click', initAudio);
+    document.addEventListener('touchstart', initAudio);
+
+    function wakeUpAudio() {
+        if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    function playClickSound() {
+        if (!audioUnlocked || !audioCtx) return;
+        wakeUpAudio();
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.05);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.05);
+            osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.05);
+        } catch (e) {}
+    }
+
+    function playSpinStartSound() {
+        if (!audioUnlocked || !audioCtx) return;
+        wakeUpAudio();
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(240, audioCtx.currentTime + 0.15);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
+            osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.15);
+        } catch (e) {}
+    }
+
+    function playReelStopSound() {
+        if (!audioUnlocked || !audioCtx) return;
+        wakeUpAudio();
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.08);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            
+            gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.08);
+            
+            osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.08);
+        } catch (e) {}
+    }
+
+    const BGMController = {
+        tracks: {
+            principal: [
+                new Audio('./audio/principal1.mp3'),
+                new Audio('./audio/principal2.mp3'),
+                new Audio('./audio/principal3.mp3')
+            ],
+            freespins: new Audio('./audio/freespins.mp3'),
+            esferas: new Audio('./audio/esferas.mp3'),
+            doblenada: new Audio('./audio/doblenada.mp3')
+        },
+        currentTrack: null,
+        currentPrincipalIndex: 0,
+        isInitialized: false,
+
+        init() {
+            if (this.isInitialized) return;
+            
+            this.tracks.principal.forEach(audio => {
+                audio.loop = true;
+                audio.volume = 0.4;
+            });
+
+            ['freespins', 'esferas', 'doblenada'].forEach(key => {
+                this.tracks[key].loop = true;
+                this.tracks[key].volume = 0.4;
+            });
+
+            this.isInitialized = true;
+        },
+
+        playTrack(trackName) {
+            this.init();
+            let nextTrack = null;
+
+            if (trackName === 'principal') {
+                if (this.currentTrack && this.tracks.principal.includes(this.currentTrack)) {
+                    return;
+                }
+
+                nextTrack = this.tracks.principal[this.currentPrincipalIndex];
+                this.currentPrincipalIndex = (this.currentPrincipalIndex + 1) % this.tracks.principal.length;
+            } else {
+                nextTrack = this.tracks[trackName];
             }
 
-            // Seleccionar la pista actual y preparar el índice para el PRÓXIMO cambio
-            nextTrack = this.tracks.principal[this.currentPrincipalIndex];
-            this.currentPrincipalIndex = (this.currentPrincipalIndex + 1) % this.tracks.principal.length;
-        } else {
-            nextTrack = this.tracks[trackName];
+            if (!nextTrack || this.currentTrack === nextTrack) return;
+
+            if (this.currentTrack) {
+                this.currentTrack.pause();
+                this.currentTrack.currentTime = 0;
+            }
+
+            this.currentTrack = nextTrack;
+            this.currentTrack.play().catch(err => {
+                console.warn(`No se pudo reproducir la pista ${trackName}:`, err);
+            });
         }
+    };
 
-        // Si la pista solicitada ya está sonando, no hacemos nada
-        if (!nextTrack || this.currentTrack === nextTrack) return;
+    document.addEventListener('click', () => {
+        BGMController.init();
+    }, { once: true });
 
-        // Pausar y reiniciar la pista activa anterior
-        if (this.currentTrack) {
-            this.currentTrack.pause();
-            this.currentTrack.currentTime = 0;
+    function triggerMegaWinEffect() {
+        const slotContainer = document.getElementById('slot-grid');
+        if (slotContainer) {
+            slotContainer.style.transition = 'box-shadow 0.3s, transform 0.3s';
+            slotContainer.style.transform = 'scale(1.05)';
+            slotContainer.style.boxShadow = '0 0 50px 20px rgba(255, 215, 0, 0.8)';
+            
+            setTimeout(() => {
+                slotContainer.style.transform = 'scale(1)';
+                slotContainer.style.boxShadow = 'none';
+            }, 1000);
         }
-
-        // Asignar y reproducir la nueva pista
-        this.currentTrack = nextTrack;
-        this.currentTrack.play().catch(err => {
-            console.warn(`No se pudo reproducir la pista ${trackName}:`, err);
-        });
     }
-}; // 👈 Verifica que este Cierre del objeto exista en tu archivo.
 
-// Desbloquear audio con el primer clic interactivo del usuario
-document.addEventListener('click', () => {
-    BGMController.init();
-}, { once: true });
-
-
-
-
-
-
-
-function triggerMegaWinEffect() {
-    // Hace un destello dorado en el contenedor principal
-    const slotContainer = document.getElementById('slot-grid');
-    if (slotContainer) {
-        slotContainer.style.transition = 'box-shadow 0.3s, transform 0.3s';
-        slotContainer.style.transform = 'scale(1.05)';
-        slotContainer.style.boxShadow = '0 0 50px 20px rgba(255, 215, 0, 0.8)';
-        
-        setTimeout(() => {
-            slotContainer.style.transform = 'scale(1)';
-            slotContainer.style.boxShadow = 'none';
-        }, 1000);
-    }
-}
 
 
 
 </script>
+
 </body>
 </html>
