@@ -280,14 +280,19 @@ button { font-family: inherit; }
   body { gap: 6px; padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left)); }
   
   /* --- 1. MODAL SUPERIOR ADAPTADO A MÓVIL --- */
+    /* Reemplaza tu .top-bar actual de móvil por este */
   .top-bar { 
-    height: auto !important; /* Liberamos los 100px para que el contenido respire */
-    min-height: auto;
+    height: 110px !important; /* CLAVE: Altura fija inamovible */
+    min-height: 110px !important;
     padding: 8px !important; 
     gap: 10px; 
     border-width: 1px; 
     border-radius: 9px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Manda el contenido hacia arriba para aprovechar el espacio */
   }
+
   
   /* Fila de información: Permitimos salto de línea y apilamos textos verticalmente */
   .top-info-row {
