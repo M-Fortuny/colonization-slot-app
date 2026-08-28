@@ -279,34 +279,39 @@ button { font-family: inherit; }
   /* Espaciado general del cuerpo */
   body { gap: 6px; padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left)); }
   
-  /* --- 1. MODAL SUPERIOR ADAPTADO A MÓVIL --- */
-    /* Reemplaza tu .top-bar actual de móvil por este */
+    /* --- 1. MODAL SUPERIOR MÓVIL (BLINDADO) --- */
   .top-bar { 
-    height: 110px !important; /* CLAVE: Altura fija inamovible */
-    min-height: 110px !important;
-    padding: 8px !important; 
-    gap: 10px; 
-    border-width: 1px; 
-    border-radius: 9px; 
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* Manda el contenido hacia arriba para aprovechar el espacio */
+    height: 115px !important; 
+    min-height: 115px !important;
+    max-height: 115px !important; /* Esto evita el salto aunque el texto sea gigante */
+    padding: 8px 10px !important; 
+    border-width: 1px !important; 
+    border-radius: 9px !important; 
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important; /* Separa la fila de arriba y la de abajo */
+    flex-wrap: nowrap !important; /* Prohíbe que la caja se desmorone */
+    overflow: hidden !important;
   }
-
   
-  /* Fila de información: Permitimos salto de línea y apilamos textos verticalmente */
+  /* Fila 1: Info unificada al 100% de ancho */
   .top-info-row {
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 8px;
+    width: 100% !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
   }
   
   .info-group, .level-group {
-    flex-direction: column; /* Apilamos "METEORITO" sobre "5000 C" para pantallas estrechas */
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
+    flex-direction: column !important; 
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2px !important;
   }
+
+  
+
 
   /* Tamaños de fuente optimizados para móvil */
   .player-name-display { font-size: clamp(11px, 3.2vw, 13px); line-height: 1; }
@@ -334,6 +339,33 @@ button { font-family: inherit; }
     width: 40px; 
     display: flex; 
     justify-content: flex-end; 
+  }
+
+ /* Fila 2: Iconos y Premios al 100% de ancho */
+  .dynamic-row { 
+    width: 100% !important; 
+    display: flex !important;
+    justify-content: space-between !important; /* Iconos a las esquinas obligatoriamente */
+    align-items: center !important;
+  }
+  
+  .left-icons { 
+    width: 40px !important; 
+    display: flex !important; 
+    justify-content: flex-start !important; 
+  }
+  
+  .right-spacer { 
+    width: 40px !important; 
+    display: flex !important; 
+    justify-content: flex-end !important; 
+  }
+
+  .dynamic-center-area { 
+    flex: 1 !important; 
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
   }
 
   .dynamic-center-area { flex: 1; min-width: 0; }
