@@ -276,46 +276,87 @@ button { font-family: inherit; }
     }
 
     @media screen and (max-width: 600px) and (orientation: portrait) {
-      body { gap: 6px; padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left)); }
-      .top-bar { min-height: 58px; gap: 5px; padding: 5px; border-width: 1px; border-radius: 9px; }
-      .total-bet-box, .balance-box { width: 28%; min-width: 0; padding: 4px 5px; border-radius: 6px; }
-      .dynamic-center-area { width: 44%; min-width: 0; padding: 0 2px; }
-      .total-bet-label, .balance-label { overflow: hidden; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
-      .total-bet-value, .balance-value { overflow: hidden; font-size: clamp(12px, 3.5vw, 16px); text-overflow: ellipsis; }
-      .player-name-display { font-size: clamp(11px, 3.2vw, 14px); }
-      .player-level-display { font-size: clamp(9px, 2.8vw, 11px); }
-      
-      .dynamic-text-display { overflow: visible; font-size: clamp(11px, 3.8vw, 17px); text-overflow: clip; white-space: normal; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; padding: 2px 0; }
-      .sub-text-free { margin-top: 1px; font-size: 0.9em; }
-      .dynamic-text-display.win-text .sub-text-free { font-size: 0.85em; line-height: 1.1; }
+  /* Espaciado general del cuerpo */
+  body { gap: 6px; padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left)); }
+  
+  /* --- 1. MODAL SUPERIOR ADAPTADO A MÓVIL --- */
+  .top-bar { 
+    height: auto !important; /* Liberamos los 100px para que el contenido respire */
+    min-height: auto;
+    padding: 8px !important; 
+    gap: 10px; 
+    border-width: 1px; 
+    border-radius: 9px; 
+  }
+  
+  /* Fila de información: Permitimos salto de línea y apilamos textos verticalmente */
+  .top-info-row {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  
+  .info-group, .level-group {
+    flex-direction: column; /* Apilamos "METEORITO" sobre "5000 C" para pantallas estrechas */
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
 
-      .dynamic-text-display.jackpot-text { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: 100%; max-width: 100%; min-width: 0; padding-inline: 2px; line-height: 1.05; white-space: normal; text-align: center; }
-      .dynamic-text-display.jackpot-text .jackpot-name, .dynamic-text-display.jackpot-text .jackpot-value { display: block; width: 100%; max-width: 100%; overflow: visible; text-align: center; text-overflow: clip; }
-      .dynamic-text-display.jackpot-text .jackpot-name { font-size: clamp(9px, 3vw, 15px); line-height: 1.1; white-space: normal; overflow-wrap: anywhere; }
-      .dynamic-text-display.jackpot-text .jackpot-value { font-size: clamp(10px, 3.2vw, 17px); line-height: 1.1; white-space: nowrap; }
-      .dynamic-text-display.win-text { font-size: clamp(12px, 4vw, 18px); }
-      .lockers-container { gap: 3px; padding: 4px; border-width: 1px; border-radius: 9px; }
-      .locker-box { height: 27px; overflow: hidden; font-size: 7px; letter-spacing: 0; white-space: nowrap; }
-      .locker-icon { margin-right: 2px; font-size: 10px; }
-      .slot-stage { gap: 8px; }
-      .badges-column { width: 22px; gap: 5px; padding: 5px 0; }
-      .badge-line { width: 21px; height: 21px; font-size: 10px; border-width: 1px; }
-      .slot-grid-container { gap: 10px; padding: 4px; border-width: 2px; border-radius: 11px; }
-      .reel-column { padding: 2px; border-radius: 6px; }
-      .reel-strip { gap: 3px; }
-      .symbol-cell { font-size: clamp(24px, 9vw, 42px); border-radius: 5px; }
-      .symbol-cell.winning { border-width: 2px; }
-      .control-panel { grid-template-columns: repeat(2, 1fr); gap: 5px; padding: 5px; border-width: 1px; border-radius: 10px; }
-      .btn-action, .btn-spin { height: 42px; border-radius: 7px; font-size: 12px; box-shadow: 0 2px 0 #1a0033; }
-      .btn-spin { font-size: 16px; }
-      .control-label { font-size: 8px; }
-      .btn-spin { order: -1; }
-      .modal-card { width: 100%; padding: 18px 12px; }
-      .modal-title { font-size: 18px; }
-      .gamble-card-display { height: 80px; margin: 12px 0; font-size: 50px; }
-      .modal-actions { gap: 7px; }
-      .modal-actions .btn-action { height: 45px !important; font-size: 11px; }
-    }
+  /* Tamaños de fuente optimizados para móvil */
+  .player-name-display { font-size: clamp(11px, 3.2vw, 13px); line-height: 1; }
+  .balance-value, .total-bet-value { font-size: clamp(13px, 3.8vw, 15px); line-height: 1; margin: 0; }
+  .player-level-display, .total-bet-label { font-size: 9px; line-height: 1; }
+  .level-progress-container { width: 60px; height: 5px; }
+
+  /* Fila de premios e iconos */
+  .dynamic-row { gap: 5px; width: 100%; }
+  .left-icons, .right-spacer { width: auto; min-width: 25px; }
+  .icon-placeholder { font-size: 18px; }
+  
+  .dynamic-center-area { flex: 1; min-width: 0; }
+  .dynamic-text-display { 
+    font-size: clamp(13px, 4vw, 16px); 
+    line-height: 1.1; 
+  }
+  
+  .dynamic-text-display.jackpot-text { flex-direction: column; gap: 2px; }
+  .dynamic-text-display.jackpot-text .jackpot-name { font-size: clamp(10px, 3vw, 12px); }
+  .dynamic-text-display.jackpot-text .jackpot-value { font-size: clamp(14px, 4vw, 18px); margin-left: 0; }
+  /* ------------------------------------------- */
+
+  /* --- 2. RESTO DEL JUEGO Y BOTONERA (Tu código original) --- */
+  .lockers-container { gap: 3px; padding: 4px; border-width: 1px; border-radius: 9px; }
+  .locker-box { height: 27px; overflow: hidden; font-size: 7px; letter-spacing: 0; white-space: nowrap; }
+  .locker-icon { margin-right: 2px; font-size: 10px; }
+  
+  .slot-stage { gap: 8px; }
+  .badges-column { width: 22px; gap: 5px; padding: 5px 0; }
+  .badge-line { width: 21px; height: 21px; font-size: 10px; border-width: 1px; }
+  .slot-grid-container { gap: 10px; padding: 4px; border-width: 2px; border-radius: 11px; }
+  .reel-column { padding: 2px; border-radius: 6px; }
+  .reel-strip { gap: 3px; }
+  .symbol-cell { font-size: clamp(24px, 9vw, 42px); border-radius: 5px; }
+  .symbol-cell.winning { border-width: 2px; }
+  
+  .control-panel { grid-template-columns: repeat(2, 1fr); gap: 5px; padding: 5px; border-width: 1px; border-radius: 10px; }
+  .btn-action, .btn-spin { height: 42px; border-radius: 7px; font-size: 12px; box-shadow: 0 2px 0 #1a0033; }
+  
+  /* Ajuste clave para el botón GIRAR */
+  .btn-spin { 
+    font-size: 16px; 
+    order: -1; 
+    grid-column: 1 / -1; /* Esto hace que GIRAR ocupe toda la fila superior, y los otros 4 botones formen un cuadrado perfecto 2x2 debajo */
+  }
+  .control-label { font-size: 8px; }
+  
+  .modal-card { width: 100%; padding: 18px 12px; }
+  .modal-title { font-size: 18px; }
+  .gamble-card-display { height: 80px; margin: 12px 0; font-size: 50px; }
+  .modal-actions { gap: 7px; }
+  .modal-actions .btn-action { height: 45px !important; font-size: 11px; }
+}
+
 
     @media screen and (max-width: 600px) and (orientation: portrait) {
   body { gap: 6px; padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left)); }
