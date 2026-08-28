@@ -315,10 +315,27 @@ button { font-family: inherit; }
   .level-progress-container { width: 60px; height: 5px; }
 
   /* Fila de premios e iconos */
-  .dynamic-row { gap: 5px; width: 100%; }
-  .left-icons, .right-spacer { width: auto; min-width: 25px; }
-  .icon-placeholder { font-size: 18px; }
+    /* Estos son los ajustes que aseguran que el HTML perfecto que tienes se vea bien en móvil */
+  .dynamic-row { 
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    width: 100%; 
+    gap: 5px;
+  }
   
+  .left-icons { 
+    width: 40px; 
+    display: flex; 
+    justify-content: flex-start; 
+  }
+  
+  .right-spacer { 
+    width: 40px; 
+    display: flex; 
+    justify-content: flex-end; 
+  }
+
   .dynamic-center-area { flex: 1; min-width: 0; }
   .dynamic-text-display { 
     font-size: clamp(13px, 4vw, 16px); 
