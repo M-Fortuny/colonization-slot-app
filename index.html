@@ -321,18 +321,49 @@ button { font-family: inherit; }
     font-size: 20px !important; /* Reducidos un pelín (antes 24px) */
   }
 
-  .dynamic-center-area { flex: 1 !important; display: flex !important; justify-content: center !important; align-items: center !important; min-width: 0; }
+  /* --- ÁREA CENTRAL Y CENTRADO VERTICAL --- */
+.dynamic-center-area { 
+  flex: 1; 
+  display: flex; 
+  align-items: center;      /* Centrado vertical exacto */
+  justify-content: center;  /* Centrado horizontal */
+  height: 100%;             /* Ocupa toda la altura del contenedor fijo */
+  text-align: center;
+}
 
-  /* Aumentar textos dinámicos centrales */
-  .dynamic-text-display { 
-    font-size: clamp(15px, 4.5vw, 18px); /* Textos dinámicos generales más grandes */
-    line-height: 1.1; 
-  }
-  
-  /* Textos y Jackpot aumentados y apilados en vertical */
-  .dynamic-text-display.jackpot-text { flex-direction: column; gap: 2px; }
-  .dynamic-text-display.jackpot-text .jackpot-name { font-size: clamp(12px, 3.5vw, 14px); } /* Título más grande */
-  .dynamic-text-display.jackpot-text .jackpot-value { font-size: clamp(16px, 5vw, 20px); margin-left: 0; } /* Número del Jackpot más grande */
+/* --- TEXTOS DINÁMICOS GENERALES --- */
+.dynamic-text-display { 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  line-height: 1.15;        /* Interlineado ajustado para centrar bloques de 2 líneas */
+  font-size: 2.2rem;        /* Tamaño más grande para "Sigue Jugando", "Buena Suerte", etc. */
+  font-weight: 800;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+}
+
+/* --- IGUALAR TAMAÑO EN JACKPOTS --- */
+/* Forzamos que tanto el título como la cifra tengan exactamente el mismo tamaño */
+.jackpot-text, 
+.jackpot-name, 
+.jackpot-value { 
+  font-size: 2rem !important; /* Mismo tamaño idéntico para texto y créditos */
+  font-weight: 900 !important;
+  line-height: 1.1;
+  color: #FFD700;
+  text-shadow: 0 0 15px #FF8C00, 0 0 25px #FFD700;
+}
+
+/* --- TAMAÑO PARA MENSAJES DE ESTADO (Sigue jugando / Buena suerte) --- */
+.status-text {
+  font-size: 2.4rem !important; /* Aumento de tamaño destacado */
+  font-weight: 900;
+  color: #FFFFFF;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+}
+
 
   /* --- 2. MODAL DESBLOQUEABLES (LOCKERS COMO IMAGEN 2) --- */
   .lockers-container { gap: 4px; padding: 5px; border-width: 1px; border-radius: 9px; }
@@ -937,7 +968,7 @@ window.onerror = function(message, source, lineno, colno, error) {
     const DEFAULT_BONUS_CONFIG = {
       scatterSymbol: '🌀',
       minRequired: 10,
-      spinsGranted: 20,
+      spinsGranted: 15,
       maxRetriggers: 5,
       multiplierOnBonus: 1.5,
       bonusSymbolWeight: 0,
@@ -1507,7 +1538,7 @@ window.onerror = function(message, source, lineno, colno, error) {
 
     const DEFAULT_GAMBLE_CONFIG = {
       mode: 'skill',
-      baseSpeed: 200,    
+      baseSpeed: 180,    
       threshold: 2,      
       step: 20,          
       minSpeed: 80       
