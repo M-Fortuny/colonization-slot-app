@@ -281,15 +281,18 @@ button { font-family: inherit; }
   
   /* --- 1. MODAL SUPERIOR MÓVIL --- */
   .top-bar { 
-    height: 90px !important;  /* Altura reducida como en la Imagen 2 */
-    min-height: 90px !important;
-    max-height: 90px !important; 
-    padding: 6px 10px !important; /* Ajustamos un poco el aire interior */
+    height: 95px !important;  /* Le damos 5px extra de oxígeno para acomodar mejor las dos líneas */
+    min-height: 95px !important;
+    max-height: 95px !important; 
+    /* Aumentamos el padding inferior a 10px para separarlo del filo de abajo */
+    padding: 8px 10px 10px 10px !important; 
     border-width: 1px !important; 
     border-radius: 9px !important; 
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important; 
+    /* Cambiamos 'space-between' por 'flex-start' para mandar todo el bloque hacia arriba y controlarlo con 'gap[span_0](start_span)'[span_0](end_span) */
+    justify-content: flex-start !important; 
+    gap: 12px !important;
     flex-wrap: nowrap !important; 
     overflow: hidden !important;
   }
@@ -318,51 +321,59 @@ button { font-family: inherit; }
 
   /* Reducción de los iconos de configuración y altavoz */
   .icon-placeholder {
-    font-size: 20px !important; /* Reducidos un pelín (antes 24px) */
+    font-size: 20px !important; 
   }
 
   /* --- ÁREA CENTRAL Y CENTRADO VERTICAL --- */
-.dynamic-center-area { 
-  flex: 1; 
-  display: flex; 
-  align-items: center;      /* Centrado vertical exacto */
-  justify-content: center;  /* Centrado horizontal */
-  height: 100%;             /* Ocupa toda la altura del contenedor fijo */
-  text-align: center;
-}
+  .dynamic-center-area { 
+    flex: 1; 
+    display: flex; 
+    align-items: center;      
+    justify-content: center;  
+    /* min-width: 0 evita que textos muy largos empujen los iconos fuera de la pantalla */
+    min-width: 0;
+    text-align: center;
+  }
 
-/* --- TEXTOS DINÁMICOS GENERALES --- */
-.dynamic-text-display { 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  line-height: 1.15;        /* Interlineado ajustado para centrar bloques de 2 líneas */
-  font-size: 1.2rem;        /* Tamaño más grande para "Sigue Jugando", "Buena Suerte", etc. */
-  font-weight: 850;
-  text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
-}
+  /* --- TEXTOS DINÁMICOS GENERALES --- */
+  .dynamic-text-display { 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    line-height: 1.1;        /* Interlineado un poco más apretado para que 2 líneas encajen perfecto */
+    /* Cambiamos el 1.2rem fijo por clamp() para que se reduzca si la pantalla es muy estrecha */
+    font-size: clamp(14px, 4.5vw, 18px) !important; 
+    font-weight: 850;
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+  }
 
-/* --- IGUALAR TAMAÑO EN JACKPOTS --- */
-/* Forzamos que tanto el título como la cifra tengan exactamente el mismo tamaño */
-.jackpot-text, 
-.jackpot-name, 
-.jackpot-value { 
-  font-size: 1.2rem !important; /* Mismo tamaño idéntico para texto y créditos */
-  font-weight: 850 !important;
-  line-height: 1.1;
-  color: #FFD700;
-  text-shadow: 0 0 15px #FF8C00, 0 0 25px #FFD700;
-}
+  /* --- IGUALAR TAMAÑO Y APILAR EN JACKPOTS --- */
+  /* Forzamos que los Jackpots se apilen verticalmente para que título y cifra nunca desborden horizontalmente[span_1](start_span)[span_1](end_span) */
+  .dynamic-text-display.jackpot-text {
+    flex-direction: column !important;
+    gap: 2px !important;
+  }
 
-/* --- TAMAÑO PARA MENSAJES DE ESTADO (Sigue jugando / Buena suerte) --- */
-.status-text {
-  font-size: 1rem !important; /* Aumento de tamaño destacado */
-  font-weight: 850;
-  color: #FFFFFF;
-  text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
-}
+  .jackpot-text, 
+  .jackpot-name, 
+  .jackpot-value { 
+    font-size: clamp(14px, 4.5vw, 18px) !important;
+    font-weight: 850 !important;
+    line-height: 1.1;
+    color: #FFD700;
+    margin-left: 0 !important; /* Eliminamos márgenes laterales al apilarlos[span_2](start_span)[span_2](end_span) */
+    text-shadow: 0 0 15px #FF8C00, 0 0 25px #FFD700;
+  }
+
+  /* --- TAMAÑO PARA MENSAJES DE ESTADO (Sigue jugando / Buena suerte) --- */
+  .status-text {
+    font-size: clamp(13px, 4vw, 16px) !important; /* Escala dinámicamente */
+    font-weight: 850;
+    color: #FFFFFF;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+  }
 
 
   /* --- 2. MODAL DESBLOQUEABLES (LOCKERS COMO IMAGEN 2) --- */
