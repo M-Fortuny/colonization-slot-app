@@ -266,9 +266,13 @@ button { font-family: inherit; }
     @keyframes badgePulse { 0% { transform: scale(1); filter: brightness(1); box-shadow: 0 0 5px orange; } 50% { transform: scale(1.15); filter: brightness(1.4); box-shadow: 0 0 15px yellow; } 100% { transform: scale(1); filter: brightness(1); box-shadow: 0 0 5px orange; } }
     .badge-line.badge-winning-pulse { background-color: #ff9800; border-color: #fff; animation: badgePulse .6s infinite ease-in-out; }
 
-    @media (orientation: landscape) and (min-width: 601px) {
-      body { gap: 8px; padding: 10px 24px; }
-      .symbol-cell { font-size: 60px; }
+    /* Ajuste específico para iPad / Tablets */
+@media screen and (min-width: 601px) and (max-width: 1024px) {
+  .symbol-cell {
+    font-size: clamp(40px, 6vw, 58px) !important; 
+  }
+}
+
       .top-bar { min-height: 65px; padding: 6px 15px; }
       .control-panel { padding: 8px 12px; }
       .btn-action { height: 48px; }
@@ -277,112 +281,132 @@ button { font-family: inherit; }
 
 @media screen and (max-width: 600px) and (orientation: portrait) {
   /* Espaciado general del cuerpo */
-  body { gap: 6px; padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left)); }
+  body { 
+    gap: 6px; 
+    padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left)); 
+  }
   
   /* --- 1. MODAL SUPERIOR MÓVIL --- */
   .top-bar { 
-    height: 90px !important;  /* Altura reducida como en la Imagen 2 */
-    min-height: 90px !important;
-    max-height: 90px !important; 
-    padding: 6px 10px 20px 10px !important; /* Ajustamos un poco el aire interior */
+    height: 115px !important; 
+    min-height: 115px !important;
+    max-height: 115px !important;
+    padding: 8px 10px !important; 
     border-width: 1px !important; 
     border-radius: 9px !important; 
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important; 
-    flex-wrap: nowrap !important; 
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
     overflow: hidden !important;
   }
   
-  /* Fila 1: Info unificada al 100% de ancho */
-  .top-info-row { width: 100% !important; display: flex !important; flex-wrap: nowrap !important; justify-content: space-between !important; align-items: flex-start !important; }
-  .info-group, .level-group { flex-direction: column !important; align-items: center !important; justify-content: center !important; gap: 2px !important; }
+  /* Fila 1: Info unificada */
+  .top-info-row {
+    width: 100% !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+  }
+  
+  .info-group, .level-group {
+    flex-direction: column !important; 
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2px !important;
+  }
 
-  /* Tamaños de fuente de datos (Saldo y Apuesta) */
+  /* Tamaños de fuente de la barra superior */
   .player-name-display { font-size: clamp(11px, 3.2vw, 13px); line-height: 1; }
   .balance-value, .total-bet-value { font-size: clamp(13px, 3.8vw, 15px); line-height: 1; margin: 0; }
   .player-level-display, .total-bet-label { font-size: 9px; line-height: 1; }
   .level-progress-container { width: 60px; height: 5px; }
 
-  /* Fila 2: Iconos y Premios al 100% de ancho */
+  /* Fila 2: Iconos y Premios */
   .dynamic-row { 
     width: 100% !important; 
     display: flex !important;
-    justify-content: space-between !important; 
+    justify-content: space-between !important;
     align-items: center !important;
     gap: 5px;
+    height: 100% !important; /* Asegura espacio de centrado vertical */
   }
   
-  .left-icons { width: 40px !important; display: flex !important; justify-content: flex-start !important; }
-  .right-spacer { width: 40px !important; display: flex !important; justify-content: flex-end !important; }
-
-  /* Reducción de los iconos de configuración y altavoz */
-  .icon-placeholder {
-    font-size: 20px !important; /* Reducidos un pelín (antes 24px) */
+  .left-icons { 
+    width: 40px !important; 
+    display: flex !important; 
+    justify-content: flex-start !important; 
+  }
+  
+  .right-spacer { 
+    width: 40px !important; 
+    display: flex !important; 
+    justify-content: flex-end !important; 
   }
 
-  /* --- ÁREA CENTRAL Y CENTRADO VERTICAL --- */
-.dynamic-center-area { 
-  flex: 1; 
-  display: flex; 
-  align-items: center;      /* Centrado vertical exacto */
-  justify-content: center;  /* Centrado horizontal */
-  height: 100%;             /* Ocupa toda la altura del contenedor fijo */
-  text-align: center;
-}
-
-/* --- TEXTOS DINÁMICOS GENERALES --- */
-.dynamic-text-display { 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  line-height: 1.15;        /* Interlineado ajustado para centrar bloques de 2 líneas */
-  font-size: 2.2rem;        /* Tamaño más grande para "Sigue Jugando", "Buena Suerte", etc. */
-  font-weight: 800;
-  text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
-}
-
-/* --- IGUALAR TAMAÑO EN JACKPOTS --- */
-/* Forzamos que tanto el título como la cifra tengan exactamente el mismo tamaño */
-.jackpot-text, 
-.jackpot-name, 
-.jackpot-value { 
-  font-size: 2rem !important; /* Mismo tamaño idéntico para texto y créditos */
-  font-weight: 900 !important;
-  line-height: 1.1;
-  color: #FFD700;
-  text-shadow: 0 0 15px #FF8C00, 0 0 25px #FFD700;
-}
-
-/* --- TAMAÑO PARA MENSAJES DE ESTADO (Sigue jugando / Buena suerte) --- */
-.status-text {
-  font-size: 2.4rem !important; /* Aumento de tamaño destacado */
-  font-weight: 900;
-  color: #FFFFFF;
-  text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
-}
-
-
-  /* --- 2. MODAL DESBLOQUEABLES (LOCKERS COMO IMAGEN 2) --- */
-  .lockers-container { gap: 4px; padding: 5px; border-width: 1px; border-radius: 9px; }
-  
-  .locker-box { 
-    height: 45px !important; /* Altura aumentada para hacerlos cuadrados */
-    flex-direction: column !important; /* Candado arriba, texto abajo */
+  /* --- CENTRADO VERTICAL REAL --- */
+  .dynamic-center-area { 
+    flex: 1 !important; 
+    display: flex !important;
     justify-content: center !important;
-    overflow: hidden; 
-    font-size: 8px !important; 
-    letter-spacing: 0; 
-    white-space: normal !important; 
-    gap: 2px !important; /* Separación entre el icono y la palabra */
+    align-items: center !important;
+    height: 100% !important;
+    min-width: 0;
+  }
+
+  .dynamic-text-display { 
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1.05 !important; /* Evita que las 2 líneas se separen verticalmente */
+    font-size: clamp(18px, 5.2vw, 22px) !important; /* "Sigue Jugando" / "Buena Suerte" más grandes */
+    font-weight: 900 !important;
+    text-align: center;
   }
   
-  .locker-icon { 
-    margin-right: 0 !important; /* Quitamos margen lateral */
-    font-size: 14px !important; /* Hacemos el candado un poquito más vistoso */
+  /* --- IGUALAR JACKPOTS (TEXTO Y CRÉDITOS IGUALES) --- */
+  .dynamic-text-display.jackpot-text { 
+    flex-direction: column !important; 
+    gap: 1px !important; 
   }
+
+  /* Fuerza que el título y la cifra compartan el mismo tamaño exacto */
+  .dynamic-text-display.jackpot-text .jackpot-name, 
+  .dynamic-text-display.jackpot-text .jackpot-value { 
+    font-size: clamp(14px, 4.2vw, 17px) !important; 
+    font-weight: 900 !important;
+    line-height: 1.1 !important;
+    margin: 0 !important;
+  }
+
+  /* --- RESTO DE LA INTERFAZ MÓVIL --- */
+  .lockers-container { gap: 3px; padding: 4px; border-width: 1px; border-radius: 9px; }
+  .locker-box { height: 27px; overflow: hidden; font-size: 7px; letter-spacing: 0; white-space: nowrap; }
+  .locker-icon { margin-right: 2px; font-size: 10px; }
+  
+  .slot-stage { gap: 8px; }
+  .badges-column { width: 22px; gap: 5px; padding: 5px 0; }
+  .badge-line { width: 21px; height: 21px; font-size: 10px; border-width: 1px; }
+  .slot-grid-container { gap: 10px; padding: 4px; border-width: 2px; border-radius: 11px; }
+  .reel-column { padding: 2px; border-radius: 6px; }
+  .reel-strip { gap: 3px; }
+  .symbol-cell { font-size: clamp(24px, 9vw, 42px); border-radius: 5px; }
+  .symbol-cell.winning { border-width: 2px; }
+  
+  .control-panel { grid-template-columns: repeat(2, 1fr); gap: 5px; padding: 5px; border-width: 1px; border-radius: 10px; }
+  .btn-action, .btn-spin { height: 42px; border-radius: 7px; font-size: 12px; box-shadow: 0 2px 0 #1a0033; }
+  .btn-spin { font-size: 16px; order: -1; grid-column: 1 / -1; }
+  .control-label { font-size: 8px; }
+  
+  .modal-card { width: 100%; padding: 18px 12px; }
+  .modal-title { font-size: 18px; }
+  .gamble-card-display { height: 80px; margin: 12px 0; font-size: 50px; }
+  .modal-actions { gap: 7px; }
+  .modal-actions .btn-action { height: 45px !important; font-size: 11px; }
+}
+
   
   /* --- 3. RESTO DEL JUEGO Y BOTONERA --- */
   .slot-stage { gap: 8px; }
