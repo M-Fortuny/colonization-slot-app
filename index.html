@@ -2500,12 +2500,12 @@ window.onerror = function(message, source, lineno, colno, error) {
             
             this.tracks.principal.forEach(audio => {
                 audio.loop = true;
-                audio.volume = 0.4;
+                audio.volume = 0.2;
             });
 
             ['freespins', 'esferas', 'doblenada'].forEach(key => {
                 this.tracks[key].loop = true;
-                this.tracks[key].volume = 0.4;
+                this.tracks[key].volume = 0.2;
             });
 
             this.isInitialized = true;
@@ -2557,8 +2557,6 @@ window.onerror = function(message, source, lineno, colno, error) {
             }, 1000);
         }
     }
-
-
 
 
 </script>
