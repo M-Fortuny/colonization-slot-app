@@ -962,7 +962,7 @@ window.onerror = function(message, source, lineno, colno, error) {
     let EMOJI_CONFIG = loadSafeData('slot_config', DEFAULT_CONFIG);
 
     const DEFAULT_ECONOMY = {
-      startingCredits: 5000, 
+      startingCredits: 2500, 
       bankProfit: 0,
       jackpotPercent: 80,
       jackpots: { 3: 0, 4: 0, 5: 0 },
@@ -1253,7 +1253,7 @@ window.onerror = function(message, source, lineno, colno, error) {
       if ($('dev-gamble-min-speed')) $('dev-gamble-min-speed').value = GAMBLE_CONFIG.minSpeed;
 
       const saveEcoFields = () => {
-        ECONOMY.startingCredits = parseFloat($('dev-starting-credits')?.value) || 5000;
+        ECONOMY.startingCredits = parseFloat($('dev-starting-credits')?.value) || 2500;
         ECONOMY.bankProfit = parseFloat($('dev-bank-profit')?.value) || 0;
         ECONOMY.jackpotPercent = parseFloat($('dev-jp-percent')?.value) || 0;
         ECONOMY.jackpots[3] = parseFloat($('dev-jp-3')?.value) || 0;
