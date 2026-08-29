@@ -266,142 +266,66 @@ button { font-family: inherit; }
     @keyframes badgePulse { 0% { transform: scale(1); filter: brightness(1); box-shadow: 0 0 5px orange; } 50% { transform: scale(1.15); filter: brightness(1.4); box-shadow: 0 0 15px yellow; } 100% { transform: scale(1); filter: brightness(1); box-shadow: 0 0 5px orange; } }
     .badge-line.badge-winning-pulse { background-color: #ff9800; border-color: #fff; animation: badgePulse .6s infinite ease-in-out; }
 
-    /* Ajuste específico para iPad / Tablets */
-@media screen and (min-width: 601px) and (max-width: 1024px) {
-  .symbol-cell {
-    font-size: clamp(40px, 6vw, 58px) !important; 
-  }
-}
-
+    @media (orientation: landscape) and (min-width: 601px) {
+      body { gap: 8px; padding: 10px 24px; }
+      .symbol-cell { font-size: 60px; }
       .top-bar { min-height: 65px; padding: 6px 15px; }
       .control-panel { padding: 8px 12px; }
       .btn-action { height: 48px; }
       .btn-spin { height: 54px; }
     }
 
-@media screen and (max-width: 600px) and (orientation: portrait) {
+    @media screen and (max-width: 600px) and (orientation: portrait) {
   /* Espaciado general del cuerpo */
-  body { 
-    gap: 6px; 
-    padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left)); 
-  }
+  body { gap: 6px; padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left)); }
   
-  @media screen and (max-width: 600px) and (orientation: portrait) {
-  
-  /* --- CONTENEDOR PRINCIPAL MÓVIL --- */
+  /* --- 1. MODAL SUPERIOR ADAPTADO A MÓVIL --- */
   .top-bar { 
-    height: auto !important; /* Liberamos la altura para que abrace el contenido[span_1](start_span)[span_1](end_span) */
-    min-height: 90px !important;
-    max-height: none !important;
-    padding: 6px 10px !important; /* Reducimos relleno vertical[span_2](start_span)[span_2](end_span) */
-    gap: 4px !important; /* Reducimos separación entre filas[span_3](start_span)[span_3](end_span) */
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
+    height: auto !important; /* Liberamos los 100px para que el contenido respire */
+    min-height: auto;
+    padding: 8px !important; 
+    gap: 10px; 
+    border-width: 1px; 
+    border-radius: 9px; 
   }
   
-  /* --- FILA SUPERIOR (INFO JUGADOR) MÁS PEQUEÑA --- */
-  .player-name-display { font-size: 11px !important; letter-spacing: 0 !important; }
-  .balance-value, .total-bet-value { font-size: 13px !important; margin: 0 !important; }
-  .player-level-display, .total-bet-label { font-size: 9px !important; }
-  .bonus-display { font-size: 11px !important; }
-  
-  .info-group, .level-group { gap: 4px !important; }
-  .level-progress-container { width: 50px !important; height: 5px !important; } /* Barra XP más corta */
-
-  /* --- TEXTOS DINÁMICOS REDUCIDOS PARA MÓVIL --- */
-  .dynamic-text-display { 
-    font-size: clamp(14px, 4.5vw, 18px) !important; /* Bajamos el tamaño drásticamente para móvil */
-    line-height: 1.05 !important; 
-    margin: 0 !important; /* Eliminamos márgenes fantasma[span_4](start_span)[span_4](end_span) */
-  }
-  
-  /* --- JACKPOTS REDUCIDOS PARA MÓVIL --- */
-  .dynamic-text-display.jackpot-text .jackpot-name, 
-  .dynamic-text-display.jackpot-text .jackpot-value { 
-    font-size: clamp(12px, 3.8vw, 15px) !important; /* Ajuste para que quepan juntos sin desbordar */
-    margin: 0 !important; /*[span_5](start_span)[span_5](end_span) */
-  }
-}
-
-  
-  /* Fila 1: Info unificada */
+  /* Fila de información: Permitimos salto de línea y apilamos textos verticalmente */
   .top-info-row {
-    width: 100% !important;
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    justify-content: space-between !important;
-    align-items: flex-start !important;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
   }
   
   .info-group, .level-group {
-    flex-direction: column !important; 
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 2px !important;
+    flex-direction: column; /* Apilamos "METEORITO" sobre "5000 C" para pantallas estrechas */
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
   }
 
+  /* Tamaños de fuente optimizados para móvil */
+  .player-name-display { font-size: clamp(11px, 3.2vw, 13px); line-height: 1; }
+  .balance-value, .total-bet-value { font-size: clamp(13px, 3.8vw, 15px); line-height: 1; margin: 0; }
+  .player-level-display, .total-bet-label { font-size: 9px; line-height: 1; }
+  .level-progress-container { width: 60px; height: 5px; }
+
+  /* Fila de premios e iconos */
+  .dynamic-row { gap: 5px; width: 100%; }
+  .left-icons, .right-spacer { width: auto; min-width: 25px; }
+  .icon-placeholder { font-size: 18px; }
   
-
-  /* Fila 2: Iconos y Premios */
-  .dynamic-row { 
-    width: 100% !important; 
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    gap: 5px;
-    height: 100% !important; /* Asegura espacio de centrado vertical */
-  }
-  
-  .left-icons { 
-    width: 40px !important; 
-    display: flex !important; 
-    justify-content: flex-start !important; 
-  }
-  
-  .right-spacer { 
-    width: 40px !important; 
-    display: flex !important; 
-    justify-content: flex-end !important; 
-  }
-
-  /* --- CENTRADO VERTICAL REAL --- */
-  .dynamic-center-area { 
-    flex: 1 !important; 
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    height: 100% !important;
-    min-width: 0;
-  }
-
+  .dynamic-center-area { flex: 1; min-width: 0; }
   .dynamic-text-display { 
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    line-height: 1.05 !important; /* Evita que las 2 líneas se separen verticalmente */
-    font-size: clamp(18px, 5.2vw, 22px) !important; /* "Sigue Jugando" / "Buena Suerte" más grandes */
-    font-weight: 900 !important;
-    text-align: center;
+    font-size: clamp(13px, 4vw, 16px); 
+    line-height: 1.1; 
   }
   
-  /* --- IGUALAR JACKPOTS (TEXTO Y CRÉDITOS IGUALES) --- */
-  .dynamic-text-display.jackpot-text { 
-    flex-direction: column !important; 
-    gap: 1px !important; 
-  }
+  .dynamic-text-display.jackpot-text { flex-direction: column; gap: 2px; }
+  .dynamic-text-display.jackpot-text .jackpot-name { font-size: clamp(10px, 3vw, 12px); }
+  .dynamic-text-display.jackpot-text .jackpot-value { font-size: clamp(14px, 4vw, 18px); margin-left: 0; }
+  /* ------------------------------------------- */
 
-  /* Fuerza que el título y la cifra compartan el mismo tamaño exacto */
-  .dynamic-text-display.jackpot-text .jackpot-name, 
-  .dynamic-text-display.jackpot-text .jackpot-value { 
-    font-size: clamp(14px, 4.2vw, 17px) !important; 
-    font-weight: 900 !important;
-    line-height: 1.1 !important;
-    margin: 0 !important;
-  }
-
-  /* --- RESTO DE LA INTERFAZ MÓVIL --- */
+  /* --- 2. RESTO DEL JUEGO Y BOTONERA (Tu código original) --- */
   .lockers-container { gap: 3px; padding: 4px; border-width: 1px; border-radius: 9px; }
   .locker-box { height: 27px; overflow: hidden; font-size: 7px; letter-spacing: 0; white-space: nowrap; }
   .locker-icon { margin-right: 2px; font-size: 10px; }
@@ -417,7 +341,13 @@ button { font-family: inherit; }
   
   .control-panel { grid-template-columns: repeat(2, 1fr); gap: 5px; padding: 5px; border-width: 1px; border-radius: 10px; }
   .btn-action, .btn-spin { height: 42px; border-radius: 7px; font-size: 12px; box-shadow: 0 2px 0 #1a0033; }
-  .btn-spin { font-size: 16px; order: -1; grid-column: 1 / -1; }
+  
+  /* Ajuste clave para el botón GIRAR */
+  .btn-spin { 
+    font-size: 16px; 
+    order: -1; 
+    grid-column: 1 / -1; /* Esto hace que GIRAR ocupe toda la fila superior, y los otros 4 botones formen un cuadrado perfecto 2x2 debajo */
+  }
   .control-label { font-size: 8px; }
   
   .modal-card { width: 100%; padding: 18px 12px; }
@@ -427,8 +357,74 @@ button { font-family: inherit; }
   .modal-actions .btn-action { height: 45px !important; font-size: 11px; }
 }
 
+
+    @media screen and (max-width: 600px) and (orientation: portrait) {
+  body { gap: 6px; padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left)); }
   
-  /* --- 3. RESTO DEL JUEGO Y BOTONERA --- */
+  /* --- TOP BAR MÓVIL: Diseño apilado en dos filas --- */
+  .top-bar { 
+    height: auto; 
+    min-height: auto; 
+    flex-wrap: wrap; /* Clave: permite que los bloques salten de línea */
+    gap: 8px; 
+    padding: 10px 8px; 
+    border-width: 1px; 
+    border-radius: 9px; 
+  }
+  
+  /* 1. Fila Superior: Saldo y Apuesta se reparten el ancho */
+  .balance-box { 
+    width: 48%; 
+    min-width: 0; 
+    order: 1; 
+    padding: 6px 4px; 
+    border-radius: 6px; 
+  }
+  .total-bet-box { 
+    width: 48%; 
+    min-width: 0; 
+    order: 2; 
+    padding: 6px 4px; 
+    border-radius: 6px; 
+  }
+  
+  /* 2. Fila Inferior: Panel de premios ocupa el 100% debajo */
+  .dynamic-center-area { 
+    width: 100%; 
+    min-width: 0; 
+    order: 3; 
+    padding: 4px 0 0 0; 
+    height: auto; 
+  }
+
+  /* Textos de Saldo y Apuesta sin desbordes */
+  .total-bet-label, .balance-label { font-size: 9px; white-space: normal; line-height: 1.1; }
+  .total-bet-value, .balance-value { font-size: clamp(14px, 4vw, 18px); margin-top: 4px; line-height: 1; }
+  .player-name-display { font-size: clamp(12px, 3.5vw, 14px); }
+  .player-level-display { font-size: clamp(10px, 3vw, 12px); }
+  
+  /* Textos Dinámicos y Jackpots en vertical estricto */
+  .dynamic-text-display { 
+    font-size: clamp(14px, 4vw, 18px); 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    line-height: 1.1; 
+    margin: 0; 
+    white-space: normal; 
+  }
+  .dynamic-text-display.jackpot-text { gap: 4px; }
+  .dynamic-text-display.jackpot-text .jackpot-name { font-size: clamp(11px, 3.5vw, 15px); }
+  .dynamic-text-display.jackpot-text .jackpot-value { font-size: clamp(16px, 5vw, 22px); margin-left: 0; }
+  
+  /* --- FIN TOP BAR MÓVIL --- */
+
+  /* Resto de tu diseño (Grid, Botones, Lockers) mantenido limpio */
+  .lockers-container { gap: 3px; padding: 4px; border-width: 1px; border-radius: 9px; }
+  .locker-box { height: 27px; font-size: 7px; letter-spacing: 0; white-space: nowrap; overflow: hidden; }
+  .locker-icon { margin-right: 2px; font-size: 10px; }
+  
   .slot-stage { gap: 8px; }
   .badges-column { width: 22px; gap: 5px; padding: 5px 0; }
   .badge-line { width: 21px; height: 21px; font-size: 10px; border-width: 1px; }
@@ -440,7 +436,7 @@ button { font-family: inherit; }
   
   .control-panel { grid-template-columns: repeat(2, 1fr); gap: 5px; padding: 5px; border-width: 1px; border-radius: 10px; }
   .btn-action, .btn-spin { height: 42px; border-radius: 7px; font-size: 12px; box-shadow: 0 2px 0 #1a0033; }
-  .btn-spin { font-size: 16px; order: -1; grid-column: 1 / -1; } 
+  .btn-spin { font-size: 16px; order: -1; }
   .control-label { font-size: 8px; }
   
   .modal-card { width: 100%; padding: 18px 12px; }
@@ -449,9 +445,9 @@ button { font-family: inherit; }
   .modal-actions { gap: 7px; }
   .modal-actions .btn-action { height: 45px !important; font-size: 11px; }
 }
+ont-size: 13px !important; }
+    }
 
-
-/* --- ANIMACIONES Y ESTILOS GLOBALES FINALES --- */
 @keyframes screenShakeAnim {
   0% { transform: translate(0, 0) rotate(0deg); }
   20% { transform: translate(-8px, 6px) rotate(-1.5deg); }
@@ -462,31 +458,112 @@ button { font-family: inherit; }
 }
 .screen-shake { animation: screenShakeAnim 0.5s ease-in-out; }
 
-/* Efecto Lluvia de Premios */
-.coin-shower-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; overflow: hidden; }
-.falling-coin { position: absolute; font-size: 35px; animation: fallDown linear forwards; filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8)); will-change: transform, opacity; }
-@keyframes fallDown { 0% { transform: translateY(-50px) rotate(0deg) scale(1); opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg) scale(1.5); opacity: 0; } }
+/* --- EFECTO LLUVIA DE PREMIOS (MEGA WIN) --- */
+.coin-shower-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+}
+.falling-coin {
+    position: absolute;
+    font-size: 35px;
+    animation: fallDown linear forwards;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+    will-change: transform, opacity;
+}
+@keyframes fallDown {
+    0% { transform: translateY(-50px) rotate(0deg) scale(1); opacity: 1; }
+    80% { opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg) scale(1.5); opacity: 0; }
+}
 
-/* Modales e Interfaces Adicionales */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
-.modal-overlay.active { opacity: 1; pointer-events: all; }
 
-.gamble-card { background: linear-gradient(145deg, #1f1b2e, #120f1d); border: 2px solid #ffd700; border-radius: 20px; padding: 25px; width: 90%; max-width: 420px; text-align: center; box-shadow: 0 0 30px rgba(255, 215, 0, 0.3); }
-.gamble-amount { font-size: 32px; font-weight: 900; color: #00ffcc; text-shadow: 0 0 10px rgba(0, 255, 204, 0.6); margin-bottom: 20px; }
-.gamble-boxes { display: flex; gap: 15px; margin-bottom: 20px; }
-.gamble-box { flex: 1; padding: 20px 10px; border-radius: 12px; background: #2a243d; border: 2px solid #443c5e; display: flex; flex-direction: column; align-items: center; transition: all 0.1s ease; opacity: 0.5; }
-.gamble-box.active-light { opacity: 1; border-color: #00ffcc; background: #3b3158; box-shadow: 0 0 20px #00ffcc; transform: scale(1.05); }
+/* Oscurecimiento de fondo y foco en la ventana */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 9999;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1; pointer-events: all;
+}
+
+.gamble-card {
+  background: linear-gradient(145deg, #1f1b2e, #120f1d);
+  border: 2px solid #ffd700;
+  border-radius: 20px;
+  padding: 25px;
+  width: 90%; max-width: 420px;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+}
+
+.gamble-amount {
+  font-size: 32px; font-weight: 900; color: #00ffcc;
+  text-shadow: 0 0 10px rgba(0, 255, 204, 0.6);
+  margin-bottom: 20px;
+}
+
+/* Recuadros de Doble o Nada */
+.gamble-boxes {
+  display: flex; gap: 15px; margin-bottom: 20px;
+}
+
+.gamble-box {
+  flex: 1; padding: 20px 10px; border-radius: 12px;
+  background: #2a243d; border: 2px solid #443c5e;
+  display: flex; flex-direction: column; align-items: center;
+  transition: all 0.1s ease; opacity: 0.5;
+}
+
+.gamble-box.active-light {
+  opacity: 1;
+  border-color: #00ffcc;
+  background: #3b3158;
+  box-shadow: 0 0 20px #00ffcc;
+  transform: scale(1.05);
+}
 
 .box-emoji { font-size: 36px; }
 .box-text { font-size: 18px; font-weight: 900; color: #fff; margin-top: 5px; }
-.gamble-status-msg { font-size: 20px; font-weight: 800; min-height: 30px; margin-top: 10px; }
 
-/* Efectos Brillantes */
-@keyframes winGlow { 0% { box-shadow: 0 0 10px #00ffcc; } 50% { box-shadow: 0 0 40px #00ffcc, 0 0 80px #00ffcc; } 100% { box-shadow: 0 0 10px #00ffcc; } }
+.gamble-status-msg {
+  font-size: 20px; font-weight: 800; min-height: 30px; margin-top: 10px;
+}
+
+/* Efectos de victoria / derrota */
+@keyframes winGlow {
+  0% { box-shadow: 0 0 10px #00ffcc; }
+  50% { box-shadow: 0 0 40px #00ffcc, 0 0 80px #00ffcc; }
+  100% { box-shadow: 0 0 10px #00ffcc; }
+}
 .win-effect { animation: winGlow 0.6s infinite alternate; }
 
-.tension-glow { position: relative; z-index: 10; box-shadow: 0 0 25px 5px rgba(255, 60, 0, 0.8), inset 0 0 15px rgba(255, 60, 0, 0.5) !important; border-radius: 10px; animation: tension-pulse 0.4s infinite alternate; }
-@keyframes tension-pulse { from { filter: brightness(1); transform: scale(1); } to { filter: brightness(1.3); transform: scale(1.02); } }
+
+.tension-glow {
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 0 25px 5px rgba(255, 60, 0, 0.8), inset 0 0 15px rgba(255, 60, 0, 0.5) !important;
+  border-radius: 10px;
+  animation: tension-pulse 0.4s infinite alternate;
+}
+
+@keyframes tension-pulse {
+  from { filter: brightness(1); transform: scale(1); }
+  to { filter: brightness(1.3); transform: scale(1.02); }
+}
+
 
 
 </style>
