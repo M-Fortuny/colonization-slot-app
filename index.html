@@ -1481,6 +1481,12 @@ function renderPaytable() {
   `).join('');
 }
 
+/* =========================================
+   CONTROLADOR DEL MODAL UNIFICADO (CORREGIDO)
+   ========================================= */
+/* =========================================
+   CONTROLADOR DEL MODAL UNIFICADO
+   ========================================= */
 function initUnifiedModal() {
   const modalUnified = document.getElementById('modal-unified');
   const btnCloseUnified = document.getElementById('btn-close-unified');
@@ -1497,7 +1503,7 @@ function initUnifiedModal() {
   if (!modalUnified) return;
 
   function openUnifiedModal(targetSection) {
-    renderPaytable(); // Carga tus emojis y multiplicadores exactos
+    if (typeof renderPaytable === 'function') renderPaytable();
     modalUnified.classList.add('active');
     if (targetSection) {
       setTimeout(() => {
@@ -1528,36 +1534,43 @@ function initUnifiedModal() {
     }
   });
 
-  // Control seguro de Música de Fondo (evita TypeError)
+  // 1. Control de Música de Fondo (BGM)
   if (toggleBgm) {
     toggleBgm.addEventListener('change', (e) => {
       const isEnabled = e.target.checked;
+      
       if (typeof BGMController !== 'undefined') {
-        if (isEnabled) {
-          if (typeof BGMController.resume === 'function') BGMController.resume();
-          else if (typeof BGMController.play === 'function') BGMController.play();
-          else if (typeof BGMController.playTrack === 'function') BGMController.playTrack('principal');
-        } else {
-          if (typeof BGMController.pause === 'function') BGMController.pause();
-          else if (typeof BGMController.stop === 'function') BGMController.stop();
-          else if (typeof BGMController.stopTrack === 'function') BGMController.stopTrack();
-          else if (BGMController.currentTrack && typeof BGMController.currentTrack.pause === 'function') {
+        BGMController.muted = !isEnabled;
+        
+        if (BGMController.currentTrack) {
+          BGMController.currentTrack.muted = !isEnabled;
+          if (!isEnabled) {
             BGMController.currentTrack.pause();
+          } else {
+            BGMController.currentTrack.play().catch(err => console.warn(err));
           }
+        } else if (isEnabled && typeof BGMController.playTrack === 'function') {
+          BGMController.playTrack('principal');
         }
       }
     });
   }
 
+  // 2. Control de Efectos de Sonido (SFX)
   if (toggleSfx) {
     toggleSfx.addEventListener('change', (e) => {
       const isEnabled = e.target.checked;
+      
       if (typeof SoundFX !== 'undefined') {
         SoundFX.muted = !isEnabled;
+        SoundFX.enabled = isEnabled;
       }
     });
   }
 }
+
+
+
 
 
 
@@ -2696,7 +2709,7 @@ function initUnifiedModal() {
     }
 
     // 🔊 Generador de Sonidos Sintetizados por Web Audio API
-    const SoundFX = {
+        const SoundFX = {
       ctx: null,
       init() {
         if (!this.ctx) {
@@ -2708,6 +2721,7 @@ function initUnifiedModal() {
       },
       
       playHoldWinTrigger() {
+        if (typeof SoundFX !== 'undefined' && (SoundFX.muted || SoundFX.enabled === false)) return;
         this.init();
         const now = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
@@ -2728,6 +2742,7 @@ function initUnifiedModal() {
       },
 
       playShakeSound() {
+        if (typeof SoundFX !== 'undefined' && (SoundFX.muted || SoundFX.enabled === false)) return;
         this.init();
         const now = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
@@ -2748,6 +2763,7 @@ function initUnifiedModal() {
       },
 
       play5InALine() {
+        if (typeof SoundFX !== 'undefined' && (SoundFX.muted || SoundFX.enabled === false)) return;
         this.init();
         const notes = [523.25, 659.25, 783.99, 1046.50];
         notes.forEach((freq, idx) => {
@@ -2769,6 +2785,7 @@ function initUnifiedModal() {
         });
       }
     };
+
 
     function triggerVibration(pattern = [100, 50, 100]) {
       if ('vibrate' in navigator) {
@@ -2822,7 +2839,8 @@ function initUnifiedModal() {
         }
     }
 
-    function playClickSound() {
+        function playClickSound() {
+        if (typeof SoundFX !== 'undefined' && (SoundFX.muted || SoundFX.enabled === false)) return;
         if (!audioUnlocked || !audioCtx) return;
         wakeUpAudio();
         try {
@@ -2839,6 +2857,7 @@ function initUnifiedModal() {
     }
 
     function playSpinStartSound() {
+        if (typeof SoundFX !== 'undefined' && (SoundFX.muted || SoundFX.enabled === false)) return;
         if (!audioUnlocked || !audioCtx) return;
         wakeUpAudio();
         try {
@@ -2855,6 +2874,7 @@ function initUnifiedModal() {
     }
 
     function playReelStopSound() {
+        if (typeof SoundFX !== 'undefined' && (SoundFX.muted || SoundFX.enabled === false)) return;
         if (!audioUnlocked || !audioCtx) return;
         wakeUpAudio();
         try {
@@ -2865,12 +2885,13 @@ function initUnifiedModal() {
             osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.08);
             osc.connect(gain); gain.connect(audioCtx.destination);
             
-            gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
             gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.08);
             
             osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.08);
         } catch (e) {}
     }
+
 
     const BGMController = {
         tracks: {
