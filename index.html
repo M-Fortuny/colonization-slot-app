@@ -12,6 +12,195 @@
   <link rel="apple-touch-icon" href="icono-app.png">
 
   <style>
+
+	/* =========================================
+   MODAL UNIFICADO (AJUSTES E INFORMACIÓN)
+   ========================================= */
+
+/* Fondo oscuro desenfocado */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Contenedor principal del Modal */
+.unified-modal {
+    background: linear-gradient(145deg, #1e1e2f, #2a2a40);
+    border: 2px solid #f39c12;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 650px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.9);
+    color: #ffffff;
+    overflow: hidden;
+}
+
+/* Cabecera Fija */
+.modal-header {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(243, 156, 18, 0.4);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: #f39c12;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-close-modal {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.btn-close-modal:hover {
+    color: #e74c3c;
+}
+
+/* Cuerpo con Scroll */
+.modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    scrollbar-width: thin;
+    scrollbar-color: #f39c12 #1e1e2f;
+}
+
+/* Diseño de Secciones Claras */
+.modal-section {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.modal-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    color: #cccccc;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
+    padding-bottom: 8px;
+}
+
+/* Cuadrícula para la Tabla de Premios (Tablet/Desktop) */
+.paytable-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+}
+
+.paytable-item {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border: 1px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.paytable-item:hover {
+    border-color: rgba(243, 156, 18, 0.5);
+}
+
+.paytable-symbol {
+    font-size: 2.2rem;
+    margin-bottom: 8px;
+}
+
+.paytable-values {
+    font-size: 0.9rem;
+    color: #a0a0a0;
+}
+
+.paytable-values span {
+    display: block;
+    color: #ffffff;
+    font-weight: bold;
+    margin-top: 3px;
+}
+
+/* =========================================
+   RESPONSIVE Y APILAMIENTO VERTICAL
+   ========================================= */
+@media (max-width: 480px) {
+    .unified-modal {
+        width: 95%;
+        max-height: 90vh;
+    }
+
+    .modal-header h2 {
+        font-size: 1.2rem;
+    }
+
+    .modal-section {
+        padding: 15px;
+    }
+
+    /* Transformamos la cuadrícula a una sola columna */
+    .paytable-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    /* Apilamos estrictamente el texto dinámico y valores para evitar desbordes */
+    .paytable-item {
+        flex-direction: column;
+        justify-content: center;
+        padding: 15px 10px;
+    }
+
+    .paytable-values {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        width: 100%;
+        word-wrap: break-word; /* Seguridad extra para textos largos */
+    }
+
+    .paytable-values span {
+        font-size: 1.1rem; /* Ligeramente más grande en móvil para legibilidad */
+    }
+}
+
+
+
+
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
 :root { --purple: #7b2cbf; --light-purple: #ab47bc; --dark-bg: #08020f; --panel-bg: rgba(15, 5, 25, .95); --gold: #ffd700; --green: #00e676; }
 html { width: 100%; height: 100%; height: -webkit-fill-available; background-color: #08020f; overflow: hidden; }
@@ -110,8 +299,6 @@ button { font-family: inherit; }
   margin: 0; 
 }
 .dynamic-text-display.jackpot-text .jackpot-value { margin-left: 8px; }
-
-
 
 
     .lockers-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 8px 10px; background: rgba(15, 5, 25, .85); border: 2px solid var(--purple); border-radius: 14px; box-shadow: 0 4px 15px rgba(0, 0, 0, .4); }
@@ -376,6 +563,9 @@ button { font-family: inherit; }
   }
 
 
+
+
+
   /* --- 2. MODAL DESBLOQUEABLES (LOCKERS COMO IMAGEN 2) --- */
   .lockers-container { gap: 4px; padding: 5px; border-width: 1px; border-radius: 9px; }
   
@@ -585,21 +775,22 @@ button { font-family: inherit; }
   </div>
 
   <!-- Fila 2: Iconos y Textos Dinámicos -->
-  <div class="dynamic-row">
-    <!-- Dejamos solo el engranaje a la izquierda -->
-    <div class="left-icons">
-      <div class="icon-placeholder">⚙️</div>
-    </div>
-    
-    <div class="dynamic-center-area">
-      <div class="dynamic-text-display" id="dynamic-display">Slots Fans</div>
-    </div>
-    
-    <!-- Metemos el altavoz en el espaciador de la derecha -->
-    <div class="right-spacer">
-      <div class="icon-placeholder">🔊</div>
-    </div>
+<div class="dynamic-row">
+  <!-- Engranaje con identificador para Ajustes -->
+  <div class="left-icons">
+    <div class="icon-placeholder" id="btn-settings" title="Ajustes">⚙️</div>
   </div>
+  
+  <div class="dynamic-center-area">
+    <div class="dynamic-text-display" id="dynamic-display">Slots Fans</div>
+  </div>
+  
+  <!-- Altavoz con identificador para Audio -->
+  <div class="right-spacer">
+    <div class="icon-placeholder" id="btn-audio" title="Audio">🔊</div>
+  </div>
+</div>
+
 </div>
 
 
@@ -930,6 +1121,97 @@ button { font-family: inherit; }
     </div>
   </div>
 
+
+	<!-- =========================================
+     MODAL UNIFICADO: AJUSTES E INFORMACIÓN
+     ========================================= -->
+<div id="modal-unified" class="modal-overlay">
+  <div class="unified-modal">
+    
+    <!-- Cabecera -->
+    <div class="modal-header">
+      <h2>Ajustes y Pagos</h2>
+      <button class="btn-close-modal" id="btn-close-unified">&times;</button>
+    </div>
+
+    <!-- Cuerpo con Scroll -->
+    <div class="modal-body">
+      
+      <!-- Sección 1: Controles de Audio -->
+      <div class="modal-section" id="section-audio">
+        <h3>🔊 Sonido y Música</h3>
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="toggle-bgm" checked style="width: 18px; height: 18px;">
+            <span>Música de Fondo</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="toggle-sfx" checked style="width: 18px; height: 18px;">
+            <span>Efectos (SFX)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Sección 2: Tabla de Premios -->
+      <div class="modal-section" id="section-paytable">
+        <h3>💎 Tabla de Premios (Multiplicadores)</h3>
+        <div class="paytable-grid">
+          
+          <div class="paytable-item">
+            <div class="paytable-symbol">7️⃣</div>
+            <div class="paytable-values">
+              5x <span>x500</span>
+              4x <span>x100</span>
+              3x <span>x20</span>
+            </div>
+          </div>
+
+          <div class="paytable-item">
+            <div class="paytable-symbol">💎</div>
+            <div class="paytable-values">
+              5x <span>x200</span>
+              4x <span>x50</span>
+              3x <span>x10</span>
+            </div>
+          </div>
+
+          <div class="paytable-item">
+            <div class="paytable-symbol">🍒</div>
+            <div class="paytable-values">
+              5x <span>x100</span>
+              4x <span>x25</span>
+              3x <span>x5</span>
+            </div>
+          </div>
+          
+          <div class="paytable-item">
+            <div class="paytable-symbol">🍋</div>
+            <div class="paytable-values">
+              5x <span>x50</span>
+              4x <span>x10</span>
+              3x <span>x2</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Sección 3: Reglas y Modos Especiales -->
+      <div class="modal-section" id="section-rules">
+        <h3>🔮 Funciones Especiales</h3>
+        <p style="font-size: 0.95rem; color: #bbb; line-height: 1.5; margin-bottom: 10px;">
+          <strong style="color: #f39c12;">Hold & Win:</strong> Consigue 8 o más esferas 🔮 para activar el bonus de respins. Si llenas las 25 casillas, ¡desbloquearás el correspondiente JACKPOT!, segun las esferas con las que se inicie el Hold & Win.
+        </p>
+        <p style="font-size: 0.95rem; color: #bbb; line-height: 1.5; margin: 0;">
+          <strong style="color: #38bdf8;">Giros Gratis:</strong> Consigue 10 símbolos Scatter y obten rondas de tiradas gratuitas con multiplicadores de premio acumulativos. Cuando subas de nivel tambien obtendras tiradas Gratis.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
 	
   <script>
 
@@ -1088,7 +1370,7 @@ window.onerror = function(message, source, lineno, colno, error) {
       updateGambleConfig();
     });
 
-    function registerEvents() {
+        function registerEvents() {
       $('btn-lines').addEventListener('click', () => { playClickSound();
         if (state.isSpinning || state.isFreeSpinMode || state.isHoldWinMode) return;
         state.selectedLinesIdx = (state.selectedLinesIdx + 1) % LINE_OPTIONS.length; updateUI(); resetIdleState();
@@ -1167,7 +1449,117 @@ window.onerror = function(message, source, lineno, colno, error) {
           resetIdleState();
         }
       });
+
+      // REGISTRO DEL MODAL UNIFICADO (DENTRO DE REGISTER EVENTS)
+      initUnifiedModal();
     }
+
+
+/* =========================================
+   CONTROLADOR DEL MODAL UNIFICADO (DINÁMICO)
+   ========================================= */
+
+// Función para renderizar la tabla de premios usando EMOJI_CONFIG / DEFAULT_CONFIG
+function renderPaytable() {
+  const paytableGrid = document.querySelector('.paytable-grid');
+  if (!paytableGrid) return;
+
+  // Usa EMOJI_CONFIG si existe en el estado actual, si no usa DEFAULT_CONFIG
+  const config = (typeof EMOJI_CONFIG !== 'undefined' && EMOJI_CONFIG.length > 0) 
+    ? EMOJI_CONFIG 
+    : DEFAULT_CONFIG;
+
+  paytableGrid.innerHTML = config.map(item => `
+    <div class="paytable-item">
+      <div class="paytable-symbol">${item.symbol}</div>
+      <div class="paytable-values">
+        5x <span>x${item.pay5}</span>
+        4x <span>x${item.pay4}</span>
+        3x <span>x${item.pay3}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function initUnifiedModal() {
+  const modalUnified = document.getElementById('modal-unified');
+  const btnCloseUnified = document.getElementById('btn-close-unified');
+
+  const btnSettings = document.getElementById('btn-settings') || document.querySelector('button[title="Ajustes"]');
+  const btnAudio = document.getElementById('btn-audio') || document.querySelector('button[title="Audio"]');
+
+  const sectionAudio = document.getElementById('section-audio');
+  const sectionPaytable = document.getElementById('section-paytable');
+
+  const toggleBgm = document.getElementById('toggle-bgm');
+  const toggleSfx = document.getElementById('toggle-sfx');
+
+  if (!modalUnified) return;
+
+  function openUnifiedModal(targetSection) {
+    renderPaytable(); // Carga tus emojis y multiplicadores exactos
+    modalUnified.classList.add('active');
+    if (targetSection) {
+      setTimeout(() => {
+        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }
+
+  function closeUnifiedModal() {
+    modalUnified.classList.remove('active');
+  }
+
+  if (btnSettings) {
+    btnSettings.addEventListener('click', () => openUnifiedModal(sectionPaytable));
+  }
+
+  if (btnAudio) {
+    btnAudio.addEventListener('click', () => openUnifiedModal(sectionAudio));
+  }
+
+  if (btnCloseUnified) {
+    btnCloseUnified.addEventListener('click', closeUnifiedModal);
+  }
+
+  modalUnified.addEventListener('click', (e) => {
+    if (e.target === modalUnified) {
+      closeUnifiedModal();
+    }
+  });
+
+  // Control seguro de Música de Fondo (evita TypeError)
+  if (toggleBgm) {
+    toggleBgm.addEventListener('change', (e) => {
+      const isEnabled = e.target.checked;
+      if (typeof BGMController !== 'undefined') {
+        if (isEnabled) {
+          if (typeof BGMController.resume === 'function') BGMController.resume();
+          else if (typeof BGMController.play === 'function') BGMController.play();
+          else if (typeof BGMController.playTrack === 'function') BGMController.playTrack('principal');
+        } else {
+          if (typeof BGMController.pause === 'function') BGMController.pause();
+          else if (typeof BGMController.stop === 'function') BGMController.stop();
+          else if (typeof BGMController.stopTrack === 'function') BGMController.stopTrack();
+          else if (BGMController.currentTrack && typeof BGMController.currentTrack.pause === 'function') {
+            BGMController.currentTrack.pause();
+          }
+        }
+      }
+    });
+  }
+
+  if (toggleSfx) {
+    toggleSfx.addEventListener('change', (e) => {
+      const isEnabled = e.target.checked;
+      if (typeof SoundFX !== 'undefined') {
+        SoundFX.muted = !isEnabled;
+      }
+    });
+  }
+}
+
+
 
     // ==========================================
     // 5. INTERFAZ DE USUARIO (UI) Y PANELES
@@ -1652,7 +2044,7 @@ window.onerror = function(message, source, lineno, colno, error) {
         
         state.credits -= gambleState.currentRisk; state.credits = Math.max(0, state.credits); 
         savePlayer();
-        setStatusText('☠️ Has perdido todo.', false);
+        setStatusText('💸 Has perdido todo.', false);
         
         setTimeout(() => { closeGambleGame(0); }, 1500);
       }
@@ -1932,7 +2324,7 @@ window.onerror = function(message, source, lineno, colno, error) {
 
       if (newSymbolsFound > 0 && HOLD_WIN_CONFIG.resetSpinsOnHit) {
         state.hwSpinsLeft = HOLD_WIN_CONFIG.initialSpins;
-        setStatusText(`✨ ¡+${newSymbolsFound} SÍMBOLOS! ✨<br><span class="sub-text-free">Respíns a ${state.hwSpinsLeft}</span>`, true);
+        setStatusText(`✨ +${newSymbolsFound} SÍMBOLOS ✨<br><span class="sub-text-free">Respíns a ${state.hwSpinsLeft}</span>`, true);
       } else {
         state.hwSpinsLeft--;
         setStatusText(`🔮 HOLD & WIN <br><span class="sub-text-free">(${state.hwSpinsLeft} RESPINS RESTANTES)</span>`, false);
@@ -2127,7 +2519,7 @@ window.onerror = function(message, source, lineno, colno, error) {
           state.freeSpinTotalWon += totalSpinWin;
 
           if (bonusTriggered) {
-    setStatusText(`🌀 ¡+${BONUS_CONFIG.spinsGranted} TIRADAS! 🌀`, true);
+    setStatusText(`🌀 +${BONUS_CONFIG.spinsGranted} TIRADAS 🌀`, true);
 } else {
 
             setStatusText(`🔥 ¡GANAS ${formatValue(totalSpinWin)}!<br><span class="sub-text-free">Acumulado: ${formatValue(state.freeSpinTotalWon)}</span>`, true);
@@ -2500,12 +2892,12 @@ window.onerror = function(message, source, lineno, colno, error) {
             
             this.tracks.principal.forEach(audio => {
                 audio.loop = true;
-                audio.volume = 0.2;
+                audio.volume = 0.4;
             });
 
             ['freespins', 'esferas', 'doblenada'].forEach(key => {
                 this.tracks[key].loop = true;
-                this.tracks[key].volume = 0.2;
+                this.tracks[key].volume = 0.4;
             });
 
             this.isInitialized = true;
@@ -2557,6 +2949,8 @@ window.onerror = function(message, source, lineno, colno, error) {
             }, 1000);
         }
     }
+
+
 
 
 </script>
