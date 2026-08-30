@@ -1481,9 +1481,7 @@ function renderPaytable() {
   `).join('');
 }
 
-/* =========================================
-   CONTROLADOR DEL MODAL UNIFICADO (CORREGIDO)
-   ========================================= */
+
 /* =========================================
    CONTROLADOR DEL MODAL UNIFICADO
    ========================================= */
@@ -1568,10 +1566,6 @@ function initUnifiedModal() {
     });
   }
 }
-
-
-
-
 
 
     // ==========================================
@@ -2894,64 +2888,72 @@ function initUnifiedModal() {
 
 
     const BGMController = {
-        tracks: {
-            principal: [
-                new Audio('./audio/principal1.mp3'),
-                new Audio('./audio/principal2.mp3'),
-                new Audio('./audio/principal3.mp3')
-            ],
-            freespins: new Audio('./audio/freespins.mp3'),
-            esferas: new Audio('./audio/esferas.mp3'),
-            doblenada: new Audio('./audio/doblenada.mp3')
-        },
-        currentTrack: null,
-        currentPrincipalIndex: 0,
-        isInitialized: false,
+    tracks: {
+        principal: [
+            new Audio('./audio/principal1.mp3'),
+            new Audio('./audio/principal2.mp3'),
+            new Audio('./audio/principal3.mp3')
+        ],
+        freespins: new Audio('./audio/freespins.mp3'),
+        esferas: new Audio('./audio/esferas.mp3'),
+        doblenada: new Audio('./audio/doblenada.mp3')
+    },
+    currentTrack: null,
+    currentPrincipalIndex: 0,
+    isInitialized: false,
+    
+    // NUEVA PROPIEDAD: Controla el estado general del silencio de la música
+    muted: false, 
 
-        init() {
-            if (this.isInitialized) return;
-            
-            this.tracks.principal.forEach(audio => {
-                audio.loop = true;
-                audio.volume = 0.4;
-            });
+    init() {
+        if (this.isInitialized) return;
+        
+        this.tracks.principal.forEach(audio => {
+            audio.loop = true;
+            audio.volume = 0.4;
+        });
 
-            ['freespins', 'esferas', 'doblenada'].forEach(key => {
-                this.tracks[key].loop = true;
-                this.tracks[key].volume = 0.4;
-            });
+        ['freespins', 'esferas', 'doblenada'].forEach(key => {
+            this.tracks[key].loop = true;
+            this.tracks[key].volume = 0.4;
+        });
 
-            this.isInitialized = true;
-        },
+        this.isInitialized = true;
+    },
 
-        playTrack(trackName) {
-            this.init();
-            let nextTrack = null;
+    playTrack(trackName) {
+        this.init();
+        let nextTrack = null;
 
-            if (trackName === 'principal') {
-                if (this.currentTrack && this.tracks.principal.includes(this.currentTrack)) {
-                    return;
-                }
-
-                nextTrack = this.tracks.principal[this.currentPrincipalIndex];
-                this.currentPrincipalIndex = (this.currentPrincipalIndex + 1) % this.tracks.principal.length;
-            } else {
-                nextTrack = this.tracks[trackName];
+        if (trackName === 'principal') {
+            if (this.currentTrack && this.tracks.principal.includes(this.currentTrack)) {
+                return;
             }
+            nextTrack = this.tracks.principal[this.currentPrincipalIndex];
+            this.currentPrincipalIndex = (this.currentPrincipalIndex + 1) % this.tracks.principal.length;
+        } else {
+            nextTrack = this.tracks[trackName];
+        }
 
-            if (!nextTrack || this.currentTrack === nextTrack) return;
+        if (!nextTrack || this.currentTrack === nextTrack) return;
 
-            if (this.currentTrack) {
-                this.currentTrack.pause();
-                this.currentTrack.currentTime = 0;
-            }
+        if (this.currentTrack) {
+            this.currentTrack.pause();
+            this.currentTrack.currentTime = 0;
+        }
 
-            this.currentTrack = nextTrack;
+        // Asignamos la nueva pista
+        this.currentTrack = nextTrack;
+        
+        // 🛑 LA CLAVE: Solo le damos al play si NO está silenciado
+        if (!this.muted) {
             this.currentTrack.play().catch(err => {
                 console.warn(`No se pudo reproducir la pista ${trackName}:`, err);
             });
         }
-    };
+    }
+};
+
 
     document.addEventListener('click', () => {
         BGMController.init();
